@@ -1,0 +1,118 @@
+{
+  "$TMF_VERSION" : "1.1",
+  "$Type" : "TrustInteroperabilityProfile",
+  "TrustExpression": "TD_1 AND TD_2 AND TD_3 AND TD_4",
+  "PublicationDateTime": "2015-09-18T14:39:07.011-04:00",
+  "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nief-minimum-authentication-process-profile/1.0/",
+  "Description": "This is a candidate Trust Interoperability Profile that specifies a proposed minimum set of requirements for subscriber authentication by NIEF Identity Provider Organizations (IDPOs).",
+  "Version": "1.0",
+  "Issuer": {
+    "Identifier": "https://trustmark.gtri.gatech.edu/",
+    "Name": "GTRI NSTIC Trustmark Pilot",
+    "PrimaryContact": {
+      "Email": "TrustmarkFeedback@gtri.gatech.edu",
+      "Telephone": "404-407-8956",
+      "Kind": "PRIMARY",
+      "MailingAddress": "75 5th NW, Suite 900, Atlanta, GA 30308",
+      "Notes": "",
+      "Responder": ""
+    }
+  },
+  "References": {
+    "TrustmarkDefinitionRequirements": [
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/mitigation-of-basic-subscriber-authentication-threats/1.0/",
+          "Name": "Mitigation of Basic Subscriber Authentication Threats",
+          "Description": "This Trustmark Definition covers requirements on Credential Service Providers (CSPs) for mitigating threats of online guessing, replay, eavesdropping, and session hijacking to authentication processes.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "Identifier": "https://trustmark.gtri.gatech.edu/",
+            "$id": "provider-1272840027",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.gfipm.net/",
+            "$id": "provider1339915196",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.org/",
+            "$id": "provider1988509422",
+            "Name": ""
+          }
+        ],
+        "$id": "TD_1"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/subscriber-authentication-process/1.0/",
+          "Name": "Subscriber Authentication Process",
+          "Description": "This Trustmark Definition covers basic requirements for subscriber authentication, done by Credential Service Providers (CSPs).",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "$ref": "#provider-1272840027"
+          },
+          {
+            "$ref": "#provider1339915196"
+          },
+          {
+            "$ref": "#provider1988509422"
+          }
+        ],
+        "$id": "TD_2"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/weak-mitigation-of-subscriber-authentication-mitm-threats/1.0/",
+          "Name": "Weak Mitigation of Subscriber Authentication MITM Threats",
+          "Description": "This Trustmark Definition covers requirements on Credential Service Providers (CSPs) for weak resistance of the man-in-the-middle threat to authentication processes.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "$ref": "#provider-1272840027"
+          },
+          {
+            "$ref": "#provider1339915196"
+          },
+          {
+            "$ref": "#provider1988509422"
+          }
+        ],
+        "$id": "TD_3"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/use-of-approved-cryptography-for-protection-of-subscriber-authentication-session-data/1.0/",
+          "Name": "Use of Approved Cryptography for Protection of Subscriber Authentication Session Data",
+          "Description": "This Trustmark Definition covers the use of approved cryptography, by Credential Service Providers (CSPs), for protecting session data during authentication processes.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "$ref": "#provider-1272840027"
+          },
+          {
+            "$ref": "#provider1339915196"
+          },
+          {
+            "$ref": "#provider1988509422"
+          }
+        ],
+        "$id": "TD_4"
+      }
+    ]
+  },
+  "LegalNotice": "This document and the information contained herein is provided on an \"AS IS\" basis, and the Georgia Tech Research Institute disclaims all warranties, express or implied, including but not limited to any warranty that the use of the information herein will not infringe any rights or any implied warranties or merchantability or fitness for a particular purpose. In addition, the Georgia Tech Research Institute disclaims legal liability for any loss incurred as a result of the use or reliance on the document or the information contained herein.",
+  "Notes": "The Georgia Tech Research Institute (GTRI) has published this document with the support of the National Strategy for Trusted Identities in Cyberspace (NSTIC) via the National Institute of Standards and Technology (NIST). The views expressed herein do not necessarily reflect the official policies of GTRI, NIST or NSTIC; nor does mention of trade names, commercial practices, or organizations imply endorsement by the U.S. Government.",
+  "Name": "NIEF Minimum Authentication Process Profile"
+}

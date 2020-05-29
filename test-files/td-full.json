@@ -1,0 +1,179 @@
+{
+  "$TMF_VERSION" : "1.1",
+  "$Type" : "TrustmarkDefinition",
+  "$id": "_3019347209384751294782134234",
+  "ConformanceCriteria": [
+    {
+      "$id": "criterion",
+      "Number": 1,
+      "Name": "Name",
+      "Description": "This is a description of the <em>conformance criterion<\/em>.",
+      "Citations": [
+        {
+          "Description": "This is the location in the source of this rule.",
+          "Source": {"$ref": "#source"}
+        },
+        {
+          "Description": "This is the location in the source of this rule. 2",
+          "Source": {"$ref": "#source2"}
+        }
+      ]
+    },
+    {
+      "$id": "criterion2",
+      "Number": 2,
+      "Name": "Name 2",
+      "Description": "This is a description of the <em>conformance criterion<\/em>. 2",
+      "Citations": [
+        {
+          "Source": {"$ref": "#source"},
+          "Description": "This is the location in the source of this rule."
+        }
+      ]
+    }
+  ],
+  "AssessmentSteps": [
+    {
+      "$id": "step",
+      "Number": 1,
+      "Name": "Name",
+      "Description": "This is a description of the assessment step.",
+      "ConformanceCriteria": [{"$ref": "#criterion"}],
+      "Artifacts": [
+        {
+          "Description": "This is a description of the artifact.",
+          "Name": "Name"
+        },
+        {
+          "Description": "This is a description of the artifact. 2",
+          "Name": "Name 2"
+        }
+      ],
+      "ParameterDefinitions": [
+        {
+          "Identifier": "param1",
+          "Name": "Param 1",
+          "ParameterKind": "STRING",
+          "Description": "This is a parameter for blah",
+          "Required": false
+        },
+        {
+          "Identifier": "param2",
+          "Name": "Param 2",
+          "ParameterKind": "ENUM",
+          "Description": "This is a parameter for blah 2",
+          "Required": false,
+          "EnumValues": [
+            "VAL1",
+            "VAL2",
+            "VAL3"
+          ]
+        }
+      ]
+    },
+    {
+      "$id": "step2",
+      "Number": 2,
+      "Name": "Name 2",
+      "Description": "This is a description of the assessment step. 2",
+      "ConformanceCriteria": [{"$ref": "#criterion2"}]
+    }
+  ],
+  "IssuanceCriteria": "yes(all)",
+  "ConformanceCriteriaPreface": "This applies to every criterion.  It can <b>Even have markup!<\/b>",
+  "Metadata": {
+    "Identifier": "http://tdo.example/trustmark-definitions/td/1.0.0/",
+    "TrustmarkReferenceAttributeName": "TrustmarkReferenceAttributeName",
+    "Name": "Trustmark Definition Name",
+    "Version": "1.0.0",
+    "Description": "This is a description of this Trustmark Definition.",
+    "PublicationDateTime": "2014-01-01T00:00:00",
+    "Deprecated": false,
+    "TargetRecipientDescription": "TargetRecipientDescription",
+    "TargetProviderDescription": "TargetProviderDescription",
+    "TargetRelyingPartyDescription": "TargetRelyingPartyDescription",
+    "TargetStakeholderDescription": "TargetStakeholderDescription",
+    "ProviderEligibilityCriteria": "ProviderEligibilityCriteria",
+    "TrustmarkRevocationCriteria": "CriteriaNecessitatingTrustmarkRevocationAndReissuance",
+    "AssessorQualificationsDescription": "AssessorQualificationsDescription",
+    "ExtensionDescription": "ExtensionDescription",
+    "Supersessions": {
+      "SupersededBy": [
+        {"Identifier": "https://example.org/newer-td-example"},
+        {"Identifier": "https://example.org/newer-td-example2"}
+      ],
+      "Supersedes": [
+        {"Identifier": "https://example.org/older-td-example"},
+        {"Identifier": "https://example.org/older-td-example2"}
+      ]
+    },
+    "Keywords": [
+      "Keyword1",
+      "Keyword2",
+      "Keyword3"
+    ],
+    "Satisfies": [
+      {"Identifier": "https://example.org/satisfies-td-example"},
+      {"Identifier": "https://example.org/satisfies-td-example2"}
+    ],
+    "TrustmarkDefiningOrganization": {
+      "Identifier": "http:///tdo.example",
+      "Name": "Trustmark Defining Organization",
+      "PrimaryContact": {
+        "Kind": "PRIMARY",
+        "Responder": "George P. Burdell",
+        "Email": "TrustmarkFeedback@gtri.gatech.edu",
+        "Telephones": [
+          "404-555-1234",
+          "404-555-2345"
+        ],
+        "WebsiteURLs": [
+          "http://trustmark.gtri.gatech.edu/",
+          "http://www.gtri.gatech.edu/"
+        ],
+        "PhysicalAddress": "75 5th Street NW, Suite 900, Atlanta GA 30308",
+        "MailingAddress": "Trustmark Feedback, 75 5th Street NW, Suite 900, Atlanta GA 30308",
+        "Notes": "The responder may change."
+      },
+      "OtherContacts" : [
+        {
+          "Kind": "OTHER",
+          "Email" : "test@123.org"
+        }
+      ]
+    },
+    "LegalNotice": "This is the legal notice.",
+    "Notes": "Notes"
+  },
+  "Terms": [
+    {
+      "Name": "Example",
+      "Abbreviations": [
+        "E",
+        "Ex"
+      ],
+      "Definition": "This is an example definition."
+    },
+    {
+      "Name": "Example2",
+      "Abbreviations": [
+        "E2",
+        "Ex2"
+      ],
+      "Definition": "This is an example definition 2."
+    }
+  ],
+  "AssessmentStepsPreface": "This applies to every assessment step.",
+  "Sources": [
+    {
+      "$id": "source",
+      "Identifier": "Example",
+      "Reference": "This is an example description."
+    },
+    {
+      "$id": "source2",
+      "Identifier": "Example2",
+      "Reference": "This is an example description 2."
+    }
+  ]
+}

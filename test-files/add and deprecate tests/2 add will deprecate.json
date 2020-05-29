@@ -1,0 +1,65 @@
+{
+  "$TMF_VERSION" : "1.1",
+  "$Type" : "TrustmarkDefinition",
+  "$id": "_3019347209384751294782134234b",
+  "ConformanceCriteria": [
+    {
+      "$id": "criterion",
+      "Number": 1,
+      "Name": "Name",
+      "Description": "This is a description of the <em>conformance criterion<\/em>.",
+      "Citations": [
+        {
+          "Description": "This is the location in the source of this rule.",
+          "Source": {"$ref": "#source"}
+        }
+      ]
+    }
+  ],
+  "AssessmentSteps": [
+    {
+      "$id": "step",
+      "Number": 1,
+      "Name": "Name",
+      "Description": "This is a description of the assessment step.",
+      "ConformanceCriteria": [{"$ref": "#criterion"}]
+    }
+  ],
+  "IssuanceCriteria": "yes(all)",
+  "Metadata": {
+    "Identifier": "http://gtri.org/addAndDeprecate/2",
+    "TrustmarkReferenceAttributeName": "TrustmarkReferenceAttributeName_2",
+    "Name": "TD Which will Do Deprecation",
+    "Version": "1.0.0",
+    "Description": "Adding this TD will deprecate the original.",
+    "PublicationDateTime": "2014-01-01T00:00:00",
+    "Deprecated": false,
+    "Supersessions": {
+      "Supersedes": [
+        {"Identifier": "http://gtri.org/addAndDeprecate/1"}
+      ]
+    },
+    "Keywords": [
+      "Keyword1"
+    ],
+    "TrustmarkDefiningOrganization": {
+      "Identifier": "http:///gtri.org",
+      "Name": "GTRI Testing",
+      "PrimaryContact": {
+        "Kind": "PRIMARY",
+        "Responder": "George P. Burdell",
+        "Email": "TrustmarkFeedback@gtri.gatech.edu"
+      }
+    },
+    "LegalNotice": "This is the legal notice.",
+    "Notes": "Notes"
+  },
+  "Terms": [],
+  "Sources": [
+    {
+      "$id": "source",
+      "Identifier": "Example",
+      "Reference": "This is an example description."
+    }
+  ]
+}

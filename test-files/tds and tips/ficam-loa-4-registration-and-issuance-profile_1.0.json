@@ -1,0 +1,118 @@
+{
+  "$TMF_VERSION" : "1.1",
+  "$Type" : "TrustInteroperabilityProfile",
+  "TrustExpression": "( TIP_1 AND TD_1 AND TD_2 AND ( TIP_2 OR TIP_3 } AND TIP_4 ) OR TIP_5",
+  "PublicationDateTime": "2015-09-18T14:39:06.867-04:00",
+  "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/ficam-loa-4-registration-and-issuance-profile/1.0/",
+  "Description": "This Trust Interoperability Profile specifies NIST 800-63 LOA 4 requirements on subscriber registration and credential issuance by CSPs. This TIP is equivalent to the NIST 800-63 LOA 4 Registration and Issuance Profile, with the sole exception being that this TIP does not allow the use of derived credentials.",
+  "Version": "1.0",
+  "Issuer": {
+    "Identifier": "https://trustmark.gtri.gatech.edu/",
+    "Name": "GTRI NSTIC Trustmark Pilot",
+    "PrimaryContact": {
+      "Email": "TrustmarkFeedback@gtri.gatech.edu",
+      "Telephone": "404-407-8956",
+      "Kind": "PRIMARY",
+      "MailingAddress": "75 5th NW, Suite 900, Atlanta, GA 30308",
+      "Notes": "",
+      "Responder": ""
+    }
+  },
+  "References": {
+    "TrustInteroperabilityProfileReferences": [
+      {
+        "$Type": "TrustInteroperabilityProfileReference",
+        "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nist-800-63-registration-baseline-profile/1.0/",
+        "Name": "NIST 800-63 Registration Baseline Profile",
+        "Description": "This Trust Interoperability Profile specifies NIST 800-63 requirements on CSP registration of subscribers.",
+        "$id": "TIP_1",
+        "Version": "1.0"
+      },
+      {
+        "$Type": "TrustInteroperabilityProfileReference",
+        "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nist-800-63-loa-4-identity-proofing-and-credential-issuance-profile/1.0/",
+        "Name": "NIST 800-63 LOA 4 Identity Proofing and Credential Issuance Profile",
+        "Description": "This Trust Interoperability Profile specifies NIST 800-63 LOA 4 requirements on identity proofing of registration applicants and credential issuance by CSPs.",
+        "$id": "TIP_2",
+        "Version": "1.0"
+      },
+      {
+        "$Type": "TrustInteroperabilityProfileReference",
+        "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nist-800-63-loa-4-identity-proofing-and-credential-issuance-by-employers-of-licensed-professionals-profile/1.0/",
+        "Name": "NIST 800-63 LOA 4 Identity Proofing and Credential Issuance by Employers of Licensed Professionals Profile",
+        "Description": "This Trust Interoperability Profile specifies NIST 800-63 LOA 3 requirements on identity proofing of registration applicants and credential issuance by CSPs, where the subscribers are licensed professionals and employees or affiliates of the CSP.",
+        "$id": "TIP_3",
+        "Version": "1.0"
+      },
+      {
+        "$Type": "TrustInteroperabilityProfileReference",
+        "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nist-800-63-loa-3-and-4-in-person-applicant-tracking-profile/1.0/",
+        "Name": "NIST 800-63 LOA 3 and 4 In-Person Applicant Tracking Profile",
+        "Description": "This Trust Interoperability Profile specifies NIST 800-63 LOA 3 and 4 requirements on in-person tracking of registration applicants by CSPs.",
+        "$id": "TIP_4",
+        "Version": "1.0"
+      },
+      {
+        "$Type": "TrustInteroperabilityProfileReference",
+        "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nist-800-63-loa-4-registration-and-issuance-for-financial-institutions-profile/1.0/",
+        "Name": "NIST 800-63 LOA 4 Registration and Issuance for Financial Institutions Profile",
+        "Description": "This Trust Interoperability Profile specifies NIST 800-63 LOA 4 requirements on CSP registration of subscribers and credential issuance, for CSPs that are financial institutions that are required, by government oversight such as the Bank Secrecy Act, the USA Patriot Act, the Office of the Comptroller of the Currency, the Federal Financial Institutions Examination Council, or the Securities and Exchanges Commission, to implement a \"Customer Identification Program\".",
+        "$id": "TIP_5",
+        "Version": "1.0"
+      }
+    ],
+    "TrustmarkDefinitionRequirements": [
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference": {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/registration-of-verified-subscriber-names/1.0/",
+          "Name": "Registration of Verified Subscriber Names",
+          "Description": "This Trustmark Definition covers requirements on Credential Service Providers (CSPs) and their Registration Authority (RA) designees for registering verified subscriber names.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "Identifier": "https://trustmark.gtri.gatech.edu/",
+            "$id": "provider-1272840027",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.gfipm.net/",
+            "$id": "provider1339915196",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.org/",
+            "$id": "provider1988509422",
+            "Name": ""
+          }
+        ],
+        "$id": "TD_1"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/registration-applicant-biometric-recording-for-non-repudiation-of-registration-application/1.0/",
+          "Name": "Registration Applicant Biometric Recording for Non-Repudiation of Registration Application",
+          "Description": "This Trustmark Definition covers the use of biometrics to obtain non-repudiation of subscribers' registrations, by Credential Service Providers (CSPs) and their Registration Authority (RA) designees.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "$ref": "#provider-1272840027"
+          },
+          {
+            "$ref": "#provider1339915196"
+          },
+          {
+            "$ref": "#provider1988509422"
+          }
+        ],
+        "$id": "TD_2"
+      }
+    ]
+  },
+  "LegalNotice": "This document and the information contained herein is provided on an \"AS IS\" basis, and the Georgia Tech Research Institute disclaims all warranties, express or implied, including but not limited to any warranty that the use of the information herein will not infringe any rights or any implied warranties or merchantability or fitness for a particular purpose. In addition, the Georgia Tech Research Institute disclaims legal liability for any loss incurred as a result of the use or reliance on the document or the information contained herein.",
+  "Notes": "The Georgia Tech Research Institute (GTRI) has published this document with the support of the National Strategy for Trusted Identities in Cyberspace (NSTIC) via the National Institute of Standards and Technology (NIST). The views expressed herein do not necessarily reflect the official policies of GTRI, NIST or NSTIC; nor does mention of trade names, commercial practices, or organizations imply endorsement by the U.S. Government.",
+  "Name": "FICAM LOA 4 Registration and Issuance Profile"
+}

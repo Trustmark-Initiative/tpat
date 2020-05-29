@@ -1,0 +1,220 @@
+package tmf.host.util
+
+import edu.gatech.gtri.trustmark.v1_0.FactoryLoader
+import edu.gatech.gtri.trustmark.v1_0.impl.model.TrustmarkFrameworkIdentifiedObjectImpl
+import edu.gatech.gtri.trustmark.v1_0.impl.service.ServiceReferenceNameResolver
+import edu.gatech.gtri.trustmark.v1_0.io.bulk.BulkReadContext
+import edu.gatech.gtri.trustmark.v1_0.model.Entity
+import edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.BulkImportUtils
+import edu.gatech.gtri.trustmark.v1_0.model.TrustmarkFrameworkIdentifiedObject
+import edu.gatech.gtri.trustmark.v1_0.service.TrustmarkFrameworkService
+import edu.gatech.gtri.trustmark.v1_0.service.TrustmarkFrameworkServiceFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+import tmf.host.VersionSet
+import tmf.host.VersionSetTDLink
+import tmf.host.VersionSetTIPLink
+
+/**
+ * Created by brad on 8/4/17.
+ */
+class BulkReadContextFromTfamProperties implements BulkReadContext {
+    
+    private static final Logger log = LoggerFactory.getLogger(BulkReadContextFromTfamProperties.class)
+
+    @Override
+    Entity getTrustmarkDefiningOrganization() {
+        return TFAMPropertiesHolder.getDefaultEntity();
+    }
+
+    @Override
+    Entity getTrustInteroperabilityProfileIssuer() {
+        return TFAMPropertiesHolder.getDefaultEntity();
+    }
+
+    @Override
+    List<Entity> getTrustmarkProviderReferences() {
+        List<URL> providerRefIds = TFAMPropertiesHolder.getProviderReferences();
+        if( providerRefIds?.size() > 0 ){
+            List providers = []
+            for( URL id : providerRefIds ){
+                DefaultEntityImpl entity = new DefaultEntityImpl();
+                entity.setIdentifier(id.toURI());
+                providers.add(entity);
+            }
+            return providers
+        }else{
+            return []
+        }
+    }
+
+    @Override
+    URI generateIdentifierForTrustmarkDefinition(String moniker, String version) throws URISyntaxException {
+        String uriString = String.format("%s/%s/%s/", TFAMPropertiesHolder.getTdIdentifierUriBase(), moniker, version);
+        return new URI(uriString);
+    }
+
+    @Override
+    URI generateIdentifierForTrustInteroperabilityProfile(String moniker, String version) throws URISyntaxException {
+        String uriString = String.format("%s/%s/%s/", TFAMPropertiesHolder.getTipIdentifierUriBase(), moniker, version);
+        return new URI(uriString);
+    }
+
+    @Override
+    TrustmarkFrameworkIdentifiedObject resolveReferencedExternalTrustmarkDefinition(String tdReference) {
+        if(BulkImportUtils.isValidUri(tdReference)) {
+            return resolveReferencedExternalArtifact(
+                    tdReference,
+                    { vs, id -> VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)?.trustmarkDefinition },
+                    { vs, name -> VersionSetTDLink.findAllByVersionSet(vs)?.find{ it?.trustmarkDefinition?.name == name }?.trustmarkDefinition },
+                    { tfs, ref -> tfs.getTrustmarkDefinitionByUrl(ref) }
+            )
+        }
+        return resolveReferencedExternalArtifact(
+            tdReference,
+            { vs, id -> VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)?.trustmarkDefinition },
+            { vs, name -> VersionSetTDLink.findAllByVersionSet(vs)?.find{ it?.trustmarkDefinition?.name == name }?.trustmarkDefinition },
+            { tfs, ref -> tfs.getTrustmarkDefinitionByName(ref) }
+        )
+    }
+
+    @Override
+    TrustmarkFrameworkIdentifiedObject resolveReferencedExternalTrustInteroperabilityProfile(String tipReference) {
+        if(BulkImportUtils.isValidUri(tipReference)) {
+            return resolveReferencedExternalArtifact(
+                    tipReference,
+                    { vs, id -> VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, id)?.trustInteroperabilityProfile },
+                    { vs, name -> VersionSetTIPLink.findAllByVersionSet(vs)?.find{ it?.trustInteroperabilityProfile?.name == name }?.trustInteroperabilityProfile },
+                    { tfs, ref -> tfs.getTrustInteroperabilityProfileByUrl(ref) }
+            )
+        }
+        return resolveReferencedExternalArtifact(
+            tipReference,
+            { vs, id -> VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, id)?.trustInteroperabilityProfile },
+            { vs, name -> VersionSetTIPLink.findAllByVersionSet(vs)?.find{ it?.trustInteroperabilityProfile?.name == name }?.trustInteroperabilityProfile },
+            { tfs, ref -> tfs.getTrustInteroperabilityProfileByName(ref) }
+        )
+    }
+
+    private static TrustmarkFrameworkIdentifiedObject resolveReferencedExternalArtifact(
+        String reference,
+        VersionSetObjectNameResolver finderByIdentifier,
+        VersionSetObjectNameResolver finderByName,
+        ServiceReferenceNameResolver serviceReferenceNameResolver
+    ) {
+        TrustmarkFrameworkIdentifiedObject result
+
+        // check for an ID or name in the current version set
+        VersionSet currentVs = null
+        VersionSet.withTransaction {
+            currentVs = VersionSet.findByProduction(true)
+            log.debug("Reference for LookUp ->  "+reference+"  Current Version Set -> " + currentVs)
+            if (currentVs == null) {
+                currentVs = VersionSet.findByDevelopment(true)  // get the first version set, since there isn't a production one
+            }
+            Object tfo = finderByIdentifier.resolveToObject(currentVs, reference)
+            if(tfo != null)
+            {
+                result = new TrustmarkFrameworkIdentifiedObjectImpl()
+                result.identifier = new URI(tfo.identifier)
+                result.name = tfo.name
+                result.description = tfo.description
+                result.version = tfo.ver
+            }
+        }
+        if (result != null) {
+            log.debug("Resolved reference by Identifier in current Version Set: " + result.version +":" + result.name +":" + result.description+":" + result.identifier)
+            return result
+        }
+        VersionSet.withTransaction {
+            Object tfo = finderByName.resolveToObject(currentVs, reference)
+              if(tfo != null)
+              {
+                  result =  new TrustmarkFrameworkIdentifiedObjectImpl()
+                  result.identifier = new URI(tfo.identifier)
+                  result.name = tfo.name
+                  result.description = tfo.description
+                  result.version = tfo.ver
+              }
+        }
+        if (result != null) {
+            log.debug("Resolved reference by Name in current Version Set: " + result.version +":" + result.name +":" + result.description+":" + result.identifier)
+            return result
+        }
+        
+        // if not found, check the registry/registries for a match
+        TrustmarkFrameworkServiceFactory tfsFactory = FactoryLoader.getInstance(TrustmarkFrameworkServiceFactory.class);
+        URL resolvingRegistry = null
+        for (URL registryUrl : TFAMPropertiesHolder.getRegistryUrls()) {
+            TrustmarkFrameworkService tfs = tfsFactory.createService(registryUrl?.toString())
+            log.debug(String.format("Registry URL -> %s ", registryUrl))
+            try {
+                TrustmarkFrameworkIdentifiedObject tfido = serviceReferenceNameResolver.resolve(tfs, reference)
+                if(tfido != null)
+                {
+                    log.debug(String.format("Returned tfido %s %s %s %s\n",tfido.getIdentifier().toString(), tfido.getName(), tfido.getVersion(), tfido.getDescription()));
+                    result =  new TrustmarkFrameworkIdentifiedObjectImpl()
+                    result.identifier = new URI(tfido.getIdentifier().toString())
+                    result.name = tfido.getName()
+                    result.description = tfido.getDescription()
+                    result.version = tfido.getVersion()
+                    result.number = tfido.getNumber()
+                }
+            }
+            catch (Exception ex) {
+                log.error("Error resolving external artifact.", ex);
+            }
+            if (result != null) {
+                resolvingRegistry = registryUrl
+                break
+            }
+        }
+        if (result != null) {
+            log.debug(String.format("Resolved reference[%s] using registry[%s]", result, resolvingRegistry))
+            return result
+        }
+        
+        // try resolving as a URL (but return the URI object)
+        URI tfUri = BulkImportUtils.getValidUrlAsUriOrNull(reference)
+        if (tfUri == null) {
+            log.debug("Unabled to resolve reference: " + reference)
+        }
+        else {
+            log.debug("Resolved reference as bare URL: " + result)
+            result =  new TrustmarkFrameworkIdentifiedObjectImpl()
+            result.identifier = tfUri
+        }
+        
+        return result
+    }
+
+
+    @Override
+    String getDefaultVersion() {
+        return TFAMPropertiesHolder.getDefaultVersion()
+    }
+
+    @Override
+    String getDefaultLegalNotice() {
+        return TFAMPropertiesHolder.getDefaultLegalNotice()
+    }
+
+    @Override
+    String getDefaultNotes() {
+        return TFAMPropertiesHolder.getDefaultNotes()
+    }
+
+    @Override
+    String getDefaultIssuanceCriteria() {
+        return TFAMPropertiesHolder.getDefaultIssuanceCriteria()
+    }
+
+    @Override
+    String getDefaultRevocationCriteria() {
+        return TFAMPropertiesHolder.getDefaultRevocationCriteria()
+    }
+
+
+
+}

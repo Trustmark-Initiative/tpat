@@ -1,0 +1,76 @@
+{
+  "$TMF_VERSION" : "1.1",
+  "$Type" : "TrustInteroperabilityProfile",
+  "TrustExpression": "TD_1 AND TD_2",
+  "PublicationDateTime": "2015-09-18T14:39:07.014-04:00",
+  "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/nief-certificate-policy-cryptographic-management/1.0/",
+  "Description": "This Trust Interoperability Profile specifies the requirements needed to meet the NIEF Certificate Policy",
+  "Version": "1.0",
+  "Issuer": {
+    "Identifier": "https://trustmark.gtri.gatech.edu/",
+    "Name": "GTRI NSTIC Trustmark Pilot",
+    "PrimaryContact": {
+      "Email": "TrustmarkFeedback@gtri.gatech.edu",
+      "Telephone": "404-407-8956",
+      "Kind": "PRIMARY",
+      "MailingAddress": "75 5th NW, Suite 900, Atlanta, GA 30308",
+      "Notes": "",
+      "Responder": ""
+    }
+  },
+  "References": {
+    "TrustmarkDefinitionRequirements": [
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/access-enforcement/1.0/",
+          "Name": "Access Enforcement",
+          "Description": "This Trustmark Definition defines conformance and assessment criteria for compliance with minimum security requirements for access enforcement as related to overall access control requirements.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "Identifier": "https://trustmark.gtri.gatech.edu/",
+            "$id": "provider-1272840027",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.gfipm.net/",
+            "$id": "provider1339915196",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.org/",
+            "$id": "provider1988509422",
+            "Name": ""
+          }
+        ],
+        "$id": "TD_1"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/approval-of-system-maintenance-activities/1.0/",
+          "Name": "Approval of System Maintenance Activities",
+          "Description": "This Trustmark Definition defines conformance and assessment criteria for compliance with minimum security requirements for approval of system maintenance activities as related to overall maintenance requirements.",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "$ref": "#provider-1272840027"
+          },
+          {
+            "$ref": "#provider1339915196"
+          },
+          {
+            "$ref": "#provider1988509422"
+          }
+        ],
+        "$id": "TD_2"
+      }
+    ]
+  },
+  "LegalNotice": "This document and the information contained herein is provided on an \"AS IS\" basis, and the Georgia Tech Research Institute disclaims all warranties, express or implied, including but not limited to any warranty that the use of the information herein will not infringe any rights or any implied warranties or merchantability or fitness for a particular purpose. In addition, the Georgia Tech Research Institute disclaims legal liability for any loss incurred as a result of the use or reliance on the document or the information contained herein.",
+  "Notes": "The Georgia Tech Research Institute (GTRI) has published this document with the support of the National Strategy for Trusted Identities in Cyberspace (NSTIC) via the National Institute of Standards and Technology (NIST). The views expressed herein do not necessarily reflect the official policies of GTRI, NIST or NSTIC; nor does mention of trade names, commercial practices, or organizations imply endorsement by the U.S. Government.",
+  "Name": "NIEF Certificate Policy Cryptographic Management"
+}
