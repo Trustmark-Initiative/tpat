@@ -1,0 +1,128 @@
+---
+grails:
+    profile: web
+    codegen:
+        defaultPackage: tmf.host
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+        buildDate: '@info.app.buildDate@'
+spring:
+    groovy:
+        template:
+            check-template-location: false
+
+---
+server:
+    port: 8080
+---
+grails:
+    assets:
+        bundle: false
+    gorm:
+        failOnError: true
+        autoFlush: true
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+              - text/html
+              - application/xhtml+xml
+            js: text/javascript
+            json:
+              - application/json
+              - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+              - application/hal+json
+              - application/hal+xml
+            xml:
+              - text/xml
+              - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlets: html
+                taglib: none
+                staticparts: none
+---
+hibernate:
+    cache:
+        use_second_level_cache: true
+        use_query_cache: true
+        region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
+    search:
+        default:
+            indexBase: '/opt/tfam/lucene'
+            indexmanager: near-real-time
+            directory_provider: filesystem
+
+endpoints:
+    jmx:
+        unique-names: true
+
+dataSource:
+    pooled: true
+    jmxExport: true
+#    driverClassName: net.sf.log4jdbc.DriverSpy
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://tpatDatabase:3306/tpat_db
+#    url: jdbc:mysql://aapc_mysql_host:3306/tfam_dev?verifyServerCertificate=false&useSSL=false&allowPublicKeyRetrieval=true
+    username: tpat_user
+    password: tpat_pw_11
+#    password: tfam11!
+    dialect: tmf.host.util.CustomMysqlDialect
+    properties: 
+      testWhileIdle: true
+      testOnBorrow: true
+      autoReconnect: true
+      initialSize: 8
+      maxActive: 64
+      minIdle: 8
+      maxIdle: 16
+      validationInterval: 450
+
+environments:
+    development:
+        dataSource:
+            dbCreate: update
+    test:
+        dataSource:
+            dbCreate: update
+    production:
+        dataSource:
+            dbCreate: update
+
+
+---
+quartz:
+    autoStartup: true

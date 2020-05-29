@@ -1,0 +1,115 @@
+{
+  "$TMF_VERSION" : "1.1",
+  "$Type" : "TrustInteroperabilityProfile",
+  "TrustExpression": "TD_1 and TD_2 and TD_3 and TD_4 and TD_5",
+  "PublicationDateTime": "2015-07-27T13:37:25.000-04:00",
+  "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trust-interoperability-profiles/ficam-privacy-tip-for-csp/1.0/",
+  "Description": "This Trust Interoperability Profile specifies the FICAM mandated privacy requirements to be followed by FICAM Credential Service Providers (CSPs).",
+  "Version": "1.0",
+  "Issuer": {
+    "Identifier": "https://trustmark.gtri.gatech.edu/",
+    "Name": "GTRI NSTIC Trustmark Pilot",
+    "PrimaryContact": {
+      "Email": "TrustmarkFeedback@gtri.gatech.edu",
+      "Telephone": "404-407-8956",
+      "Kind": "PRIMARY",
+      "MailingAddress": "75 5th NW, Suite 900, Atlanta, GA 30308",
+      "Notes": "",
+      "Responder": ""
+    }
+  },
+  "References": {
+    "TrustmarkDefinitionRequirements": [
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/privacy-csp-and-ap-end-user-activity-tracking/1.0/",
+          "Name": "Privacy - CSP and AP End-User Activity Tracking",
+          "Description": "",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {
+            "Identifier": "https://trustmark.gtri.gatech.edu/",
+            "$id": "provider-1272840027",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.gfipm.net/",
+            "$id": "provider1339915196",
+            "Name": ""
+          },
+          {
+            "Identifier": "https://nief.org/",
+            "$id": "provider1988509422",
+            "Name": ""
+          }
+        ],
+        "$id": "TD_1"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/privacy-csp-adequate-notice/1.0/",
+          "Name": "Privacy - CSP Adequate Notice",
+          "Description": "",
+          "Version": "1.0"
+        },
+        "ProviderReferences": [
+          {"$ref": "#provider-1272840027"},
+          {"$ref": "#provider1339915196"},
+          {"$ref": "#provider1988509422"}
+        ],
+        "$id": "TD_2"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/privacy-csp-and-ap-minimal-attribute-release/1.0/",
+          "Name": "Privacy - CSP and AP Minimal Attribute Release",
+          "Description": "",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {"$ref": "#provider-1272840027"},
+          {"$ref": "#provider1339915196"},
+          {"$ref": "#provider1988509422"}
+        ],
+        "$id": "TD_3"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/privacy-csp-end-user-opt-in/1.0/",
+          "Name": "Privacy - CSP End-User Opt-In",
+          "Description": "",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {"$ref": "#provider-1272840027"},
+          {"$ref": "#provider1339915196"},
+          {"$ref": "#provider1988509422"}
+        ],
+        "$id": "TD_4"
+      },
+      {
+        "$Type": "TrustmarkDefinitionRequirement",
+        "TrustmarkDefinitionReference" : {
+          "Identifier": "https://trustmark.gtri.gatech.edu/operational-pilot/trustmark-definitions/privacy-csp-and-ap-end-user-service-termination/1.0/",
+          "Name": "Privacy - CSP and AP End-User Service Termination",
+          "Description": "",
+          "Version": "1.0"
+        },
+        "ProviderReference": [
+          {"$ref": "#provider-1272840027"},
+          {"$ref": "#provider1339915196"},
+          {"$ref": "#provider1988509422"}
+        ],
+        "$id": "TD_5"
+      }
+    ]
+  },
+  "LegalNotice": "This document and the information contained herein is provided on an \"AS IS\" basis, and the Georgia Tech Research Institute disclaims all warranties, express or implied, including but not limited to any warranty that the use of the information herein will not infringe any rights or any implied warranties or merchantability or fitness for a particular purpose. In addition, the Georgia Tech Research Institute disclaims legal liability for any loss incurred as a result of the use or reliance on the document or the information contained herein.",
+  "Notes": "The Georgia Tech Research Institute (GTRI) has published this document with the support of the National Strategy for Trusted Identities in Cyberspace (NSTIC) via the National Institute of Standards and Technology (NIST). The views expressed herein do not necessarily reflect the official policies of GTRI, NIST or NSTIC; nor does mention of trade names, commercial practices, or organizations imply endorsement by the U.S. Government.",
+  "Name": "FICAM Privacy TIP for CSP"
+}
