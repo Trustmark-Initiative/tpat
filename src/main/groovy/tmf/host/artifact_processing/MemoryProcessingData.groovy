@@ -62,6 +62,7 @@ class MemoryProcessingData {
 
     List<edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition> trustmarkDefinitions;
     List<edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile> trustInteroperabilityProfiles;
+    List<String> invalidParameters
 
 
     Map collisionData = null;

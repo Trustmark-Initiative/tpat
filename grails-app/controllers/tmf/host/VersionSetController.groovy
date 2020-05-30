@@ -171,8 +171,10 @@ class VersionSetController extends AbstractVersionSetController {
 
         session.setAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE, emptyVs.name)
 
-        VersionSetLogEntry.create(vs.id, "CLEARED_PRODUCTION",
-                "Cleared version set ${vs.name} and Production", [name: vs.name, userid: springSecurityService.currentUser.username])
+        if(vs != null)  {
+            VersionSetLogEntry.create(vs.id, "CLEARED_PRODUCTION",
+                    "Cleared version set ${vs.name} and Production", [name: vs.name, userid: springSecurityService.currentUser.username])
+        }
 
         flash.message = "Successfully wiped Production and Development."
         redirect(controller: 'versionSetEdit', action: 'index', id: emptyVs.name)
@@ -198,6 +200,7 @@ class VersionSetController extends AbstractVersionSetController {
         final String userName = user.username
         final String fName = devVs.name
         final Long fVersionSetId = devVs.id
+        log.info("resetDevelopment ${userName} ${fName} ${fVersionSetId}")
 
         VersionSet prodVS = VersionSet.findByProduction(true)
         if(prodVS != null) {
@@ -214,6 +217,10 @@ class VersionSetController extends AbstractVersionSetController {
             })
             createThread.setName("CreateVersionSetThread_" + System.currentTimeMillis())
             createThread.start()
+        } else {
+            createVersionSetService.stopExecuting()
+            devVs.createdSuccessfully = true
+            log.info("resetDevelopment ${userName} ${fName} ${fVersionSetId} production was NULL!")
         }
 
         session.setAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE, devVs.name)
@@ -240,7 +247,7 @@ class VersionSetController extends AbstractVersionSetController {
 
         if( tdCount == 0 && tipCount == 0 )  {
             flash.error = "You can't move this version set to production because it contains no TDs or TIPs.  Please add some and try again."
-            return redirect(action: 'show', id: vs.name)
+            return redirect(controller: 'versionSetEdit', action: 'index', id: vs.name)
         }
 
         VersionSet.withTransaction  {
@@ -408,7 +415,10 @@ class VersionSetController extends AbstractVersionSetController {
         log.debug("saveEmptyVersionSet...")
         User user = springSecurityService.currentUser
 
-        boolean productionVS = predecessor.production;
+        boolean productionVS = false
+        if(predecessor != null)  {
+            productionVS = predecessor.production;
+        }
 
         CreateVersionSetCommand command = new CreateVersionSetCommand(name: generateNextVsName())
 
@@ -418,9 +428,11 @@ class VersionSetController extends AbstractVersionSetController {
             if(productionVS)  {
                 predecessor.production = false
             }
-            predecessor.development = false
-            predecessor.editable = false
-            predecessor.save(failOnError: true)
+            if(predecessor != null)  {
+                predecessor.development = false
+                predecessor.editable = false
+                predecessor.save(failOnError: true)
+            }
 
             VersionSet vs = new VersionSet(name: command.name)
             vs.createdBy = user

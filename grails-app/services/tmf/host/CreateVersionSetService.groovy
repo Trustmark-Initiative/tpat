@@ -26,23 +26,27 @@ class CreateVersionSetService extends AbstractLongRunningService {
     /**
      * A simple method to tell you if a thread is already executing.
      */
-    public boolean isExecuting() {
-        return isExecuting(EXECUTING_VAR);
+    boolean isExecuting() {
+        return isExecuting(EXECUTING_VAR)
     }
 
     /**
      * An external controller can call this to obtain the global "lock" on processing.  This should be done
      * BEFORE ay calls to applyChanges are made.
      */
-    public boolean setExecuting() {
-        return setExecuting(EXECUTING_VAR);
+    boolean setExecuting() {
+        return setExecuting(EXECUTING_VAR)
+    }
+
+    void stopExecuting() {
+        stopExecuting(EXECUTING_VAR)
     }
 
     /**
      * Called to actually begin the process of creating the version set.  Assumes that the calling thread has
      * gained the ability to execute, by first calling setExecuting() and getting a true response.
      */
-    public void createVersionSet(Long vsId, String name, String previousName, String username){
+    void createVersionSet(Long vsId, String name, String previousName, String username){
         log.info("User[@|cyan ${username}|@] is Creating new version set[@|green ${name}|@]...")
         setStatus("START", "Starting the create version set service...", 0)
 

@@ -258,6 +258,34 @@ class VersionSetEditController extends AbstractVersionSetController {
     }
 
     /**
+     * handles the cancel button and resets the processed file indicator to false
+     * @return
+     */
+    def cancelActionSummary() {
+        User user = springSecurityService.currentUser
+        log.debug("User @|green ${user.username}|@ called cancel action summaryrocess file upload[id=@|cyan ${params.id}|@]...")
+        VersionSet vs = VersionSet.findByDevelopment(true)
+
+        BinaryObject upload = BinaryObject.get(params.id)
+        if( upload == null )
+            throw new ServletException("No such binary: "+params.id)
+
+        MemoryProcessingData mpd = MemoryProcessingData.find(upload.id)
+        if( !mpd ){
+            throw new ServletException("Cannot find any upload data for upload #"+upload.id+": "+upload.originalFilename)
+        }
+
+        VersionSetUpload.withTransaction {
+            BinaryObject artifact = BinaryObject.get(upload.id)
+            VersionSetUpload up = VersionSetUpload.findByVersionSetAndArtifact(vs, artifact)
+            up.processed = false
+            up.save(failOnError: true)
+        }
+
+        redirect(action: 'index', id: vs.name)
+    }
+
+    /**
      * When a file upload is in process (not yet committed to database) this method will display artifacts that are
      * associated with it.
      */
