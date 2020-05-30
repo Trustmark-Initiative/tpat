@@ -32,7 +32,7 @@ enum ActionType {
      */
     IGNORE;
 
-    public static ActionType fromString( String str ){
+    static ActionType fromString( String str ){
         ActionType type = null;
         for( ActionType at : ActionType.values() ){
             if( at.toString().equalsIgnoreCase(str) ){

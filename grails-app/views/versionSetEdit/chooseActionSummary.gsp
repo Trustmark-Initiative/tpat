@@ -69,7 +69,7 @@
             <g:else>
                 <button class="btn btn-primary" disabled>Apply Actions &raquo;</button>
             </g:else>
-            <g:link controller="versionSetEdit" action="index" id="${tmf.host.VersionSet.findByDevelopment(true).name}" class="btn btn-default">
+            <g:link controller="versionSetEdit" action="cancelActionSummary" id="${upload.id}" class="btn btn-default">
                 Cancel
             </g:link>
         </div>

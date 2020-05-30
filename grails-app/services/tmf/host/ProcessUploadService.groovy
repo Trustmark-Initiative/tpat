@@ -103,6 +103,7 @@ class ProcessUploadService extends AbstractLongRunningService {
         int tdCount = mpd.getTdSize()
         mpd.trustInteroperabilityProfiles = results.tips
         int tipCount = mpd.getTipSize()
+        mpd.invalidParameters = results.invalidParms
 
         setProcessStatus(uploadId, ProcessPhase.COLLISION_CHECK, "The system has resolved your ${tdCount} TDs and ${tipCount} TIPs, and they are being checked for any collisions...")
 
@@ -558,7 +559,7 @@ class ProcessUploadService extends AbstractLongRunningService {
      * Responsible for creating a list of TDs and TIPs from the given file upload.  The tds and tips params are modified.
      */
     protected Map resolveArtifacts(Long uploadId, File uploadedFile, String uploadedFileOriginalName){
-        Map data = [tds: [], tips: []]
+        Map data = [tds: [], tips: [], invalidParms: []]
         String normalizedName = uploadedFileOriginalName.toLowerCase()
         if( normalizedName.endsWith(".xml") || normalizedName.endsWith(".json") ) {
             log.info("handling xml/json upload...")
@@ -580,6 +581,7 @@ class ProcessUploadService extends AbstractLongRunningService {
 
             data.tds.addAll(bulkReadResult.getResultingTrustmarkDefinitions())
             data.tips.addAll(bulkReadResult.getResultingTrustInteroperabilityProfiles())
+            data.invalidParms.addAll(bulkReadResult.getResultingInvalidParameters())
 
             if( listenerImpl.hasError() ) {
                 throw listenerImpl.getErrorDuringRead()
