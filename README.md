@@ -7,7 +7,8 @@ If you are interested in trying out the TPAT, the recommmended way is to downloa
 and simply use the https://github.com/Trustmark-Initiative/tpat-deploy project.  You can
 quickly setup a local version of the tool to experiment with, and you can use that project
 to deploy an Internet facing version as well.  That project includes a compiled version of
-the code available in this project.  
+the code available in this project. For more information about how  to use the TPAT, please
+see the TPAT User Guide at https://github.com/Trustmark-Initiative/tpat/wiki.
 
 ## How to Build
 
