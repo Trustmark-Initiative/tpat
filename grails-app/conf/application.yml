@@ -93,13 +93,10 @@ endpoints:
 dataSource:
     pooled: true
     jmxExport: true
-#    driverClassName: net.sf.log4jdbc.DriverSpy
-    driverClassName: com.mysql.jdbc.Driver
+    driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://tpatDatabase:3306/tpat_db
-#    url: jdbc:mysql://aapc_mysql_host:3306/tfam_dev?verifyServerCertificate=false&useSSL=false&allowPublicKeyRetrieval=true
     username: tpat_user
     password: tpat_pw_11
-#    password: tfam11!
     dialect: tmf.host.util.CustomMysqlDialect
     properties: 
       testWhileIdle: true
