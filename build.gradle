@@ -91,7 +91,7 @@ dependencies {
     compile 'org.grails.plugins:quartz:2.0.13' // For monitoring configuration directories periodically
     compile 'org.quartz-scheduler:quartz:2.2.1'
 
-    compile 'edu.gatech.gtri.trustmark:tf-api:1.4'
+    compile 'edu.gatech.gtri.trustmark:tf-api:1.4.1'
     compile('edu.gatech.gtri.trustmark:tf-api-impl:1.4.1')
 
     compile 'org.fusesource.jansi:jansi:1.17' // For colored command line output
