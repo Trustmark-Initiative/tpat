@@ -253,56 +253,6 @@
                                     </g:each>
                                 </table>
                             </div>
-
-                            %{-- TODO: enable Sources and Terms inside of TIPs --}%
-                            %{--<g:if test="${tip.sources.size() > 0}">--}%
-                                %{--<div style="margin-top: 2em;">--}%
-                                    %{--<h4 style="margin-bottom: 0;">Sources (${tip.sources.size()})</h4>--}%
-                                    %{--<div>--}%
-                                        %{--<table class="table table-condensed table-bordered table-striped">--}%
-                                            %{--<g:each in="${tip.sources}" var="source">--}%
-                                                %{--<tr>--}%
-                                                    %{--<td style="width: 20%; font-size: 120%; font-weight: bold;">${source.identifier}</td>--}%
-                                                    %{--<td>${raw(source.reference)}</td>--}%
-                                                %{--</tr>--}%
-                                            %{--</g:each>--}%
-                                        %{--</table>--}%
-                                    %{--</div>--}%
-                                %{--</div>--}%
-                            %{--</g:if>--}%
-
-                            %{--<g:if test="${tip.terms.size() > 0}">--}%
-                                %{--<div style="margin-top: 2em;">--}%
-                                    %{--<h4 style="margin-bottom: 0;">Terms (${tip.terms.size()})</h4>--}%
-                                    %{--<div>--}%
-                                        %{--<table class="table table-condensed table-bordered table-striped">--}%
-                                            %{--<thead>--}%
-                                            %{--<tr>--}%
-                                                %{--<th>Term Name</th>--}%
-                                                %{--<th>Abbreviations</th>--}%
-                                                %{--<th>Definition</th>--}%
-                                            %{--</tr>--}%
-                                            %{--</thead>--}%
-                                            %{--<tbody>--}%
-                                            %{--<g:each in="${tip.termsSorted}" var="term">--}%
-                                                %{--<tr>--}%
-                                                    %{--<td style="width: 20%;">${term.name}</td>--}%
-                                                    %{--<td style="text-align: center; width: 10%;">--}%
-                                                        %{--<g:each in="${term.abbreviations}" status="index" var="abbr">--}%
-                                                            %{--${abbr}<g:if test="${index < (term.abbreviations.size() - 1)}">, </g:if>--}%
-                                                        %{--</g:each>--}%
-                                                    %{--</td>--}%
-                                                    %{--<td>--}%
-                                                        %{--${raw(term.definition)}--}%
-                                                    %{--</td>--}%
-                                                %{--</tr>--}%
-                                            %{--</g:each>--}%
-                                            %{--</tbody>--}%
-                                        %{--</table>--}%
-
-                                    %{--</div>--}%
-                                %{--</div>--}%
-                            %{--</g:if>--}%
                         </div>
                     </div>
                 </div>

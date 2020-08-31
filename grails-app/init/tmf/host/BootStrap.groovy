@@ -65,7 +65,7 @@ class BootStrap {
         def tmf = FactoryLoader.getInstance(TrustmarkFramework.class)
 
         info.append("    --------------------------------------------------------------------------------------------------------------------\n")
-        info.append("    | GTRI Trustmark Framework Artifact Manager, v.${grailsApplication.metadata.getApplicationVersion()}\n")
+        info.append("    | GTRI Trust Policy Authoring Tool, v.${grailsApplication.metadata.getApplicationVersion()}\n")
         info.append("    |     TMF API Version: ${tmf.getApiVersion()}, Build Date: ${tmf.getApiBuildDate()}\n")
         info.append("    |     TMF API Impl Version: ${tmf.getApiImplVersion()}, Build Date: ${tmf.getApiImplBuildDate()}\n")
         info.append("    |     TMF Supported Version: @|cyan ${tmf.getTrustmarkFrameworkVersion()}|@\n")
