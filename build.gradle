@@ -19,7 +19,7 @@ buildscript {
     }
 }
 
-version "1.0-SNAPSHOT"
+version "1.1-SNAPSHOT"
 group "tf.host"
 
 apply plugin:"eclipse"
@@ -91,8 +91,8 @@ dependencies {
     compile 'org.grails.plugins:quartz:2.0.13' // For monitoring configuration directories periodically
     compile 'org.quartz-scheduler:quartz:2.2.1'
 
-    compile 'edu.gatech.gtri.trustmark:tf-api:1.4'
-    compile('edu.gatech.gtri.trustmark:tf-api-impl:1.4')
+    compile 'edu.gatech.gtri.trustmark:tf-api:1.4.1'
+    compile('edu.gatech.gtri.trustmark:tf-api-impl:1.4.1')
 
     compile 'org.fusesource.jansi:jansi:1.17' // For colored command line output
     compile 'org.json:json:20180130'
@@ -122,7 +122,7 @@ dependencies {
 
     runtime 'org.apache.poi:poi-ooxml:3.17'
 
-    runtime 'mysql:mysql-connector-java:5.1.46'
+    runtime 'mysql:mysql-connector-java:8.0.20'
 
     runtime 'org.lazyluke:log4jdbc-remix:0.2.7'
 
