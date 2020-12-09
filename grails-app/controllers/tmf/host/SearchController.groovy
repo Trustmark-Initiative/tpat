@@ -16,13 +16,6 @@ import javax.servlet.ServletException
  * Created by brad on 2/17/17.
  */
 class SearchController {
-    //==================================================================================================================
-    //  Autowired Services
-    //==================================================================================================================
-//    SessionFactory sessionFactory;
-    //==================================================================================================================
-    //  Web Methods
-    //==================================================================================================================
     final int MAX_SEARCH_RESULTS = 1000
 
     /**
@@ -140,7 +133,6 @@ class SearchController {
                         results.remoteResults.add(formatRemoteResult(status, result))
 
                     }
-
 
                     render results as JSON
                 }

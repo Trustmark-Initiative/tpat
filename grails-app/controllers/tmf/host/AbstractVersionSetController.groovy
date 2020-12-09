@@ -37,6 +37,8 @@ abstract class AbstractVersionSetController {
     }
 
     protected VersionSet resolveVersionSet(String value){
+        log.debug "resolveVersionSet --> ${value}"
+
         if( StringUtils.isBlank(value) )
             throw new ServletException("The version set parameter is empty.")
 

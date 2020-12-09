@@ -21,13 +21,7 @@
                         <g:if test="${session[VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE] != null}">
                             <li><a target="_self" href="${createLink(controller:'search')}">Search</a></li>
                             <li><a target="_self" href="${createLink(controller:'trustmarkDefinition', action: 'list')}">All TDs</a></li>
-%{--
-                            <li><a target="_self" href="${createLink(controller:'trustmarkDefinition', action: 'listByName')}">Trustmark Definitions by Name</a></li>
---}%
                             <li><a target="_self" href="${createLink(controller:'tip', action: 'list')}">All TIPs</a></li>
-%{--
-                            <li><a target="_self" href="${createLink(controller:'tip', action: 'listByName')}">Trust Profiles by Name</a></li>
---}%
                             <li><a target="_self" href="${createLink(controller:'keyword', action: 'list')}">Keywords</a></li>
                             <li><a target="_self" href="${createLink(controller:'tip', action: 'tipTree')}">Primary TIPs</a></li>
                             <li><a target="_self" href="${createLink(controller:'downloadAll')}">Download All</a></li>
