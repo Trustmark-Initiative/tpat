@@ -246,8 +246,8 @@
                             <td style="width: 20%;">Keywords</td>
                             <td style="width: 80%;">
                                 <g:if test="${td.metadata.keywords && td.metadata.keywords.size() > 0}">
-                                    <g:each in="${td.metadata.keywords}" var="keyword">
-                                        ${keyword},
+                                    <g:each in="${td.metadata.keywords}" var="keyword" status="i">
+                                        ${keyword}<g:if test="${i + 1 != td.metadata.keywords.size()}">,</g:if>
                                     </g:each>
                                 </g:if><g:else>
                                 <em>There are no keywords.</em>
