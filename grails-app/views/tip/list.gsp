@@ -42,7 +42,11 @@
         <div id="page-body" role="main">
             <div>
                 <h1>Trust Interoperability Profiles
-                    <small>(${startIndex}-${endIndex} of ${tipCount})</small>
+                    <g:if test="${tips?.size() > 0}">
+                        <small>(${startIndex}-${endIndex} of ${tipCount})</small>
+                    </g:if><g:else>
+                        <small>(none loaded)</small>
+                    </g:else>
                 </h1>
                 <div>
                     <div style="float: left;">

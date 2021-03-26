@@ -259,7 +259,7 @@ class TipController extends AbstractTFObjectAwareController {
             throw new ServletException("Operation is not supported until Version Sets exist in the database.")
         }
 
-        log.debug("Displaying TIP Tree for VersionSetTIPLink.TrustInteroperabilityProfile[id=@|cyan ${params.id}|@]...")
+        log.debug("Displaying Primary TIPs / TIP Tree for VersionSetTIPLink.TrustInteroperabilityProfile[id=@|cyan ${params.id}|@]...")
         if( StringUtils.isBlank(params.id) ){
             log.warn("Given blank ID, cannot display!")
             throw new ServletException("Invalid blank id, cannot display tmf.host.TrustInteroperabilityProfile.")
@@ -275,10 +275,10 @@ class TipController extends AbstractTFObjectAwareController {
         String jsonOutput = null
         TipTreeCache cache = TipTreeCache.findByTip(databaseTip)
         if( cache && StringUtils.isBlank(params.resetCache)){
-            log.debug("Successfully found TIP Tree JSON in cache!")
+            log.debug("Successfully found Primary TIPs / TIP Tree JSON in cache!")
             jsonOutput = cache.binaryObject.content.toFile().text
         }else{
-            log.info("Successfully Found TIP[${params.id}]: ${databaseTip.name}, v. ${databaseTip.tipVersion} ${databaseTip.identifier} | Downloading TIP Tree...")
+            log.info("Successfully Found TIP[${params.id}]: ${databaseTip.name}, v. ${databaseTip.tipVersion} ${databaseTip.identifier} | Downloading Primary TIPs / TIP Tree...")
             TipTreeNode tipTreeNode = FactoryLoader.getInstance(TrustInteroperabilityProfileUtils.class).buildTipTree(new URI(databaseTip.getIdentifier()))
 
             log.debug("Displaying format JSON...")

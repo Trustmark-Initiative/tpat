@@ -248,7 +248,7 @@ class VersionSetController extends AbstractVersionSetController {
         int tipCount = VersionSetTIPLink.countByVersionSet(vs)
 
         if( tdCount == 0 && tipCount == 0 )  {
-            flash.error = "You can't move this version set to production because it contains no TDs or TIPs.  Please add some and try again."
+            flash.error = "You can't move this development repository to production because it contains no TDs or TIPs.  Please add some and try again."
             return redirect(controller: 'versionSetEdit', action: 'index', id: vs.name)
         }
 

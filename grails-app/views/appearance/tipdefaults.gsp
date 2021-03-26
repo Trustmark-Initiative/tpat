@@ -41,16 +41,7 @@
                                 <div class="col-md-6">${sysvar.description}</div>
                             </div>
                             <div class="row">
-                                <g:if test="${[tmf.host.DefaultVariable.DEFAULT_ISSUER_ID
-                                , tmf.host.DefaultVariable.DEFAULT_ISSUER_PRIMARY_POC_EMAIL
-                                , tmf.host.DefaultVariable.DEFAULT_ISSUER_PRIMARY_POC_ADDRESS
-                                , tmf.host.DefaultVariable.DEFAULT_ISSUER_PRIMARY_POC_PHONE
-                                , tmf.host.DefaultVariable.DEFAULT_ISSUER_NAME].contains(sysvar.name)}">
-                                    <div class="col-md-6"><input type="text" id=${sysvar.name} class="form-control" value="${sysvar.fieldValue}" placeholder="New Value"></div>
-                                </g:if>
-                                <g:else>
-                                    <div class="col-md-6"><textarea id=${sysvar.name} rows="6" cols="80" class="form-control" placeholder="New Value">${sysvar.fieldValue}</textarea></div>
-                                </g:else>
+                                <div class="col-md-6"><textarea id=${sysvar.name} rows="6" cols="80" class="form-control" placeholder="New Value">${sysvar.fieldValue}</textarea></div>
                                 <div class="col-md-2" style="text-align: center;">
                                     <button onclick="updateSysVar('${sysvar.name}', '${sysvar.title}', document.getElementById('${sysvar.name}').value, ${sysvar.id});" type="add" class="btn btn-primary">Update</button>
                                 </div>

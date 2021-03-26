@@ -40,7 +40,11 @@
         <div id="page-body" role="main">
             <div>
                 <h1>Trustmark Definitions
-                    <small>(${startIndex}-${endIndex} of ${trustmarkDefinitionsCount})</small>
+                    <g:if test="${trustmarkDefinitions?.size() > 0}">
+                        <small>(${startIndex}-${endIndex} of ${trustmarkDefinitionsCount})</small>
+                    </g:if><g:else>
+                        <small>(none loaded)</small>
+                    </g:else>
                 </h1>
                 <div>
                     <div style="float: left;">

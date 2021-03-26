@@ -3,10 +3,14 @@ package tmf.host.util
 import edu.gatech.gtri.trustmark.v1_0.model.Contact
 import edu.gatech.gtri.trustmark.v1_0.model.ContactKindCode
 import edu.gatech.gtri.trustmark.v1_0.model.Entity
+import grails.util.Environment
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
+import tmf.host.DefaultVariable
+import tmf.host.Provider
 
+import javax.servlet.ServletException
 import java.util.regex.Pattern
 
 /**
@@ -204,36 +208,76 @@ class TFAMPropertiesHolder {
      * Returns a list of URL objects which can be used as "provider references" in TIP references of TDs.
      */
     static List<URL> getProviderReferences(){
-        synchronized (log){
-            if( providerReferences )
-                return providerReferences
-            providerReferences = getUrlList("tdProviderReferenceIds")
-            return providerReferences
+        //instead of retrieving the list from properties through getUrlList("-tdProviderReferenceIds") retrieve from db
+        List urlsList = []
+        log.warn("Generating list of ProviderReferences");
+        Provider.withTransaction {
+            for (Provider p : Provider.findAll()) {
+                if(p.getTp())
+                    urlsList.add(new URL(p.getUri()))
+            }
         }
+        log.warn("Generated list of ProviderReferences...${urlsList}");
+        return urlsList
     }
 
     static String getTdIdentifierUriBase(){
         return getBaseUrlAsString() + getString("tdIdentifierUriPath")
     }
+
     static String getTipIdentifierUriBase(){
         return getBaseUrlAsString() + getString("tipIdentifierUriPath")
     }
 
     static String getDefaultVersion(){
+        //TODO review if we want to propagate defaultVersion from config file.
         return getString("defaultVersion")
     }
+
     static String getDefaultLegalNotice(){
-        return getString("defaultLegalNotice")
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_LEGAL_NOTICE)
     }
+
     static String getDefaultNotes(){
-        return getString("defaultNotes")
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_NOTES)
     }
+
     static String getDefaultIssuanceCriteria(){
-        return getString("defaultIssuanceCriteria")
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_ISSUANCE_CRITERIA)
     }
+
     static String getDefaultRevocationCriteria(){
-        return getString("defaultRevocationCriteria")
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TM_REVOCATION_CRITERIA)
     }
+
+    static    String getDefaultTargetStakeholderDescription() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TARGET_STAKEHOLDER_DESC)
+    }
+
+    static     String getDefaultTargetRecipientDescription() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TARGET_RECIPIENT_DESC)
+    }
+
+    static     String getDefaultTargetRelyingPartyDescription() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TARGET_RELYING_PARTY_DESC)
+    }
+
+    static     String getDefaultTargetProviderDescription() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TARGET_PROVIDER_DESC)
+    }
+
+    static     String getDefaultProviderEligibilityCriteria() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_PROVIDER_ELIGIBILITY_CRITERIA)
+    }
+
+    static     String getDefaultAssessorQualificationsDescription() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_ASSESSOR_QUALIFICATIONS_DESC)
+    }
+
+    static    String getDefaultExtensionDescription() {
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_EXTENSION_DESC)
+    }
+
     static void storeProperties()
     {
         RESOURCES.store(new FileWriter(BUNDLE_NAME), HEADER_COMMENTS)

@@ -2,7 +2,7 @@
     <head>
         <meta name="layout" content="main"/>
 
-        <title>TIP Tree Index</title>
+        <title>Primary Trust Interoperability Profiles</title>
 
 
         <style type="text/css">
@@ -24,9 +24,9 @@
     <body>
 
         <div>
-            <h1>High-Level Trust Interoperability Profiles</h1>
+            <h1>Primary Trust Interoperability Profiles</h1>
             <div>
-                A list of prominent trust interoperability profiles (TIPs) that have been created to date.
+                This page displays a list of primary trust interoperability profiles (TIPs) that have been created on this system.
             </div>
 
             <div id="topLevelTipsContainer" style="margin-top: 2em;">
@@ -45,7 +45,7 @@
                     </g:if><g:else>
                         <tr>
                             <td colspan="2">
-                                <em>There are no High-Level Trust Interoperability Profiles defined.</em>
+                                <em>There are no Primary Trust Interoperability Profiles defined.</em>
                             </td>
                         </tr>
                     </g:else>

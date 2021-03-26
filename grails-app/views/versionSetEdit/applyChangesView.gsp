@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Version Set Edit - Process File Upload</title>
+    <title>Version Set Edit - Processing File (${upload.originalFilename}) Upload </title>
     <style type="text/css">
 
 
@@ -19,8 +19,8 @@
                 Applying Changes from ${upload.originalFilename}
 %{--
                 <small>(For <g:link action="index" id="${versionSet.name}">${versionSet.name}</g:link>)</small>
---}%
                 <small>(For <g:link action="index" id="${versionSet.name}">Development</g:link>)</small>
+--}%
             </h1>
         </div>
     </div>

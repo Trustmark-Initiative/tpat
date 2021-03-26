@@ -22,7 +22,8 @@ class ScanConfigJob {
         QuartzConfig config = TFAMPropertiesHolder.getQuartzConfig("scanjob");
         if( config.getType() == QuartzConfig.TriggerType.cron ){
             cron cronExpression: config.getCronExpression(), startDelay: config.getStartDelay()
-        }else {
+        }
+        if( config.getType() == QuartzConfig.TriggerType.interval ) {
             simple repeatInterval: config.getRepeatInterval(), startDelay: config.getStartDelay(), repeatCount: config.getRepeatCount()
         }
     }

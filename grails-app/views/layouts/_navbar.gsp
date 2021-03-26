@@ -35,17 +35,22 @@
                         <a target="_self" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Repositories<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li><a target="_self" href="${createLink(controller:'index', params: [VERSION_SET_NAME: tmf.host.VersionSet.findByDevelopment(true)?.name])}">Development</a></li>
+                            <g:if test="${tmf.host.VersionSet.findByProduction(true)?.name != null}">
                             <li><a target="_self" href="${createLink(controller:'index', params: [VERSION_SET_NAME: tmf.host.VersionSet.findByProduction(true)?.name])}">Production</a></li>
+                            </g:if>
                         </ul>
                     </li>
                     <sec:ifAllGranted roles="ROLE_ADMIN">
                         <li class="dropdown">
                             <a target="_self" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-%{--                                <li><a target="_self" href="${createLink(controller:'provider', action: 'list')}">Providers</a></li>  --}%
+                                <li><a target="_self" href="${createLink(controller:'provider', action: 'list')}">Manage Organizations</a></li>
                                 <li><a target="_self" href="${createLink(controller:'appearance', action: 'tddefaults')}">Change TD Defaults</a></li>
                                 <li><a target="_self" href="${createLink(controller:'appearance', action: 'tipdefaults')}">Change TIP Defaults</a></li>
-                                <li><a target="_self" href="${createLink(controller:'appearance', action: 'index')}">Change Password</a></li>
+                                <li><a target="_self" href="${createLink(controller:'chpasswd', action: 'index')}">Change Password</a></li>
+                                <li><a target="_self" href="${createLink(controller:'taxonomyTerm', action: 'index')}">Taxonomy</a></li>
+                                <li><a target="_self" href="${createLink(controller:'systemVariable')}">System Variables</a></li>
+                                <li><a target="_self" href="${createLink(controller: 'email', action: 'settings')}">Email</a></li>
                             </ul>
                         </li>
                     </sec:ifAllGranted>

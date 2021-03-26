@@ -95,24 +95,6 @@
                         <div role="tabpanel" class="tab-pane ${actionType == request.getAttribute("foundActionWithData") ? 'active' : ''}" id="${actionType}">
 
                             <g:if test="${actions.size() > 0}">
-                                <div class="row" style="margin-top: 0.5em; margin-bottom: 0.5em;">
-                                    <div class="col-md-6">
-                                        <form class="form-inline">
-                                            <div class="form-group">
-                                                <label class="sr-only" for="${actionType}SearchBox">Search String</label>
-                                                <input type="email" class="form-control" id="${actionType}SearchBox" placeholder="Search String">
-                                            </div>
-                                        </form>
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="pull-right">
-                                            <a href="#" class="btn btn-default">Ignore All</a> &nbsp;
-                                            <a href="#" class="btn btn-default">Hide TDs</a> &nbsp;
-                                            <a href="#" class="btn btn-default">Hide TIPs</a>
-                                        </div>
-                                    </div>
-                                </div>
                                 <table class="table table-condensed table-bordered table-striped">
                                     <g:each in="${actions}" var="${action}">
                                         <tr>

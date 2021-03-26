@@ -55,7 +55,7 @@ class VersionSetTIPLink implements VersionSetLink {
     VersionSet originalVersionSet;
 
     /**
-     * If true, it indicates that this TIP should be included in the "TIP Tree" page.  In otherwords, the TIP is marked
+     * If true, it indicates that this TIP should be included in the "Primary TIPs" page.  In otherwords, the TIP is marked
      * as very special or an important high-level TIP that should drive the user's view of the system.  An entry point.
      */
     Boolean primaryTIP;

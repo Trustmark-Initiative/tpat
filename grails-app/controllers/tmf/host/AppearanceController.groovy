@@ -42,35 +42,6 @@ class AppearanceController {
         [sysvars: DefaultVariable.findAll()]
     }
 
-    /**
-     * handles the administrator password update
-     * @return
-     */
-    def adminPswd() {
-        User user = springSecurityService.currentUser
-        log.debug("User @|green ${user.username}|@ called adminpswd @|cyan -> ${params.origPswd}")
-
-        def status = [
-            rc: 'success',
-            message: 'Password updated!'
-        ]
-
-        if(params.newPswd == params.origPswd)  {
-            status.rc = 'fail'
-            status.message = 'Passwords are unchanged!'
-        } else if(params.newPswd != params.renewPswd)  {
-            status.rc = 'fail'
-            status.message = 'Passwords do not match!'
-        } else {
-            user.password = params.newPswd
-            log.debug("User @|green ${user.username}|@ saved @|cyan -> ${user.name} ${user.password}")
-            User.withTransaction {
-                user.save(failOnError: true)
-            }
-        }
-        render status as JSON
-    }
-
     def sysDefault() {
         User user = springSecurityService.currentUser
         log.debug("User @|green ${user.username}|@ called systemDefault @|cyan -> ${params.name} ${params.value}")

@@ -300,7 +300,7 @@
                 }  // end loadTree()
 
                 /**
-                 * The incoming parameter is a TIP Tree built by the server (ie, data.tree).  It represents a TIP, and assumes
+                 * The incoming parameter is a Primary TIPs / TIP Tree built by the server (ie, data.tree).  It represents a TIP, and assumes
                  * that it only has a uniqueId field throughout it.  The goal here is to add a GUID field to each node in this
                  * tree, so that it can be styled as HTML with no overlapping ids (in case a TIP is used twice in this HTML document).
                  * The tip and subtree is modified inline.
@@ -338,7 +338,7 @@
 
                 var ROOT_GUID = null;
                 /**
-                 * Styles the given TIP Tree data as a "tree table" in HTML and javascript.
+                 * Styles the given Primary TIPs / TIP Tree data as a "tree table" in HTML and javascript.
                  */
                 function styleTree(data)  {
                     var html = "";

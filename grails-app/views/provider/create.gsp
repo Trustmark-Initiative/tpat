@@ -13,10 +13,10 @@
     <body>
         <div id="page-body" role="main">
             <div>
-                <h1>Create Provider</h1>
+                <h1>Create Organization</h1>
                 <p class="text-muted">
-                    This page allows you to define a new provider.  Providers are those organizations in the Trustmark
-                    Framework which are capable of granting new Trustmarks.
+                    This page allows you to define a new TDO/TIP and/or TP.
+                    Providers are those organizations in the Trustmark Framework which are capable of granting new Trustmarks.
                 </p>
             </div>
 
@@ -56,7 +56,7 @@
 
                     <div class="form-group ${hasErrors(bean: command, field: 'responder', 'has-error')}">
                         <label for="responder" class="col-sm-2 control-label">
-                            Responder
+                            Contact Name
                         </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="responder" name="responder" placeholder="Name of a Contact Person" value="${command?.responder ?: ''}" />
@@ -65,7 +65,7 @@
 
                     <div class="form-group ${hasErrors(bean: command, field: 'email', 'has-error')}">
                         <label for="email" class="col-sm-2 control-label">
-                            Email <span class="glyphicon glyphicon-star"></span>
+                            Email
                         </label>
                         <div class="col-sm-10">
                             <input type="text" class="form-control" id="email" name="email" placeholder="user@domain.ext" value="${command?.email ?: ''}" />
@@ -99,9 +99,9 @@
                         </div>
                     </div>
 
-
                     <div class="form-group" style="margin-top: 3em;">
                         <div class="col-sm-12" style="text-align: center;">
+                            <g:link action="list" class="btn btn-primary">&laquo; Back to List</g:link>
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </div>

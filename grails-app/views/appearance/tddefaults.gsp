@@ -42,12 +42,7 @@
                                 <div class="col-md-6">${sysvar.description}</div>
                             </div>
                             <div class="row">
-                                <g:if test="${[tmf.host.DefaultVariable.DEFAULT_TDO_ID
-                                            , tmf.host.DefaultVariable.DEFAULT_TDO_PRIMARY_POC_EMAIL
-                                            , tmf.host.DefaultVariable.DEFAULT_TDO_PRIMARY_POC_ADDRESS
-                                            , tmf.host.DefaultVariable.DEFAULT_TDO_PRIMARY_POC_PHONE
-                                            , tmf.host.DefaultVariable.DEFAULT_ISSUANCE_CRITERIA
-                                            , tmf.host.DefaultVariable.DEFAULT_TDO_NAME].contains(sysvar.name)}">
+                                <g:if test="${[ tmf.host.DefaultVariable.DEFAULT_ISSUANCE_CRITERIA ].contains(sysvar.name)}">
                                     <div class="col-md-6"><input type="text" id=${sysvar.name} class="form-control" value="${sysvar.fieldValue}" placeholder="New Value"></div>
                                 </g:if>
                                 <g:else>

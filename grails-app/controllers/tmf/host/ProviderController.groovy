@@ -19,7 +19,7 @@ class ProviderController {
     //==================================================================================================================
     @Secured("ROLE_DEVELOPER")
     def index() {
-        redirect(action:'list')
+        redirect(action: 'list')
     }//end index()
 
     @Secured("ROLE_DEVELOPER")
@@ -155,6 +155,8 @@ class ProviderController {
         provider.setMailingAddress(command.getMailingAddress()?.trim() ?: "");
         provider.setTelephone(command.getTelephone()?.trim() ?: "");
         provider.setNotes(command.getNotes()?.trim() ?: "");
+        provider.setTd(command.getTd());
+        provider.setTp(command.getTp());
 
         provider.save(failOnError: true)
 
@@ -178,13 +180,63 @@ class ProviderController {
     }//end edit()
 
     @Secured("ROLE_ORG_ADMIN")
+    def setTd() {
+        log.info("Request to set TD provider[${params.id}]...")
+        if( StringUtils.isBlank(params.id) )
+            throw new ServletException("Missing required param: id")
+
+        Provider tdProvider = Provider.findByName(params.id);
+        if( tdProvider == null )
+            throw new ServletException("Could not find Provider: "+params.id);
+
+        Provider.withTransaction {
+            for (Provider p : Provider.findAll()) {
+                if (p.equals(tdProvider)){
+                    p.setTd(true);
+                    p.save(failOnError: true)
+                } else {
+                    p.setTd(false);
+                    p.save(failOnError: true)
+                }
+            }
+        }
+
+        flash.message = "Successfully set " + tdProvider.name + " as TD provider"
+
+        redirect(action: 'list')
+    }//end edit()
+
+    @Secured("ROLE_ORG_ADMIN")
+    def setTp() {
+        log.info("Request to set TP provider[${params.id}]...")
+        if( StringUtils.isBlank(params.id) )
+            throw new ServletException("Missing required param: id")
+
+        Provider tpProvider = Provider.findByName(params.id);
+        if( tpProvider == null )
+            throw new ServletException("Could not find Provider: "+params.id);
+
+        Provider.withTransaction {
+            if (tpProvider.getTp()){
+                tpProvider.setTp(false);
+                flash.message = "Successfully unset " + tpProvider.name + " as TP provider"
+            } else {
+                tpProvider.setTp(true);
+                flash.message = "Successfully set " + tpProvider.name + " as TP provider"
+            }
+            tpProvider.save(failOnError: true)
+        }
+
+        redirect(action: 'list')
+    }//end edit()
+
+    @Secured("ROLE_ORG_ADMIN")
     def update(EditProviderCommand command) {
         log.info("Processing EditProviderCommand...")
         if( command.hasErrors() ){
             log.warn("Found errors in EditProviderCommand...")
             for( ObjectError oe : command.errors.allErrors ){
                 log.warn("   FORM ERROR -> "+message(error:oe));
-//                log.warn("   FORM ERROR -> "+oe);
             }
             return render(view: '/provider/edit', model: [command: command]);
         }
@@ -203,6 +255,8 @@ class ProviderController {
             provider.setMailingAddress(command.getMailingAddress()?.trim() ?: "");
             provider.setTelephone(command.getTelephone()?.trim() ?: "");
             provider.setNotes(command.getNotes()?.trim() ?: "");
+            provider.setTd(command.getTd());
+            provider.setTp(command.getTp());
 
             provider.save(failOnError: true)
         }
@@ -245,6 +299,8 @@ class CreateProviderCommand {
     String telephone
     String mailingAddress
     String notes
+    Boolean td = false
+    Boolean tp = false
 
     static constraints = {
         uri(nullable: false, blank: false, maxSize: 1024, url: true, validator: {val, obj, errors ->
@@ -256,11 +312,13 @@ class CreateProviderCommand {
                 errors.rejectValue('name', 'createProviderCommand.name.exists', [val] as Object[], "Name '${val}' already exists in the database.");
         })
 
-        responder(nullable: true, blank: true, maxSize: 512)
-        email(nullable: false, blank: false, email: true, maxSize: 512)
-        telephone(nullable: true, blank: true, maxSize: 512, matches: "[0-9]{3}\\-[0-9]{3}\\-[0-9]{4}.*")
+        responder     (nullable: true, blank: true, maxSize: 512)
+        email         (nullable: true, blank: false, email: true, maxSize: 512)
+        telephone     (nullable: true, blank: true, maxSize: 512, matches: "[0-9]{3}\\-[0-9]{3}\\-[0-9]{4}.*")
         mailingAddress(nullable: true, blank: true, maxSize: 512)
-        notes(nullable: true, blank: true, maxSize: 65532)
+        notes         (nullable: true, blank: true, maxSize: 65532)
+        td            (nullable: true)
+        tp            (nullable: true)
     }
 }
 
@@ -276,6 +334,8 @@ class EditProviderCommand {
         this.telephone = p.telephone;
         this.mailingAddress = p.mailingAddress;
         this.notes = p.notes;
+        this.td = p.td;
+        this.tp = p.tp;
     }
 
     Long id
@@ -286,9 +346,12 @@ class EditProviderCommand {
     String telephone
     String mailingAddress
     String notes
+    Boolean td
+    Boolean tp
 
     static constraints = {
         id(nullable: false)
+
         uri(nullable: false, blank: false, maxSize: 1024, url: true, validator: {val, obj, errors ->
             log.debug("Validating the URI...")
             def p = Provider.findByUri(val)
@@ -296,6 +359,7 @@ class EditProviderCommand {
                 errors.rejectValue('uri', 'editProviderCommand.uri.exists', [val] as Object[], "URL '${val}' already exists in the database.");
             }
         })
+
         name(nullable: false, blank: false, maxSize: 512, validator: {val, obj, errors ->
             log.debug("Validating the Name...")
             def p = Provider.findByName(val)
@@ -304,10 +368,12 @@ class EditProviderCommand {
             }
         })
 
-        responder(nullable: true, blank: true, maxSize: 512)
-        email(nullable: false, blank: false, email: true, maxSize: 512)
-        telephone(nullable: true, blank: true, maxSize: 512, matches: "[0-9]{3}\\-[0-9]{3}\\-[0-9]{4}.*")
-        mailingAddress(nullable: true, blank: true, maxSize: 512)
-        notes(nullable: true, blank: true, maxSize: 65532)
+        responder       (nullable: true, blank: true, maxSize: 512)
+        email           (nullable: true, blank: false, email: true, maxSize: 512)
+        telephone       (nullable: true, blank: true, maxSize: 512, matches: "[0-9]{3}\\-[0-9]{3}\\-[0-9]{4}.*")
+        mailingAddress  (nullable: true, blank: true, maxSize: 512)
+        notes           (nullable: true, blank: true, maxSize: 65532)
+        td              (nullable: true, blank: true)
+        tp              (nullable: true, blank: true)
     }
 }

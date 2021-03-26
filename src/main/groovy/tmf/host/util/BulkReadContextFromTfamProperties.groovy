@@ -215,6 +215,39 @@ class BulkReadContextFromTfamProperties implements BulkReadContext {
         return TFAMPropertiesHolder.getDefaultRevocationCriteria()
     }
 
+    @Override
+    String getDefaultTargetStakeholderDescription() {
+        return TFAMPropertiesHolder.getDefaultTargetStakeholderDescription()
+    }
 
+    @Override
+    String getDefaultTargetRecipientDescription() {
+        return TFAMPropertiesHolder.getDefaultTargetRecipientDescription()
+    }
+
+    @Override
+    String getDefaultTargetRelyingPartyDescription() {
+        return TFAMPropertiesHolder.getDefaultTargetRelyingPartyDescription()
+    }
+
+    @Override
+    String getDefaultTargetProviderDescription() {
+        return TFAMPropertiesHolder.getDefaultTargetProviderDescription()
+    }
+
+    @Override
+    String getDefaultProviderEligibilityCriteria() {
+        return TFAMPropertiesHolder.getDefaultProviderEligibilityCriteria()
+    }
+
+    @Override
+    String getDefaultAssessorQualificationsDescription() {
+        return TFAMPropertiesHolder.getDefaultAssessorQualificationsDescription()
+    }
+
+    @Override
+    String getDefaultExtensionDescription() {
+        return TFAMPropertiesHolder.getDefaultExtensionDescription()
+    }
 
 }
