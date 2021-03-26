@@ -15,7 +15,7 @@ class KeywordController extends AbstractTFObjectAwareController {
     //  Public Web Methods
     //==================================================================================================================
     def index() {
-        redirect(action:'list');
+        redirect(action: 'list');
     }
 
     def list() {

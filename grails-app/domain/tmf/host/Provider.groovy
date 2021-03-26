@@ -16,21 +16,28 @@ class Provider implements Comparable<Provider>{
     String telephone
     String mailingAddress
     String notes
+    Boolean td = false
+    Boolean tp = false
 
 
     static constraints = {
-        uri(nullable: false, blank: false, maxSize: 1024, url: true, unique: true)
-        name(nullable: false, blank: false, maxSize: 512, unique: true)
+        uri             (nullable: false, blank: false, maxSize: 1024, unique: true, url: true)
+        name            (nullable: false, blank: false, maxSize: 512,  unique: true)
+        td              (nullable: false)
+        tp              (nullable: false)
 
-        responder(nullable: true, blank: true, maxSize: 512)
-        email(nullable: false, blank: false, maxSize: 1024, email: true)
-        telephone(nullable: true, blank: true, maxSize: 512)
-        mailingAddress(nullable: true, blank: true, maxSize: 512)
-        notes(nullable: true, blank: true, maxSize: 65535)
+        responder       (nullable: true, blank: true, maxSize: 512)
+        email           (nullable: true, blank: true, maxSize: 1024, email: true)
+        telephone       (nullable: true, blank: true, maxSize: 512)
+        mailingAddress  (nullable: true, blank: true, maxSize: 512)
+        notes           (nullable: true, blank: true, maxSize: 65535)
+
     }
 
     static mapping = {
         notes type: 'text'
+//        td    type: 'boolean', column: 'td'
+//        tp    type: 'boolean', column: 'tp'
     }
 
 

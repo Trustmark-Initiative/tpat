@@ -54,7 +54,9 @@ class UrlMappings {
         "/version-sets/$versionSetName/edit/process-upload/$id/apply-changes/status"(controller: 'versionSetEdit', action: 'applyChangesStatus')
         "/version-sets/$id/edit/trustmark-definitions"(controller: 'versionSetEdit', action: 'trustmarkDefinitions')
         "/version-sets/$id/edit/trustmark-definitions/$linkId/delete"(controller: 'versionSetEdit', action: 'deleteTrustmarkDefinition')
+        //@deprecated
         "/version-sets/$id/edit/trustmark-definitions/$linkId/edit"(controller: 'versionSetEdit', action: 'editTrustmarkDefinition')
+        //@deprecated
         "/version-sets/$id/edit/trustmark-definitions/$linkId/save"(controller: 'versionSetEdit', action: 'saveTrustmarkDefinition')
         "/version-sets/$id/edit/trust-interoperability-profiles"(controller: 'versionSetEdit', action: 'trustInteroperabilityProfiles')
         "/version-sets/$id/edit/trust-interoperability-profiles/create"(controller: 'versionSetEdit', action: 'createTrustInteroperabilityProfile')
@@ -67,20 +69,23 @@ class UrlMappings {
         "/keywords"(controller: 'keyword', action: 'list')
         "/keywords/$id"(controller: 'keyword', action: 'view')
 
-        "/providers"(controller:'provider', action:'list')
-        "/providers/create"(controller: 'provider', action:'create')
-        "/providers/save"(controller: 'provider', action:'save')
-        "/providers/$id"(controller: 'provider', action:'show')
-        "/providers/$id/delete"(controller: 'provider', action:'delete')
-        "/providers/$id/edit"(controller: 'provider', action:'edit')
-        "/providers/$id/update"(controller: 'provider', action:'update')
+        "/providers"            (controller: 'provider', action:'list')
+        "/providers/create"     (controller: 'provider', action:'create')
+        "/providers/save"       (controller: 'provider', action:'save')
+        "/providers/$id"        (controller: 'provider', action:'show')
+        "/providers/$id/delete" (controller: 'provider', action:'delete')
+        "/providers/$id/edit"   (controller: 'provider', action:'edit')
+        "/providers/$id/update" (controller: 'provider', action:'update')
+        "/providers/$id/settd"  (controller: 'provider', action:'setTd')
+        "/providers/$id/settp"  (controller: 'provider', action:'setTp')
 
         "/taxonomy-terms"(controller:'taxonomyTerm', action: 'index')
         "/taxonomy-terms/synchronize"(controller:'taxonomyTerm', action: 'synchronize')
 
-        "/appearance"(controller:'appearance', action: 'index')
         "/appearance/banner"(controller:'appearance', action: 'banner')
         "/appearance/title"(controller:'appearance', action: 'title')
+
+        "/chpasswd"(controller:'chpasswd', action: 'index')
 
         "500"(controller: 'errors', action: 'servletError')
         "404"(controller: 'errors', action: 'notFound')

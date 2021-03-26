@@ -67,11 +67,11 @@
             <div style="margin-top: 1em;">
                 <table class="table table-condensed table-bordered table-striped">
                     <tr>
-                        <td style="width: 20%;"><abbr title="The date and time at which this Trust Interoperability Profile was published">Publication Date:</abbr></td>
+                        <td style="width: 20%;"><abbr title="The date and time at which this Trust Interoperability Profile was published">Publication Date</abbr></td>
                         <td style="width: 80%;"><g:formatDate date="${tip.publicationDateTime}" format="yyyy-MM-dd" /></td>
                     </tr>
                     <tr>
-                        <td style="width: 20%;"><abbr title="The organization that published this Trust Interoperability Profile">Issuing Organization: </abbr></td>
+                        <td style="width: 20%;"><abbr title="The organization that published this Trust Interoperability Profile">Issuing Organization</abbr></td>
                         <td style="width: 80%;">
                             <div>
                                 ${tip.issuer.name} (<a href="${tip.issuer.identifier.toString()}" target="_blank">${tip.issuer.identifier.toString()}</a>)
@@ -101,11 +101,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="width: 20%;">Keywords: </td>
+                        <td style="width: 20%;">Keywords</td>
                         <td style="width: 80%;">
                             <g:if test="${tip.keywords && tip.keywords.size() > 0}">
-                                <g:each in="${tip.keywords}" var="keyword">
-                                    ${keyword},
+                                <g:each in="${tip.keywords}" var="keyword" status="i">
+                                    ${keyword}<g:if test="${i + 1 != tip.keywords.size()}">,</g:if>
                                 </g:each>
                             </g:if><g:else>
                                 <em>There are no keywords.</em>
@@ -114,7 +114,7 @@
                     </tr>
                     <g:if test="${tip.supersedes?.size() > 0}">
                         <tr>
-                            <td style="width: 20%;"><abbr title="A list of other Trust Interoperability Profiles that this Trust Interoperability Profile supersedes or replaces">Supersedes: </abbr></td>
+                            <td style="width: 20%;"><abbr title="A list of other Trust Interoperability Profiles that this Trust Interoperability Profile supersedes or replaces">Supersedes</abbr></td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
                                 <ul>
                                     <g:each in="${tip.supersedes}" var="ref">
@@ -137,7 +137,7 @@
                     </g:if>
                     <g:if test="${tip.supersededBy?.size() > 0}">
                         <tr>
-                            <td style="width: 20%;"><abbr title="A list of other Trust Interoperability Profiles that supersede or replace this Trust Interoperability Profile">Superseded By: </abbr></td>
+                            <td style="width: 20%;"><abbr title="A list of other Trust Interoperability Profiles that supersede or replace this Trust Interoperability Profile">Superseded By</abbr></td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
                                 <ul>
                                     <g:each in="${tip.supersededBy}" var="ref">
@@ -160,7 +160,7 @@
                     </g:if>
                     <g:if test="${tip.satisfies?.size() > 0}">
                         <tr>
-                            <td style="width: 20%;"><abbr title="A list of Trustmark Definitions, indicating that if an entity satisfies the conformance criteria for this Trust Interoperability Profile, then the entity may also satisfy the conformance criteria for the referenced Trustmark Definitions">Satisfies: </abbr></td>
+                            <td style="width: 20%;"><abbr title="A list of Trustmark Definitions, indicating that if an entity satisfies the conformance criteria for this Trust Interoperability Profile, then the entity may also satisfy the conformance criteria for the referenced Trustmark Definitions">Satisfies</abbr></td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
                                 <ul>
                                     <g:each in="${tip.satisfies}" var="ref">
@@ -183,7 +183,7 @@
                     </g:if>
                     <g:if test="${org.apache.commons.lang.StringUtils.isNotBlank(tip.legalNotice)}">
                         <tr>
-                            <td style="width: 20%;">Legal Notice: </td>
+                            <td style="width: 20%;">Legal Notice</td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
                                 ${tip.legalNotice}
                             </td>
@@ -191,7 +191,7 @@
                     </g:if>
                     <g:if test="${org.apache.commons.lang.StringUtils.isNotBlank(tip.notes)}">
                         <tr>
-                            <td style="width: 20%;">Notes: </td>
+                            <td style="width: 20%;">Notes</td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
                                 ${tip.notes}
                             </td>
@@ -200,7 +200,7 @@
                     %{-- TODO: need to show Known Conflicts when available --}%
                     %{--<g:if test="${org.apache.commons.lang.StringUtils.isNotBlank(tip.knownConflicts)}">--}%
                         %{--<tr>--}%
-                            %{--<td style="width: 20%;"><abbr title="A list of Trust Interoperability Profiles, indicating that if an entity satisfies the conformance criteria for this Trust Interoperability Profile, then the entity is unlikely to satisfy the conformance criteria for the referenced Trust Interoperability Profiles">Known Conflicts: </abbr></td>--}%
+                            %{--<td style="width: 20%;"><abbr title="A list of Trust Interoperability Profiles, indicating that if an entity satisfies the conformance criteria for this Trust Interoperability Profile, then the entity is unlikely to satisfy the conformance criteria for the referenced Trust Interoperability Profiles">Known Conflicts</abbr></td>--}%
                             %{--<td style="width: 80%; font-size: 90%;" class="text-muted">--}%
                                 %{--${tip.knownConflicts}--}%
                             %{--</td>--}%
@@ -300,7 +300,7 @@
                 }  // end loadTree()
 
                 /**
-                 * The incoming parameter is a TIP Tree built by the server (ie, data.tree).  It represents a TIP, and assumes
+                 * The incoming parameter is a Primary TIPs / TIP Tree built by the server (ie, data.tree).  It represents a TIP, and assumes
                  * that it only has a uniqueId field throughout it.  The goal here is to add a GUID field to each node in this
                  * tree, so that it can be styled as HTML with no overlapping ids (in case a TIP is used twice in this HTML document).
                  * The tip and subtree is modified inline.
@@ -338,7 +338,7 @@
 
                 var ROOT_GUID = null;
                 /**
-                 * Styles the given TIP Tree data as a "tree table" in HTML and javascript.
+                 * Styles the given Primary TIPs / TIP Tree data as a "tree table" in HTML and javascript.
                  */
                 function styleTree(data)  {
                     var html = "";

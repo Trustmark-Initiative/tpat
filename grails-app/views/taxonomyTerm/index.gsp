@@ -50,13 +50,6 @@
                     No Terms
                 </g:else>
             </div>
-            <sec:ifAllGranted roles="ROLE_ADMIN">
-                <div class="row" style="margin-top: 2em;">
-                    <div class="col-md-4">
-                        <a href="javascript:synchronize()" class="btn btn-warning" title="Causes your local TFAM to synchronize all terms with the remote registry.  All local terms are overwritten.">Synchronize</a>
-                    </div>
-                </div>
-            </sec:ifAllGranted>
         </div>
 
     <script type="text/javascript">

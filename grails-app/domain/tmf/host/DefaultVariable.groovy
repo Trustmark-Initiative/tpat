@@ -5,19 +5,6 @@ class DefaultVariable {
     public static final String DEFAULT_NOTES = "DEFAULT_NOTES"
     public static final String DEFAULT_LEGAL_NOTICE = "DEFAULT_LEGAL_NOTICE"
 
-    public static final String DEFAULT_REVOCATION_CRITERIA = "DEFAULT_REVOCATION_CRITERIA"
-    public static final String DEFAULT_ISSUER_ID = "DEFAULT_ISSUER_ID"
-    public static final String DEFAULT_ISSUER_NAME = "DEFAULT_ISSUER_NAME"
-    public static final String DEFAULT_ISSUER_PRIMARY_POC_EMAIL = "DEFAULT_ISSUER_PRIMARY_POC_EMAIL"
-    public static final String DEFAULT_ISSUER_PRIMARY_POC_PHONE = "DEFAULT_ISSUER_PRIMARY_POC_PHONE"
-    public static final String DEFAULT_ISSUER_PRIMARY_POC_ADDRESS = "DEFAULT_ISSUER_PRIMARY_POC_ADDRESS"
-    public static final String DEFAULT_TRUSTMARK_PROVIDERS = "DEFAULT_TRUSTMARK_PROVIDERS"
-
-    public static final String DEFAULT_TDO_ID = "DEFAULT_TDO_ID"
-    public static final String DEFAULT_TDO_NAME = "DEFAULT_TDO_NAME"
-    public static final String DEFAULT_TDO_PRIMARY_POC_EMAIL = "DEFAULT_TDO_PRIMARY_POC_EMAIL"
-    public static final String DEFAULT_TDO_PRIMARY_POC_PHONE = "DEFAULT_TDO_PRIMARY_POC_PHONE"
-    public static final String DEFAULT_TDO_PRIMARY_POC_ADDRESS = "DEFAULT_TDO_PRIMARY_POC_ADDRESS"
     public static final String DEFAULT_ISSUANCE_CRITERIA = "DEFAULT_ISSUANCE_CRITERIA"
     public static final String DEFAULT_TARGET_STAKEHOLDER_DESC = "DEFAULT_TARGET_STAKEHOLDER_DESC"
     public static final String DEFAULT_TARGET_RECIPIENT_DESC = "DEFAULT_TARGET_RECIPIENT_DESC"
@@ -45,16 +32,37 @@ class DefaultVariable {
 
         DefaultVariable.withTransaction {
             DefaultVariable prop = DefaultVariable.findByName(name)
-            if( !prop )
-                prop = new DefaultVariable(name:name, title: titl, description: desc, fieldValue: value?.toString(), tdRelated: tdRel, tipRelated: tipRel)
-            else  {
-                prop.title = titl
-                prop.description = desc
-                prop.fieldValue = value?.toString()
-                prop.tdRelated = tdRel
-                prop.tipRelated = tipRel
+            if( !prop ) {
+                prop = new DefaultVariable(name: name, title: titl, description: desc, fieldValue: value?.toString(), tdRelated: tdRel, tipRelated: tipRel)
+                prop.save(failOnError: true)
+                log.debug("Property added to DB: ${prop.title} ")
+            } else {
+                log.debug("Property already exists: ${prop.title} ")
+//                prop.fieldValue = value?.toString()
             }
-            prop.save(failOnError: true)
+            //prop.save(failOnError: true)
+        }
+    }
+
+    static String getPropertyValue(String name) {
+        DefaultVariable.withTransaction {
+            DefaultVariable prop = DefaultVariable.findByName(name)
+            if (!prop){
+                log.error("Invalid property name specified: ${name}")
+                return ""
+            }
+            return prop.fieldValue;
+        }
+    }
+
+    static void loadProperty(String name) {
+        DefaultVariable.withTransaction {
+            DefaultVariable prop = DefaultVariable.findByName(name)
+            if (!prop){
+                log.error("Invalid property name specified: ${name}")
+                return ""
+            }
+            return prop
         }
     }
 
@@ -66,11 +74,11 @@ class DefaultVariable {
         }
     }
 
-    static void storeTdProperty(String name, String title, String desc, Object value) {
+    static void storeTdProperty(String name, Object value, String title, String desc) {
         storeProperty(name, title, desc, value, true, false);
     }
 
-    static void storeTipProperty(String name, String title, String desc, Object value) {
+    static void storeTipProperty(String name, Object value, String title, String desc) {
         storeProperty(name, title, desc, value, false, true);
     }
 

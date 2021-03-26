@@ -504,8 +504,7 @@
                 <div class="col-md-12">
                     <h3 style="margin: 0;">Primary Trust Interoperability Profiles <span id="primaryTipCount"><small>(${primaryTIPLinks.size()})</small></span></h3>
                     <div class="text-muted">
-                        These TIPs show up on the "TIP Tree" page and are intended to give users a high-level overview of the
-                        TIP and TD artifacts hosted in this version set.
+                        These TIPs show up on the "Primary TIPs" page and are intended to give users a high-level overview of the TIP and TD artifacts hosted in this version set.
                     </div>
                     <div id="primaryTIPLinksContainer" style="margin-top: 1em">
                         <g:if test="${primaryTIPLinks.size() > 0}">

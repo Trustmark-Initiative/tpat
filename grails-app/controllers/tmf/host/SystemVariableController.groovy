@@ -29,7 +29,7 @@ class SystemVariableController {
             }
             flash.message = "Successfully deleted System Variable '${params.varName}'."
         }
-        redirect(action:'list')
+        redirect(action: 'list')
     }
 
     def edit() {
@@ -42,7 +42,7 @@ class SystemVariableController {
         systemVariable.save(failOnError: true);
 
         flash.message = "Successfully set value for System Variable '${params.varName}'."
-        redirect(action:'list')
+        redirect(action: 'list')
     }
 
 }

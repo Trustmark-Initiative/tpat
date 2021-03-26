@@ -602,6 +602,7 @@ class VersionSetEditController extends AbstractVersionSetController {
 
     /**
      * Displays the Trustmark Definition edit page, with the given trustmark definition.
+     * @deprecated
      */
     def createTrustmarkDefinitionComplete() {
         User user = springSecurityService.currentUser
@@ -634,6 +635,7 @@ class VersionSetEditController extends AbstractVersionSetController {
 
     /**
      * Displays the Trustmark Definition edit page, with the given trustmark definition.
+     * @deprecated
      */
     def editTrustmarkDefinition() {
         User user = springSecurityService.currentUser

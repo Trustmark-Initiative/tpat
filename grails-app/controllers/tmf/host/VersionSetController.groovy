@@ -163,7 +163,9 @@ class VersionSetController extends AbstractVersionSetController {
 
         VersionSet vs = VersionSet.findByProduction(true);
 
-        VersionSet emptyProductionVs = saveEmptyVersionSet(vs, true)
+        if(vs != null)  {
+            VersionSet emptyProductionVs = saveEmptyVersionSet(vs, true)
+        }
 
         VersionSet vsDev = resolveVersionSet(params.id)
 
@@ -246,7 +248,7 @@ class VersionSetController extends AbstractVersionSetController {
         int tipCount = VersionSetTIPLink.countByVersionSet(vs)
 
         if( tdCount == 0 && tipCount == 0 )  {
-            flash.error = "You can't move this version set to production because it contains no TDs or TIPs.  Please add some and try again."
+            flash.error = "You can't move this development repository to production because it contains no TDs or TIPs.  Please add some and try again."
             return redirect(controller: 'versionSetEdit', action: 'index', id: vs.name)
         }
 
@@ -412,7 +414,7 @@ class VersionSetController extends AbstractVersionSetController {
      *  or wiping a production and development set and creating 2 empty repos
      */
     def saveEmptyVersionSet(VersionSet predecessor, boolean noCopyTdsAndTips) {
-        log.debug("saveEmptyVersionSet...")
+        log.debug("saveEmptyVersionSet... ${predecessor.name}")
         User user = springSecurityService.currentUser
 
         boolean productionVS = false
@@ -422,7 +424,7 @@ class VersionSetController extends AbstractVersionSetController {
 
         CreateVersionSetCommand command = new CreateVersionSetCommand(name: generateNextVsName())
 
-        log.debug("saveEmptyVersionSet... new name "+ command.name)
+        log.debug("saveEmptyVersionSet... new name ${command.name}")
 
         VersionSet.withTransaction {
             if(productionVS)  {
