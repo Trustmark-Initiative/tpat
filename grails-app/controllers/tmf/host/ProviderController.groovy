@@ -140,7 +140,6 @@ class ProviderController {
             log.warn("Found errors in CreateProviderCommand...")
             for( ObjectError oe : command.errors.allErrors ){
                 log.warn("   FORM ERROR -> "+message(error:oe));
-//                log.warn("   FORM ERROR -> "+oe);
             }
             return render(view: '/provider/create', model: [command: command]);
         }

@@ -740,7 +740,12 @@ class TipController extends AbstractTFObjectAwareController {
         return newParams
     }
 
-
+    /**
+     *
+     * @param tip
+     * @param content
+     * @return
+     */
     private String addJsonXmlLinks(TrustInteroperabilityProfile tip, String content){
         StringWriter newContent = new StringWriter()
 
@@ -750,6 +755,7 @@ class TipController extends AbstractTFObjectAwareController {
             if( line.contains(menuReplaceText) ){
                 String xmlLink = LinkHelper.getLink(request, tip, 'xml')
                 String jsonLink = LinkHelper.getLink(request, tip, 'json')
+
                 String xmlJsonContent = """
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">

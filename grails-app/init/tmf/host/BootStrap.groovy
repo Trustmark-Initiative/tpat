@@ -191,6 +191,9 @@ class BootStrap {
         //TODO distinct with  DEFAULT_TD_NOTES, below is for TIP
         DefaultVariable.storeTipProperty(DefaultVariable.DEFAULT_NOTES,                         grailsApplication.config.defaultNotes,                              "Default Notes",                                                        "Contains the default value for additional optional text content about your published trust interoperability profiles.")
         DefaultVariable.storeTipProperty(DefaultVariable.DEFAULT_LEGAL_NOTICE,                  grailsApplication.config.defaultLegalNotice,                        "Default Legal Notice",                                                 "Contains the default value for the legal notice for your published trust interoperability profiles.")
+
+        //Populate Providers
+        Provider.populateProviders()
     }
 
     private String replaceWebapp(String str, ServletContext context) {
