@@ -308,7 +308,6 @@
             TRUSTMARK_DEFINITION.Metadata.PublicationDateTime               = $('#tdPublicationDate').val();
             TRUSTMARK_DEFINITION.Metadata.Version                           = $('#tdVersion').val();
             TRUSTMARK_DEFINITION.Metadata.Identifier                        = $('#identifier').val();
-            TRUSTMARK_DEFINITION.Metadata.TrustmarkReferenceAttributeName   = $('#refAttribute').val();
             TRUSTMARK_DEFINITION.Metadata.Description                       = $('#tdDescription').val();
             TRUSTMARK_DEFINITION.Metadata.TargetStakeholderDescription      = $('#TargetStakeholderDescription').val();
             TRUSTMARK_DEFINITION.Metadata.TargetProviderDescription         = $('#TargetProviderDescription').val();
@@ -514,18 +513,6 @@
                 $('#identifier').focus();
                 return false;
             }
-            if( TRUSTMARK_DEFINITION.Metadata.TrustmarkReferenceAttributeName.trim().length == 0 ){
-                setValidationError("Reference Attribute must not be empty.");
-                displayMetadata();
-                $('#refAttribute').focus();
-                return false;
-            }
-            if( !validateURL(TRUSTMARK_DEFINITION.Metadata.TrustmarkReferenceAttributeName) ){
-                setValidationError("Reference Attribute must be a valid URL (ie, internet address).");
-                displayMetadata();
-                $('#refAttribute').focus();
-                return false;
-            }
             if( TRUSTMARK_DEFINITION.Metadata.TrustmarkDefiningOrganization.Name.trim().length == 0 ){
                 setValidationError("Defining Organization Name must not be empty.");
                 displayMetadata();
@@ -628,7 +615,6 @@
             $('#tdPublicationDate').val(valOrEmpty(METADATA.PublicationDateTime));
             $('#tdVersion').val(valOrEmpty(METADATA.Version));
             $('#identifier').val(valOrEmpty(METADATA.Identifier));
-            $('#refAttribute').val(valOrEmpty(METADATA.TrustmarkReferenceAttributeName));
             $('#tdDescription').val(valOrEmpty(METADATA.Description));
 
             $('#tdDefinitionOrgName').val(valOrEmpty(METADATA.TrustmarkDefiningOrganization.Name));

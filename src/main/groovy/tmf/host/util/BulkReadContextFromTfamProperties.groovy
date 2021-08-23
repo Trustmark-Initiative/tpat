@@ -196,13 +196,23 @@ class BulkReadContextFromTfamProperties implements BulkReadContext {
     }
 
     @Override
-    String getDefaultLegalNotice() {
-        return TFAMPropertiesHolder.getDefaultLegalNotice()
+    String getDefaultTipLegalNotice() {
+        return TFAMPropertiesHolder.getDefaultTipLegalNotice()
     }
 
     @Override
-    String getDefaultNotes() {
-        return TFAMPropertiesHolder.getDefaultNotes()
+    String getDefaultTipNotes() {
+        return TFAMPropertiesHolder.getDefaultTipNotes()
+    }
+
+    @Override
+    String getDefaultTdLegalNotice() {
+        return TFAMPropertiesHolder.getDefaultTdLegalNotice()
+    }
+
+    @Override
+    String getDefaultTdNotes() {
+        return TFAMPropertiesHolder.getDefaultTdNotes()
     }
 
     @Override

@@ -11,7 +11,7 @@
     <div>
         <h1>Change Password</h1>
         <p class="text-muted">
-            Configure the ${grailsApplication.config.tf.org.organization} Tool.  You will need to logout and log back in to see your changes.
+            Configure the ${grailsApplication.config.tf.org.tooltitle} Tool.  You will need to logout and log back in to see your changes.
         </p>
     </div>
 

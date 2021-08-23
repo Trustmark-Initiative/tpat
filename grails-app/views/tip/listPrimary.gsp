@@ -38,7 +38,7 @@
                                     </td>
                                     <td>
                                         <div style="font-size: 110%; font-weight: bold;">${tip.name}, v${tip.tipVersion}</div>
-                                        <div>${tip.description}</div>
+                                        <div><%= LinkHelper.linkifyText(tip.description) %></div>
                                     </td>
                                 </tr>
                             </g:each>

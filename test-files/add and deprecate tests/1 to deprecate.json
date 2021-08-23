@@ -25,7 +25,7 @@
       "ConformanceCriteria": [{"$ref": "#criterion"}]
     }
   ],
-  "IssuanceCriteria": "yes(all)",
+  "IssuanceCriteria": "yes(ALL)",
   "Metadata": {
     "Identifier": "http://gtri.org/addAndDeprecate/1",
     "TrustmarkReferenceAttributeName": "TrustmarkReferenceAttributeName_1",

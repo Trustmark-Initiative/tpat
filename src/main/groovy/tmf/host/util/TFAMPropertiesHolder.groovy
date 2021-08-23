@@ -222,11 +222,13 @@ class TFAMPropertiesHolder {
     }
 
     static String getTdIdentifierUriBase(){
-        return getBaseUrlAsString() + getString("tdIdentifierUriPath")
+        // This must match the URL Mappings.
+        return getBaseUrlAsString() + "/tds"; 
     }
 
     static String getTipIdentifierUriBase(){
-        return getBaseUrlAsString() + getString("tipIdentifierUriPath")
+        // This must match the URL Mappings.
+        return getBaseUrlAsString() + "/tips";
     }
 
     static String getDefaultVersion(){
@@ -234,12 +236,20 @@ class TFAMPropertiesHolder {
         return getString("defaultVersion")
     }
 
-    static String getDefaultLegalNotice(){
-        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_LEGAL_NOTICE)
+    static String getDefaultTdLegalNotice(){
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TD_LEGAL_NOTICE)
     }
 
-    static String getDefaultNotes(){
-        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_NOTES)
+    static String getDefaultTdNotes(){
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TD_NOTES)
+    }
+
+    static String getDefaultTipLegalNotice(){
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TIP_LEGAL_NOTICE)
+    }
+
+    static String getDefaultTipNotes(){
+        return DefaultVariable.getPropertyValue(DefaultVariable.DEFAULT_TIP_NOTES)
     }
 
     static String getDefaultIssuanceCriteria(){

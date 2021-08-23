@@ -1,4 +1,4 @@
-<%@ page import="edu.gatech.gtri.trustmark.v1_0.model.*; org.apache.commons.lang.StringUtils" %>
+<%@ page import="edu.gatech.gtri.trustmark.v1_0.model.*; org.apache.commons.lang.StringUtils; tmf.host.util.LinkHelper" %>
 <!doctype html>
 <html>
     <head>
@@ -25,7 +25,7 @@
             <div class="row" style="margin-top: 1em;">
                 <div class="col-md-11">
                     <h2 style="margin-top: 0; margin-bottom: 0;">${td.metadata.name}, v${td.metadata.version}</h2>
-                    <div style="font-size: 110%;">${raw(td.metadata.description)}</div>
+                    <div style="font-size: 110%;"><%= LinkHelper.linkifyText(raw(td.metadata.description)) %></div>
                 </div>
                 <div class="col-md-1" style="text-align: center; font-size: 350%;">
                     <span class="glyphicon glyphicon-tag" title="Trustmark Definition"></span>
@@ -209,10 +209,6 @@
                             <td style="width: 80%;"><g:formatDate date="${td.metadata.publicationDateTime}" format="yyyy-MM-dd" /></td>
                         </tr>
                         <tr>
-                            <td style="width: 20%;"><abbr title="A URI indicating the name of an attribute that can be used to refer to trustmarks issued under this Trustmark Definition">Trustmark Reference Attribute</abbr></td>
-                            <td style="width: 80%;">${td.metadata.trustmarkReferenceAttributeName?.toString()}</td>
-                        </tr>
-                        <tr>
                             <td style="width: 20%;"><abbr title="The organization that published this Trustmark Definition">Issuing Organization</abbr></td>
                             <td style="width: 80%;">
                                 <div>
@@ -334,7 +330,7 @@
                             <tr>
                                 <td style="width: 20%;">Target Stakeholder</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.targetStakeholderDescription}
+                                    <%= LinkHelper.linkifyText(td.metadata.targetStakeholderDescription) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -342,7 +338,7 @@
                             <tr>
                                 <td style="width: 20%;">Target Recipient</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.targetRecipientDescription}
+                                    <%= LinkHelper.linkifyText(td.metadata.targetRecipientDescription) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -350,7 +346,7 @@
                             <tr>
                                 <td style="width: 20%;">Target Relying Party</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.targetRelyingPartyDescription}
+                                    <%= LinkHelper.linkifyText(td.metadata.targetRelyingPartyDescription) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -358,7 +354,7 @@
                             <tr>
                                 <td style="width: 20%;">Target Provider</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.targetProviderDescription}
+                                    <%= LinkHelper.linkifyText(td.metadata.targetProviderDescription) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -366,7 +362,7 @@
                             <tr>
                                 <td style="width: 20%;">Provider Eligibility Criteria</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.providerEligibilityCriteria}
+                                    <%= LinkHelper.linkifyText( td.metadata.providerEligibilityCriteria) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -374,7 +370,7 @@
                             <tr>
                                 <td style="width: 20%;">Assessor Qualifications</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.assessorQualificationsDescription}
+                                    <%= LinkHelper.linkifyText(td.metadata.assessorQualificationsDescription) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -382,7 +378,7 @@
                             <tr>
                                 <td style="width: 20%;">Trustmark Revocation Criteria</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.trustmarkRevocationCriteria}
+                                    <%= LinkHelper.linkifyText( td.metadata.trustmarkRevocationCriteria) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -390,7 +386,7 @@
                             <tr>
                                 <td style="width: 20%;">Extension Description</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${raw(td.metadata.extensionDescription)}
+                                    <%= LinkHelper.linkifyText(raw(td.metadata.extensionDescription)) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -400,7 +396,7 @@
                             <tr>
                                 <td style="width: 20%;">Legal Notice</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.legalNotice}
+                                    <%= LinkHelper.linkifyText( td.metadata.legalNotice) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -408,7 +404,7 @@
                             <tr>
                                 <td style="width: 20%;">Notes</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    ${td.metadata.notes}
+                                    <%= LinkHelper.linkifyText( td.metadata.notes) %>
                                 </td>
                             </tr>
                         </g:if>
@@ -433,7 +429,7 @@
                             <g:each in="${td.sources}" var="source">
                                 <tr>
                                     <td style="width: 20%; font-size: 120%; font-weight: bold;">${source.identifier}</td>
-                                    <td>${raw(source.reference)}</td>
+                                    <td><%= LinkHelper.linkifyText( raw(source.reference)) %></td>
                                 </tr>
                             </g:each>
                             </table>
@@ -462,9 +458,7 @@
                                                 ${abbr}<g:if test="${index < (term.abbreviations.size() - 1)}">, </g:if>
                                             </g:each>
                                         </td>
-                                        <td>
-                                            ${raw(term.definition)}
-                                        </td>
+                                        <td><%= LinkHelper.linkifyText( raw(term.definition)) %></td>
                                     </tr>
                                 </g:each>
                                 </tbody>

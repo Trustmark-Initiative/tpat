@@ -18,10 +18,7 @@ import java.nio.file.StandardCopyOption
 class AppearanceController {
 
     SpringSecurityService springSecurityService
-
-    final String BANNER_PATH = "grails-app/assets/images/tmi-header.png"
-    final String APPLICATION_TITLE= "tf.org.organization"
-
+    
     Resource resource
     Path bannerPath
 

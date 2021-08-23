@@ -63,11 +63,11 @@ class ProcessUploadService extends AbstractLongRunningService {
         if( MemoryProcessingData.find(uploadId) != null ) {
             MemoryProcessingData mpd = MemoryProcessingData.find(uploadId)
             if( mpd.alreadyDone(versionSetId, uploadId) ) {
-                log.warn("The memory object has already processed this file, so we are skipping a re-process of it.")
+                log.warn("The memory object has already processed file @|magenta ${uploadId}|@, so we are skipping a re-process of it.")
                 setProcessStatus(uploadId, ProcessPhase.COMPLETE, "Successfully processed file: ${originalFilename}")
                 return
             } else {
-                log.error("Error - cannot process upload that is already executing but not finished yet!")
+                log.error("Error - cannot process file @|magenta ${uploadId}|@ upload that is already executing but not finished yet!")
                 throw new UnsupportedOperationException("Cannot process upload that is already executing and not finished yet!")
             }
         }
@@ -180,10 +180,10 @@ class ProcessUploadService extends AbstractLongRunningService {
      * @param td
      */
     private void processTd(Long uploadId, edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td){
-        log.debug("td[${td.getMetadata().getIdentifier().toString()}] Deprecated: "+td.getMetadata().isDeprecated())
+        log.debug("Processing TD td[${td.getMetadata().getIdentifier().toString()}] Deprecated: "+td.getMetadata().isDeprecated())
         String id = td.getMetadata().getIdentifier().toString()
         MemoryProcessingData mpd = MemoryProcessingData.find(uploadId)
-        log.debug("Processing TD @|green ${id}|@...")
+        log.debug("Processing TD id=[@|green ${id}|@]...")
 
         VersionSetTDLink.withTransaction {
             VersionSet vs = VersionSet.get(mpd.versionSetId)
@@ -239,22 +239,26 @@ class ProcessUploadService extends AbstractLongRunningService {
                 if( CollectionUtils.isNotEmpty(td.getMetadata().getSupersedes()) ){
                     for( TrustmarkFrameworkIdentifiedObject tmfi : td.getMetadata().getSupersedes() ){
                         VersionSetLink link = isLocalToVersionSet(vs, tmfi)
+                        log.info("Processing supersedes link ${link.toString()}")
                         if( link ){
                             ArtifactAction deprecateAction = createDeprecateAction(vs, link)
                             deprecateAction.artifact.put("SupersededBy", td.getMetadata().getIdentifier().toString())
                             action.postActions.add(deprecateAction)
+                            log.info("Added SupersedeBy action for: ${td.getMetadata().getIdentifier().toString()}")
                         }else{
                             action.warnings.add("Supersedes TD[${tmfi.identifier.toString()}], but it is not local.  Cannot deprecate that TD or mark it as superseded.")
                         }
                     }
                 }else if( findTDByName(vs, td.getMetadata().getName()) != null ){
-                    log.info("Found matching TD by name '@|cyan ${td.getMetadata().getName()}|@'!")
+                    log.info("Processing TD which was matching by name '@|cyan ${td.getMetadata().getName()}|@'!")
                     VersionSetTDLink tdToDeprecate = findTDByName(vs, td.getMetadata().getName())
                     TmfiObjImpl tmfi = new TmfiObjImpl(typeName: 'TrustmarkDefinition', identifier: new URI(tdToDeprecate.getTdIdentifier()))
                     td.getMetadata().getSupersedes().add(tmfi)
                     ArtifactAction deprecateAction = createDeprecateAction(vs, tdToDeprecate)
                     deprecateAction.artifact.put("SupersededBy", td.getMetadata().getIdentifier().toString())
                     action.postActions.add(deprecateAction)
+                } else {
+                    log.info("Skipping processing supercedes")
                 }
             }
 
@@ -299,12 +303,13 @@ class ProcessUploadService extends AbstractLongRunningService {
         return fullTip
     }
 
-
     private ArtifactAction createDeprecateAction(VersionSet vs, VersionSetLink link){
+        log.debug("Creating DeprecateAction");
         String id = null
         String type = null
         TrustmarkFrameworkIdentifiedObject artifact = null
         if( link.isTdLink() ){
+            log.debug("Creating DeprecateAction - given version set link is associated with TD");
             id = ((VersionSetTDLink) link).getTrustmarkDefinition().getIdentifier()
             type = "TD"
             artifact = resolveTmfiForTd(((VersionSetTDLink) link).getTrustmarkDefinition())
@@ -312,6 +317,7 @@ class ProcessUploadService extends AbstractLongRunningService {
             id = ((VersionSetTIPLink) link).getTrustInteroperabilityProfile().getIdentifier()
             type = "TIP"
             artifact = resolveTmfiForTip(((VersionSetTIPLink) link).getTrustInteroperabilityProfile())
+            log.debug("Creating DeprecateAction - given version set link is associated with TIP");
         }
 
         ArtifactAction deprecation = new ArtifactAction(id: id, type: type, artifact: createSummary(artifact))
@@ -378,7 +384,7 @@ class ProcessUploadService extends AbstractLongRunningService {
     private VersionSetTDLink findTDByName(VersionSet vs, String name){
         List<VersionSetTDLink> links =
                 VersionSetTDLink.executeQuery(
-                        "from VersionSetTDLink link where link.versionSet = :vs and lower(link.trustmarkDefinition.name) = :name",
+                        "from VersionSetTDLink link where link.versionSet = :vs and lower(link.trustmarkDefinition.name) = :name order by link.trustmarkDefinition.tdVersion desc",
                         [vs: vs, name: name.toLowerCase()])
         if( links.isEmpty() )
             return null
@@ -467,7 +473,7 @@ class ProcessUploadService extends AbstractLongRunningService {
     private VersionSetTIPLink findTIPByName(VersionSet vs, String name){
         List<VersionSetTIPLink> links =
                 VersionSetTIPLink.executeQuery(
-                        "from VersionSetTIPLink link where link.versionSet = :vs and lower(link.trustInteroperabilityProfile.name) = :name",
+                        "from VersionSetTIPLink link where link.versionSet = :vs and lower(link.trustInteroperabilityProfile.name) = :name order by link.trustInteroperabilityProfile.tipVersion desc",
                         [vs: vs, name: name.toLowerCase()])
         if( links.isEmpty() )
             return null
@@ -619,8 +625,13 @@ class ProcessUploadService extends AbstractLongRunningService {
                     "and properties file "+(properties == null ? '@|red IS NULL|@' : '@|green IS NOT NULL|@'))
 
             BulkReadContext context = null
-            if( properties != null )
+            if( properties != null ) {
+                log.debug("Using provided in zip properties file: " + printProperties(properties))
                 context = bulkReaderFactory.createBulkReadContextFromProperties(properties)
+            } else {
+                log.debug("Using default properties since no properties file were provided")
+                context = new BulkReadContextFromTfamProperties()
+            }
             setProcessStatus(uploadId, ProcessPhase.RESOLVE, "Processing ${files.size()} files from archive ${uploadedFileOriginalName}...")
             BulkReadListenerImpl listenerImpl = new BulkReadListenerImpl(uploadId)
             bulkReader.addListener(listenerImpl)
@@ -628,6 +639,7 @@ class ProcessUploadService extends AbstractLongRunningService {
 
             data.tds.addAll(bulkReadResult.getResultingTrustmarkDefinitions())
             data.tips.addAll(bulkReadResult.getResultingTrustInteroperabilityProfiles())
+            data.invalidParms.addAll(bulkReadResult.getResultingInvalidParameters())
 
             if( listenerImpl.hasError() ) {
                 throw listenerImpl.getErrorDuringRead()
@@ -640,11 +652,22 @@ class ProcessUploadService extends AbstractLongRunningService {
         return data
     }//end resolveArtifacts()
 
+    protected printProperties(Properties prop)
+    {
+        StringBuilder propertieString = new StringBuilder();
+        for (Object key: prop.keySet()) {
+            propertieString.append(key).append(" : ").append(prop.getProperty(key.toString()));
+        }
+        return propertieString.toString()
+    }
+
     protected List<File> collectFiles(List<File> files, FileFilter filter){
         List<File> newFiles = new ArrayList<>()
         for( File f : files ){
-            if( filter.accept(f) )
+            if( filter.accept(f) ) {
                 newFiles.add(f)
+                log.debug("Adding property file :" + f.getAbsolutePath())
+            }
         }
         return newFiles
     }
@@ -712,18 +735,13 @@ class ProcessUploadService extends AbstractLongRunningService {
                     if (!containsContextPropertiesFile) {
                         containsContextPropertiesFile = true
                     } else {
-                        log.warn("Archive does not have excel structure because of a duplicate properties file found.")
-                        return false
+                        log.warn("Archive does not have excel structure or a duplicate properties file found.")
                     }
                 } else if (!f.getName().toLowerCase().endsWith(".xls") && !f.getName().toLowerCase().endsWith(".xlsx")) {
                     log.warn("Archive does not have excel structure because there is a file @|yellow ${f.getName()}|@ which is neither properties or xls.")
                     return false
                 }
             }
-        }
-        if( !containsContextPropertiesFile ){
-            log.warn("Archive does not have excel structure because there is no context properties file found.")
-            return false
         }
         return true
     }

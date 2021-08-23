@@ -112,7 +112,7 @@
                                         </div>
                                     </div>
                                     <div class="text-muted" style="font-size: 80%; margin-left: 2.5em; margin-top: 0;">
-                                        ${tip.description}
+                                        <%= LinkHelper.linkifyText(tip.description) %>
                                     </div>
                                 </td>
                                 <td style="width: 10%; text-align: center;">

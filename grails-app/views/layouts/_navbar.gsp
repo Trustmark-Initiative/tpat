@@ -10,7 +10,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" target="_self" href="${createLink(uri:'/')}">
-                ${grailsApplication.config.tf.org.organization}
+                ${grailsApplication.config.tf.org.tooltitle}
             </a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
@@ -48,8 +48,8 @@
                                 <li><a target="_self" href="${createLink(controller:'appearance', action: 'tddefaults')}">Change TD Defaults</a></li>
                                 <li><a target="_self" href="${createLink(controller:'appearance', action: 'tipdefaults')}">Change TIP Defaults</a></li>
                                 <li><a target="_self" href="${createLink(controller:'chpasswd', action: 'index')}">Change Password</a></li>
-                                <li><a target="_self" href="${createLink(controller:'taxonomyTerm', action: 'index')}">Taxonomy</a></li>
-                                <li><a target="_self" href="${createLink(controller:'systemVariable')}">System Variables</a></li>
+                                <%--<li><a target="_self" href="${createLink(controller:'taxonomyTerm', action: 'index')}">Taxonomy</a></li>--%>
+                                <%--<li><a target="_self" href="${createLink(controller:'systemVariable')}">System Variables</a></li>--%>
                                 <li><a target="_self" href="${createLink(controller: 'email', action: 'settings')}">Email</a></li>
                             </ul>
                         </li>

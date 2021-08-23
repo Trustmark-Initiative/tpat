@@ -1,3 +1,4 @@
+<%@ page import="tmf.host.util.LinkHelper" %>
 <!doctype html>
 <html>
     <head>
@@ -21,7 +22,7 @@
             <div>
                 <h2>${tip.name}, v${tip.version}</h2>
             </div>
-            <div style="font-size: 110%;">${raw(tip.description)}</div>
+            <div style="font-size: 110%;"><%= LinkHelper.linkifyText(raw(tip.description)) %></div>
 
             <g:if test="${tip.deprecated}">
                 <div class="alert alert-warning" style="margin-top: 1em;">
@@ -185,7 +186,7 @@
                         <tr>
                             <td style="width: 20%;">Legal Notice</td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                ${tip.legalNotice}
+                                <%= LinkHelper.linkifyText(tip.legalNotice) %>
                             </td>
                         </tr>
                     </g:if>
@@ -193,7 +194,7 @@
                         <tr>
                             <td style="width: 20%;">Notes</td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                ${tip.notes}
+                                <%= LinkHelper.linkifyText(tip.notes) %>
                             </td>
                         </tr>
                     </g:if>
@@ -246,7 +247,7 @@
                                         </tr>
                                         <tr>
                                             <td class="col-md-2">Description</td>
-                                            <td>${reference.description}</td>
+                                            <td><%= LinkHelper.linkifyText(reference.description) %></td>
                                         </tr>
                                         <tr>
                                             <td class="col-md-2">ID</td>
@@ -257,7 +258,7 @@
                                                 <td class="col-md-2">Provider Reference</td>
                                                 <td>
                                                     <g:each in="${reference.providerReferences}" var="providerReference">
-                                                        <div>${providerReference.identifier}</div>
+                                                        <div><%= LinkHelper.linkifyText(providerReference.identifier) %></div>
                                                     </g:each>
                                                 </td>
                                             </tr>

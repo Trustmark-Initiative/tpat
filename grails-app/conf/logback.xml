@@ -12,7 +12,7 @@
       </layout>
     </encoder>
   </appender>
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender" additivity="false">
     <file>${LOG_HOME}/tfam.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover. Make sure the path matches the one in the file element or else
@@ -20,7 +20,7 @@
       <fileNamePattern>${LOG_HOME}/tfam.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
 
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>5MB</maxFileSize>
+        <maxFileSize>10MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
       <!-- keep 30 days' worth of history -->
       <maxHistory>30</maxHistory>
@@ -40,7 +40,7 @@
       <fileNamePattern>${LOG_HOME}/url-printer.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
 
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>5MB</maxFileSize>
+        <maxFileSize>10MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
       <!-- keep 30 days' worth of history -->
       <maxHistory>30</maxHistory>
@@ -63,6 +63,14 @@
   <logger name="org.gtri" level="DEBUG" />
   <logger name="tmf.host" level="DEBUG" />
 
+<!--  <logger name="edu.gatech.gtri" level="DEBUG" />-->
+  <logger name="edu.gatech.gtri.trustmark" level="DEBUG" />
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.ExcelBulkReaderImpl" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.BulkReadRawData" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.XmlJsonBulKReader" level="DEBUG" />-->
+
 
   <logger name="jdbc" level="DEBUG" />
 
@@ -72,13 +80,11 @@
   <!--<logger name="org.grails" level="DEBUG" />-->
   <!--<logger name="org.grails.gorm" level="DEBUG" />-->
 
+<!--  <logger name="freemarker" level="off"/>-->
 
   <logger name="grails.app.controllers.tmf.host.UrlPrinterInterceptor" level="INFO">
     <appender-ref ref="URL_AUDIT_LOG" />
   </logger>
-
-  <logger name="edu.gatech.gtri.trustmark" level="INFO" />
-  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.XmlJsonBulKReader" level="DEBUG" />
 
   <logger name="grails.plugin.formfields" level="DEBUG" />
 

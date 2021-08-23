@@ -340,6 +340,7 @@ class ApplyChangesService extends AbstractLongRunningService {
         VersionSet.withTransaction {
             VersionSet vs = VersionSet.get(mpd.versionSetId)
             if( !vs ) throw new UnsupportedOperationException("Cannot find VS: "+mpd.versionSetId)
+            log.debug("Performing ApplyAction @|cyan ${action.id}|@ to VersionSet @|green ${vs.name}|@...")
 
             // TODO PRE Actions
 
@@ -368,6 +369,7 @@ class ApplyChangesService extends AbstractLongRunningService {
     private void doDeprecateAction(MemoryProcessingData mpd, VersionSet vs, ArtifactAction action){
         String id = action.artifact.identifier
         String supersededBy = action.artifact.SupersededBy
+        log.debug("Performing DeprecateAction for id @|cyan ${id}|@ and supersededBy @|cyan ${supersededBy}|@")
         if(StringUtils.isNotBlank(id)){
             doDeprecateTd(vs, id, supersededBy)
             doDeprecateTip(vs, id, supersededBy)
@@ -381,6 +383,7 @@ class ApplyChangesService extends AbstractLongRunningService {
         VersionSetTDLink tdLink = VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)
         if (tdLink) {
             TrustmarkDefinition databaseTd = tdLink.trustmarkDefinition
+            log.debug("Performing DeprecateTd for TD @|cyan ${databaseTd.identifier}|@, id@|cyan ${id}|@ to supersededById @|cyan ${supersededById}|@")
             File tdFile = databaseTd.artifact.content.toFile()
             String originalJson = null
             if( databaseTd.artifact.mimeType.contains("json") ){

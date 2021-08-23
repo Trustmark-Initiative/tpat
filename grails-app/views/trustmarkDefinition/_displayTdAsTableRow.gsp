@@ -12,7 +12,7 @@
                 <tmf:createLink td="${td}" format="json">JSON</tmf:createLink>
             </div>
         </div>
-        <div class="text-muted" style="margin-left: 0.5em;"><small>${td.description}</small></div>
+        <div class="text-muted" style="margin-left: 0.5em;"><small><%= LinkHelper.linkifyText(td.description) %></small></div>
     </td>
     <td class="versionCol">
         ${td.tdVersion}
