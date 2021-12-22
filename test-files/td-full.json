@@ -79,7 +79,7 @@
       "ConformanceCriteria": [{"$ref": "#criterion2"}]
     }
   ],
-  "IssuanceCriteria": "yes(all)",
+  "IssuanceCriteria": "yes(ALL)",
   "ConformanceCriteriaPreface": "This applies to every criterion.  It can <b>Even have markup!<\/b>",
   "Metadata": {
     "Identifier": "http://tdo.example/trustmark-definitions/td/1.0.0/",

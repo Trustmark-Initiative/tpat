@@ -1,6 +1,12 @@
 package tmf.host
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.StringUtils
+import tmf.host.util.TFAMPropertiesHolder;
+
+import edu.gatech.gtri.trustmark.v1_0.model.Entity
+import tmf.host.util.TfamOwnerOrganization
+import edu.gatech.gtri.trustmark.v1_0.model.Contact
+import edu.gatech.gtri.trustmark.v1_0.model.ContactKindCode
 
 /**
  * Presents an "Entity" in the Trustmark Framework that is capable of granting Trustmarks based on Trustmark Definitions.
@@ -36,8 +42,6 @@ class Provider implements Comparable<Provider>{
 
     static mapping = {
         notes type: 'text'
-//        td    type: 'boolean', column: 'td'
-//        tp    type: 'boolean', column: 'tp'
     }
 
 
@@ -85,5 +89,56 @@ class Provider implements Comparable<Provider>{
         return this.getName().compareToIgnoreCase(o.getName());
     }
 
+    static void populateProviders() {
+        Provider.withTransaction {
+            List<Provider> providers = Provider.findAll()
+            if (providers.isEmpty()) {
+                Provider provider
+                TfamOwnerOrganization ownerOrganization = TFAMPropertiesHolder.getDefaultEntity()
+                Contact contact
+                contact = ownerOrganization.getDefaultContact()
+                if(contact) {
+                    //TD
+                    if(!contact.websiteURLs.isEmpty()) {
+                        provider = new Provider()
+                        provider.setName("TDO")
+                        provider.setUri(contact.websiteURLs.get(0)?.toString().trim() ?: "")
+                        provider.setEmail(contact.getDefaultEmail().toString().trim() ?: "")
+                        if (!contact.getTelephones().isEmpty()) {
+                            provider.setTelephone(contact.getTelephones().get(0).toString().trim() ?: "")
+                        }
+                        provider.setTd(true)
+                        provider.setTp(true)
+                        provider.save(failOnError: true)
+                        log.debug("Provider is added to DB: ${provider.name} ")
+                    } else {
+                        log.error("Unable to add Provider to DB since URL is not specified.")
+                    }
 
+                }
+                List<Contact> contacts = ownerOrganization.getOtherContacts()
+                if(!contacts.isEmpty()) {
+                    //TP
+                    for(Contact cur: contacts){
+                        if(!contact.websiteURLs.isEmpty()) {
+                            provider = new Provider()
+                            provider.setName("Trustmark Provider")
+                            provider.setUri(cur.websiteURLs.get(0)?.toString().trim() ?: "")
+                            provider.setEmail(cur.getDefaultEmail().toString().trim() ?: "")
+                            if (!contact.getTelephones().isEmpty()) {
+                                provider.setTelephone(contact.getTelephones().get(0).toString().trim() ?: "")
+                            }
+                            provider.setTp(true)
+                            provider.save(failOnError: true)
+                            log.debug("Provider is added to DB: ${provider.name} ")
+                        } else {
+                            log.error("Unable to add Provider to DB since URL is not specified.")
+                        }
+                    }
+                }
+            } else {
+                log.debug("DB already contains providers. Skipping...")
+            }
+        }
+    }
 }

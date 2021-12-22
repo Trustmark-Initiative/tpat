@@ -291,10 +291,12 @@ class TipController extends AbstractTFObjectAwareController {
             ]
 
             jsonOutput = JsonOutput.prettyPrint(JsonOutput.toJson(responseJson))
-            log.debug("Tree[${params.id}] JSON: \n"+jsonOutput)
+            log.trace("Tree[${params.id}] JSON: \n"+jsonOutput)
 
             File tempFile = File.createTempFile("tip-tree-", ".json")
             tempFile << jsonOutput
+            log.debug("Saved Tree[${params.id}] to temp JSON file: [${tempFile.getCanonicalPath()}]")
+
             BinaryObject bo = fileService.createBinaryObject(tempFile, "System", "application/json", "tip-tree.json", "json")
             cache = new TipTreeCache(tip: databaseTip, binaryObject: bo)
             cache.save(failOnError: false); // Silently fail here.
@@ -418,6 +420,8 @@ class TipController extends AbstractTFObjectAwareController {
     def view(){
         VersionSet vs = VersionSet.findByName(session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE))
         if( !vs ){
+            log.error("Operation is not supported until Version Sets exist in the database : VERSION_SET_NAME param: " +
+                    "[${session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE)}]")
             throw new ServletException("Operation is not supported until Version Sets exist in the database.")
         }
 
@@ -460,7 +464,7 @@ class TipController extends AbstractTFObjectAwareController {
         edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip2 = tipResolver.resolve(new FileReader(artifact.content.toFile()))
 
         for(AbstractTIPReference ref : tip2.references) {
-            log.info( "Returning TIP: [name=${ref.name} | version=${ref.version} | identifier=${ref.identifier} | description=${ref.description}]...")
+            log.info( "Returning TIP ref: [name=${ref.name} | version=${ref.version} | identifier=${ref.identifier} | description=${ref.description}]...")
         }
 
         SerializerFactory serializerFactory = FactoryLoader.getInstance(SerializerFactory.class)
@@ -740,7 +744,12 @@ class TipController extends AbstractTFObjectAwareController {
         return newParams
     }
 
-
+    /**
+     *
+     * @param tip
+     * @param content
+     * @return
+     */
     private String addJsonXmlLinks(TrustInteroperabilityProfile tip, String content){
         StringWriter newContent = new StringWriter()
 
@@ -750,6 +759,7 @@ class TipController extends AbstractTFObjectAwareController {
             if( line.contains(menuReplaceText) ){
                 String xmlLink = LinkHelper.getLink(request, tip, 'xml')
                 String jsonLink = LinkHelper.getLink(request, tip, 'json')
+
                 String xmlJsonContent = """
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">

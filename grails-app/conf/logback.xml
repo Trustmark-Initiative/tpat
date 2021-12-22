@@ -2,7 +2,7 @@
 
 <configuration>
 
-  <property name="LOG_HOME" value="/opt/tfam/logs" />
+  <property name="LOG_HOME" value="/opt/tpat/logs" />
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <!-- encoders are  by default assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
@@ -12,18 +12,18 @@
       </layout>
     </encoder>
   </appender>
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_HOME}/tfam.log</file>
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender" additivity="false">
+    <file>${LOG_HOME}/tpat.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover. Make sure the path matches the one in the file element or else
        the rollover logs are placed in the working directory. -->
-      <fileNamePattern>${LOG_HOME}/tfam.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+      <fileNamePattern>${LOG_HOME}/tpat.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
 
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>5MB</maxFileSize>
+        <maxFileSize>10MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
-      <!-- keep 30 days' worth of history -->
-      <maxHistory>30</maxHistory>
+      <!-- keep 3 days' worth of history -->
+      <maxHistory>3</maxHistory>
     </rollingPolicy>
     <!-- encoders are  by default assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
@@ -40,10 +40,10 @@
       <fileNamePattern>${LOG_HOME}/url-printer.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
 
       <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-        <maxFileSize>5MB</maxFileSize>
+        <maxFileSize>10MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
-      <!-- keep 30 days' worth of history -->
-      <maxHistory>30</maxHistory>
+      <!-- keep 10 days' worth of history -->
+      <maxHistory>10</maxHistory>
     </rollingPolicy>
     <!-- encoders are  by default assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
@@ -58,13 +58,22 @@
     <appender-ref ref="FILE" />
   </root>
 
-  <logger name="grails.plugins.hibernate.search" level="DEBUG" />
-  <logger name="grails.app" level="DEBUG" />
-  <logger name="org.gtri" level="DEBUG" />
-  <logger name="tmf.host" level="DEBUG" />
+  <logger name="grails.plugins.hibernate.search" level="INFO" />
+  <logger name="grails.app" level="INFO" />
+  <logger name="tmf.host" level="INFO" />
+  <logger name="org.gtri" level="INFO" />
+  <logger name="edu.gatech.gtri" level="INFO" />
+  <logger name="edu.gatech.gtri.trustmark" level="INFO" />
+
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.ExcelBulkReaderImpl" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.BulkReadRawData" level="DEBUG"/>-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.XmlJsonBulKReader" level="DEBUG" />-->
+<!--  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.xml.XmlStreamWriterDelegating" level="INFO" />-->
 
 
-  <logger name="jdbc" level="DEBUG" />
+<!--  <logger name="jdbc" level="DEBUG" />-->
 
 
   <!--<logger name="org.springframework" level="DEBUG" />-->
@@ -72,14 +81,12 @@
   <!--<logger name="org.grails" level="DEBUG" />-->
   <!--<logger name="org.grails.gorm" level="DEBUG" />-->
 
+<!--  <logger name="freemarker" level="off"/>-->
 
   <logger name="grails.app.controllers.tmf.host.UrlPrinterInterceptor" level="INFO">
     <appender-ref ref="URL_AUDIT_LOG" />
   </logger>
 
-  <logger name="edu.gatech.gtri.trustmark" level="INFO" />
-  <logger name="edu.gatech.gtri.trustmark.v1_0.impl.io.bulk.XmlJsonBulKReader" level="DEBUG" />
-
-  <logger name="grails.plugin.formfields" level="DEBUG" />
+<!--  <logger name="grails.plugin.formfields" level="DEBUG" />-->
 
 </configuration>

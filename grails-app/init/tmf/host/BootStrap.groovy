@@ -188,9 +188,11 @@ class BootStrap {
 
         DefaultVariable.storeTdProperty(DefaultVariable.DEFAULT_TM_REVOCATION_CRITERIA,         grailsApplication.config.trustmarkRevocationCriteria,               "Default Trustmark Revocation Criteria",                                "Contains the default value for the criteria that, if triggered, would require that the trustmark provider revoke a trustmark issued under your published trustmark definitions. Note that, if this field is not specified, then by default the trustmark provider must revoke any trustmark issued under the trustmark definition upon discovery of any information indicating that the trustmark recipient no longer fulfills one or more of the conformance criteria in the trustmark definition.")
 
-        //TODO distinct with  DEFAULT_TD_NOTES, below is for TIP
-        DefaultVariable.storeTipProperty(DefaultVariable.DEFAULT_NOTES,                         grailsApplication.config.defaultNotes,                              "Default Notes",                                                        "Contains the default value for additional optional text content about your published trust interoperability profiles.")
-        DefaultVariable.storeTipProperty(DefaultVariable.DEFAULT_LEGAL_NOTICE,                  grailsApplication.config.defaultLegalNotice,                        "Default Legal Notice",                                                 "Contains the default value for the legal notice for your published trust interoperability profiles.")
+        DefaultVariable.storeTipProperty(DefaultVariable.DEFAULT_TIP_LEGAL_NOTICE,              grailsApplication.config.defaultTipLegalNotice,                        "Default Legal Notice",                                              "Contains the default value for the legal notice for your published trust interoperability profiles.")
+        DefaultVariable.storeTipProperty(DefaultVariable.DEFAULT_TIP_NOTES,                     grailsApplication.config.defaultTipNotes,                              "Default Notes",                                                     "Contains the default value for additional optional text content about your published trust interoperability profiles.")
+
+        //Populate Providers
+        Provider.populateProviders()
     }
 
     private String replaceWebapp(String str, ServletContext context) {

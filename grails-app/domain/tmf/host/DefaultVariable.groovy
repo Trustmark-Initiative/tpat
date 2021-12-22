@@ -2,8 +2,8 @@ package tmf.host
 
 class DefaultVariable {
 
-    public static final String DEFAULT_NOTES = "DEFAULT_NOTES"
-    public static final String DEFAULT_LEGAL_NOTICE = "DEFAULT_LEGAL_NOTICE"
+    public static final String DEFAULT_TIP_NOTES = "DEFAULT_TIP_NOTES"
+    public static final String DEFAULT_TIP_LEGAL_NOTICE = "DEFAULT_TIP_LEGAL_NOTICE"
 
     public static final String DEFAULT_ISSUANCE_CRITERIA = "DEFAULT_ISSUANCE_CRITERIA"
     public static final String DEFAULT_TARGET_STAKEHOLDER_DESC = "DEFAULT_TARGET_STAKEHOLDER_DESC"

@@ -4,7 +4,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>${grailsApplication.config.tf.org.organization}</title>
+        <title>${grailsApplication.config.tf.org.tooltitle}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <asset:stylesheet src="application.css" />
@@ -21,7 +21,7 @@
         <div class="container" style="margin-top: 5em; margin-bottom: 5em;">
             <div class="header">
                 <div class="topImageContainer">
-                    <asset:image height="70em" src="${grailsApplication.config.tf.org.banner}" />
+                    <asset:image height="90em" src="${grailsApplication.config.tf.org.banner}" />
                 </div>
             </div>
 

@@ -108,15 +108,13 @@ class ApplyChangesService extends AbstractLongRunningService {
         String tdJson = stringWriter.toString()
         tempFile << tdJson
 
-        log.debug("TD JSON: \n"+tdJson)
-
         String checksum = BinaryObject.calculateChecksum(tempFile)
         BinaryObject existing = BinaryObject.findByChecksumAndChecksumAlgorithm(checksum, BinaryObject.CHECKSUM_ALGORITHM)
         if( existing ){
             log.warn("WE COULD IMPROVE THIS BY USING AN EXISTING OBJECT!")
         }
 
-        log.debug("Building binary object...")
+        log.debug("Building binary TD object...")
         BinaryObject tdObject = buildBinary(username, tempFile)
         TrustmarkDefinition databaseTd = new TrustmarkDefinition()
         databaseTd.artifact = tdObject
@@ -340,6 +338,7 @@ class ApplyChangesService extends AbstractLongRunningService {
         VersionSet.withTransaction {
             VersionSet vs = VersionSet.get(mpd.versionSetId)
             if( !vs ) throw new UnsupportedOperationException("Cannot find VS: "+mpd.versionSetId)
+            log.debug("Performing ApplyAction @|cyan ${action.id}|@ to VersionSet @|green ${vs.name}|@...")
 
             // TODO PRE Actions
 
@@ -349,7 +348,8 @@ class ApplyChangesService extends AbstractLongRunningService {
                 doOverwriteAction(mpd, vs, action)
             } else if( action.actionType == ActionType.DEPRECATE ) {
                 doDeprecateAction(mpd, vs, action)
-
+            } else if( action.actionType == ActionType.SUPERSEDE ) {
+                doSupersedesAction(mpd, vs, action)
 
                 // TODO Handle other add types (ie, besides ADD or OVERWRITE)
 
@@ -365,9 +365,112 @@ class ApplyChangesService extends AbstractLongRunningService {
         }
     }//end doApplyAction()
 
+    private void doSupersedesAction(MemoryProcessingData mpd, VersionSet vs, ArtifactAction action){
+        String id = action.artifact.identifier
+        String supersedes = action.artifact.Supersedes
+        log.debug("--------Performing SupersedesAction for id @|cyan ${id}|@ and supersedes @|cyan ${supersedes}|@")
+        if(StringUtils.isNotBlank(id)){
+            doSupersedesTd(vs, id, supersedes)
+            doSupersedesTip(vs, id, supersedes)
+        }else{
+            log.error("Error - cannot supersede because action.artifact.identifier is not found!")
+        }
+
+    }//end doSupersedesAction
+
+    private void doSupersedesTd(VersionSet vs, String id, String supersedesId) {
+        VersionSetTDLink tdLink = VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)
+        if (tdLink) {
+            TrustmarkDefinition databaseTd = tdLink.trustmarkDefinition
+            log.debug("Performing SupersedesTd for TD @|cyan ${databaseTd.identifier}|@, id@|cyan ${id}|@ to supersedesId @|cyan ${supersedesId}|@")
+            File tdFile = databaseTd.artifact.content.toFile()
+            String originalJson = null
+            if( databaseTd.artifact.mimeType.contains("json") ){
+                originalJson = tdFile.text
+            }else{
+                edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td = FactoryLoader.getInstance(TrustmarkDefinitionResolver.class).resolve(tdFile)
+                StringWriter writer = new StringWriter()
+                FactoryLoader.getInstance(SerializerFactory.class).getJsonSerializer().serialize(td, writer)
+                originalJson = writer.toString()
+            }
+            JSONObject json = new JSONObject(originalJson)
+            //json.getJSONObject("Metadata").put("Deprecated", true)
+            if( StringUtils.isNotBlank(supersedesId) ) {
+                JSONObject tmiRefObj = new JSONObject()
+                tmiRefObj.put("Identifier", supersedesId)
+                JSONArray jsonArray = new JSONArray()
+                jsonArray.put(tmiRefObj)
+                JSONObject supersedesObj
+                if (json.getJSONObject("Metadata").isNull("Supersedes"))
+                    supersedesObj = new JSONObject()
+                else
+                    supersedesObj = json.getJSONObject("Metadata").getJSONObject("Supersedes")
+                //TODO check if supersedesObj is already in the list of Supersessions
+                supersedesObj.put("Supersedes", jsonArray)
+                json.getJSONObject("Metadata").put("Supersessions", supersedesObj)
+                databaseTd.supersedes = supersedesId
+            }
+            String jsonStr = json.toString()
+            File tempFile = File.createTempFile("td-", ".json")
+            tempFile << jsonStr
+            BinaryObject newArtifact = this.fileService.createBinaryObject(
+                    tempFile, "SYSTEM", "application/json", "trustmarkDefinition.json", "json")
+
+            databaseTd.artifact = newArtifact
+            //databaseTd.Deprecated = true
+            databaseTd.save(failOnError: true)
+
+        }
+    }//end doSupersedesTd()
+
+    private void doSupersedesTip(VersionSet vs, String id, String supersedesId) {
+        VersionSetTIPLink tipLink = VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, id)
+        if( tipLink ) {
+            TrustInteroperabilityProfile databaseTip = tipLink.trustInteroperabilityProfile
+            log.debug("Performing SupersedesTd for TIP @|cyan ${databaseTip.identifier}|@, id@|cyan ${id}|@ to supersedesId @|cyan ${supersedesId}|@")
+            File tipFile = databaseTip.artifact.content.toFile()
+            String originalJson = null
+            if( databaseTip.artifact.mimeType.contains("json") ){
+                originalJson = tipFile.text
+            }else{
+                edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip = FactoryLoader.getInstance(TrustInteroperabilityProfileResolver.class).resolve(tipFile)
+                StringWriter writer = new StringWriter()
+                FactoryLoader.getInstance(SerializerFactory.class).getJsonSerializer().serialize(tip, writer)
+                originalJson = writer.toString()
+            }
+            JSONObject json = new JSONObject(originalJson)
+            //json.put("Supersedesd", true)
+            if( StringUtils.isNotBlank(supersedesId) ){
+                JSONObject tmiRefObj = new JSONObject()
+                tmiRefObj.put("Identifier", supersedesId)
+                JSONArray jsonArray = new JSONArray()
+                jsonArray.put(tmiRefObj)
+                JSONObject supersedesObj
+                if (json.isNull("Supersedes"))
+                    supersedesObj = new JSONObject()
+                else
+                    supersedesObj = json.getJSONObject("Supersedes")
+                //TODO check if supersedesObj is already in the list of Supersessions
+                supersedesObj.put("Supersedes", jsonArray)
+                json.put("Supersessions", supersedesObj)
+                databaseTip.supersedes = supersedesId
+            }
+            String jsonStr = json.toString()
+            File tempFile = File.createTempFile("tip-", ".json")
+            tempFile << jsonStr
+            BinaryObject newArtifact = this.fileService.createBinaryObject(
+                    tempFile, "SYSTEM", "application/json", "trustInteroperabilityProfile.json", "json")
+
+            databaseTip.artifact = newArtifact
+            //databaseTip.Deprecated = true
+            databaseTip.save(failOnError: true)
+        }
+    }//end doSupersedesTip()
+
     private void doDeprecateAction(MemoryProcessingData mpd, VersionSet vs, ArtifactAction action){
         String id = action.artifact.identifier
         String supersededBy = action.artifact.SupersededBy
+        log.debug("Performing DeprecateAction for id @|cyan ${id}|@ and supersededBy @|cyan ${supersededBy}|@")
         if(StringUtils.isNotBlank(id)){
             doDeprecateTd(vs, id, supersededBy)
             doDeprecateTip(vs, id, supersededBy)
@@ -381,6 +484,8 @@ class ApplyChangesService extends AbstractLongRunningService {
         VersionSetTDLink tdLink = VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)
         if (tdLink) {
             TrustmarkDefinition databaseTd = tdLink.trustmarkDefinition
+            //Note databaseTd.identifier == id
+            log.debug("Performing DeprecateTd for TD @|cyan ${databaseTd.identifier}|@, id @|cyan ${id}|@ to supersededById @|cyan ${supersededById}|@")
             File tdFile = databaseTd.artifact.content.toFile()
             String originalJson = null
             if( databaseTd.artifact.mimeType.contains("json") ){
@@ -396,11 +501,28 @@ class ApplyChangesService extends AbstractLongRunningService {
             if( StringUtils.isNotBlank(supersededById) ) {
                 JSONObject tmiRefObj = new JSONObject()
                 tmiRefObj.put("Identifier", supersededById)
-                JSONArray jsonArray = new JSONArray()
-                jsonArray.put(tmiRefObj)
-                JSONObject supersededByObj = new JSONObject()
-                supersededByObj.put("SupersededBy", jsonArray)
-                json.getJSONObject("Metadata").put("Supersessions", supersededByObj)
+//                Metadata
+//                    Supersessions
+//                        Supersedes
+//                        SupersededBy
+                if (json.getJSONObject("Metadata").isNull("Supersessions")) {
+                    JSONArray supersededByJSONArray = new JSONArray()
+                    supersededByJSONArray.put(tmiRefObj)
+                    JSONObject supersededByObj = new JSONObject()
+                    supersededByObj.put("SupersededBy", supersededByJSONArray)
+                    json.getJSONObject("Metadata").put("Supersessions", supersededByObj)
+                } else {
+                    JSONObject supersessionsJSONObject = json.getJSONObject("Metadata").getJSONObject("Supersessions")
+                    if(supersessionsJSONObject.isNull("SupersededBy")){
+                        JSONArray supersededByJSONArray = new JSONArray()
+                        supersededByJSONArray.put(tmiRefObj)
+                        supersessionsJSONObject.put("SupersededBy", supersededByJSONArray)
+                    } else {
+                        JSONArray supersededByJSONArray = supersessionsJSONObject.getJSONArray("SupersededBy")
+                        supersededByJSONArray.put(tmiRefObj)
+                    }
+                    //TODO go through all Supersedes to add supersededById as SupersededBy
+                }
                 databaseTd.supersededBy = supersededById
             }
             String jsonStr = json.toString()
@@ -420,6 +542,8 @@ class ApplyChangesService extends AbstractLongRunningService {
         VersionSetTIPLink tipLink = VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, id)
         if( tipLink ) {
             TrustInteroperabilityProfile databaseTip = tipLink.trustInteroperabilityProfile
+            //Note databaseTd.identifier == id
+            log.debug("Performing DeprecateTip for TIP @|cyan ${databaseTip.identifier}|@, id @|cyan ${id}|@ to supersededById @|cyan ${supersededById}|@")
             File tipFile = databaseTip.artifact.content.toFile()
             String originalJson = null
             if( databaseTip.artifact.mimeType.contains("json") ){
@@ -435,11 +559,27 @@ class ApplyChangesService extends AbstractLongRunningService {
             if( StringUtils.isNotBlank(supersededById) ){
                 JSONObject tmiRefObj = new JSONObject()
                 tmiRefObj.put("Identifier", supersededById)
-                JSONArray jsonArray = new JSONArray()
-                jsonArray.put(tmiRefObj)
-                JSONObject supersededByObj = new JSONObject()
-                supersededByObj.put("SupersededBy", jsonArray)
-                json.put("Supersessions", supersededByObj)
+//                    Supersessions
+//                        Supersedes
+//                        SupersededBy
+                if (json.isNull("Supersessions")) {
+                    JSONArray supersededByJSONArray = new JSONArray()
+                    supersededByJSONArray.put(tmiRefObj)
+                    JSONObject supersededByObj = new JSONObject()
+                    supersededByObj.put("SupersededBy", supersededByJSONArray)
+                    json.put("Supersessions", supersededByObj)
+                } else {
+                    JSONObject supersessionsJSONObject = json.getJSONObject("Supersessions")
+                    if(supersessionsJSONObject.isNull("SupersededBy")){
+                        JSONArray supersededByJSONArray = new JSONArray()
+                        supersededByJSONArray.put(tmiRefObj)
+                        supersessionsJSONObject.put("SupersededBy", supersededByJSONArray)
+                    } else {
+                        JSONArray supersededByJSONArray = supersessionsJSONObject.getJSONArray("SupersededBy")
+                        supersededByJSONArray.put(tmiRefObj)
+                    }
+                    //TODO go through all Supersedes to add supersededById as SupersededBy
+                }
                 databaseTip.supersededBy = supersededById
             }
             String jsonStr = json.toString()
@@ -460,7 +600,8 @@ class ApplyChangesService extends AbstractLongRunningService {
         StringWriter stringWriter = new StringWriter()
         jsonSerializer.serialize(tip, stringWriter)
         File tempFile = File.createTempFile("tip-", ".json")
-        tempFile << stringWriter.toString()
+        String tipJson = stringWriter.toString()
+        tempFile << tipJson
 
         String checksum = BinaryObject.calculateChecksum(tempFile)
         BinaryObject existing = BinaryObject.findByChecksumAndChecksumAlgorithm(checksum, BinaryObject.CHECKSUM_ALGORITHM)
@@ -468,11 +609,12 @@ class ApplyChangesService extends AbstractLongRunningService {
             log.warn("WE COULD IMPROVE THIS BY USING AN EXISTING OBJECT!")
         }
 
-        log.debug("Building binary object...")
+        log.debug("Building binary TIP object...")
         BinaryObject tipObject = buildBinary(username, tempFile)
         TrustInteroperabilityProfile databaseTip = new TrustInteroperabilityProfile()
         databaseTip.artifact = tipObject
         setData(databaseTip, tip)
+        databaseTip.save(failOnError: true)
 
         return databaseTip
     }

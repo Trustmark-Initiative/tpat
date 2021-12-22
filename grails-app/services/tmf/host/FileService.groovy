@@ -16,7 +16,7 @@ class FileService {
     }
 
     BinaryObject createBinaryObject(User user, Map requestData, MultipartFile file, File actualContent) {
-        log.info("Creating binary object for file[${file.originalFilename}, ${file.size} bytes]...")
+        log.info("Creating binary object for multipart file[${file.originalFilename}, ${file.size} bytes]...")
         String originalFilename = requestData.name
         String extension = parseFileExtension(originalFilename);
         String mimeType = getMimeByFileExtension(extension);
@@ -35,7 +35,7 @@ class FileService {
 
 
     BinaryObject createBinaryObject(File file, String createdBy, String mimeType, String originalFilename, String originalExtension) {
-        log.info("Creating binary object for file[${originalFilename}, ${file.length()} bytes]...")
+        log.info("Creating binary object for file[name ${originalFilename}, bytes ${file.length()}, createdBy ${createdBy}, mimeType ${mimeType}, originalFilename ${originalFilename}, originalExtension ${originalExtension}]...")
         String checksum = digestFile(file);
 
         log.debug("Creating BinaryObject in database...")
@@ -65,10 +65,11 @@ class FileService {
      * Simplest of all create methods, this one simply uses a file and nothing else.
      */
     BinaryObject createBinaryObject(File file){
-        log.info("Creating binary object for file[${file.name}, ${file.length()} bytes]...")
+        log.info("Creating binary object for file[name ${file.name}, bytes ${file.length()}]...")
         String extension = parseFileExtension(file.name)
         String mimeType = getMimeByFileExtension(extension)
         String checksum = digestFile(file);
+        log.info("Determined file[name ${file.name}, determined extention: ${extension}, mimeType ${mimeType}, checksum ${checksum} ]...")
 
         log.debug("Creating BinaryObject in database...")
         BinaryObject binaryObject = new BinaryObject();

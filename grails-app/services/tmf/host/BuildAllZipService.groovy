@@ -161,7 +161,7 @@ class BuildAllZipService extends AbstractLongRunningService {
     private Map writeTIPJson(VersionSetTIPLink tipLink, File tipDir){
         String tdFilename = makeTDFileName(tipLink.trustInteroperabilityProfile.name, tipLink.trustInteroperabilityProfile.tipVersion, tipDir, "json");
         File tipFile = new File(tipDir, tdFilename);
-        log.debug("Saving TIP[@|cyan ${tipLink.trustInteroperabilityProfile.name}|@] to File[@|green ${tipFile.canonicalPath}|@]...")
+        log.debug("Saving TIP [@|cyan ${tipLink.trustInteroperabilityProfile.name}|@] to File [@|green ${tipFile.canonicalPath}|@]...")
 
         BinaryObject binaryObject = tipLink.getTrustInteroperabilityProfile().getArtifact();
         File content = binaryObject.getContent().toFile();
@@ -215,7 +215,7 @@ class BuildAllZipService extends AbstractLongRunningService {
     private Map writeTDJson(VersionSetTDLink tdLink, File tdDir){
         String tdFilename = makeTDFileName(tdLink.trustmarkDefinition.name, tdLink.trustmarkDefinition.tdVersion, tdDir, "json");
         File tdFile = new File(tdDir, tdFilename);
-        log.debug("Saving TD[@|cyan ${tdLink.trustmarkDefinition.name}|@] to File[@|green ${tdFile.canonicalPath}|@]...")
+        log.debug("Saving TD [@|cyan ${tdLink.trustmarkDefinition.name}|@] to File [@|green ${tdFile.canonicalPath}|@]...")
 
         BinaryObject binaryObject = tdLink.getTrustmarkDefinition().getArtifact();
         File content = binaryObject.getContent().toFile();

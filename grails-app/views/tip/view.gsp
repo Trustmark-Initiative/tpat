@@ -1,3 +1,4 @@
+<%@ page import="tmf.host.util.LinkHelper" %>
 <!doctype html>
 <html>
     <head>
@@ -21,7 +22,7 @@
             <div>
                 <h2>${tip.name}, v${tip.version}</h2>
             </div>
-            <div style="font-size: 110%;">${raw(tip.description)}</div>
+            <div style="font-size: 110%;"><%= LinkHelper.linkifyText(raw(tip.description)) %></div>
 
             <g:if test="${tip.deprecated}">
                 <div class="alert alert-warning" style="margin-top: 1em;">
@@ -185,7 +186,7 @@
                         <tr>
                             <td style="width: 20%;">Legal Notice</td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                ${tip.legalNotice}
+                                <%= LinkHelper.linkifyText(tip.legalNotice) %>
                             </td>
                         </tr>
                     </g:if>
@@ -193,7 +194,7 @@
                         <tr>
                             <td style="width: 20%;">Notes</td>
                             <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                ${tip.notes}
+                                <%= LinkHelper.linkifyText(tip.notes) %>
                             </td>
                         </tr>
                     </g:if>
@@ -229,29 +230,41 @@
                             <div id="tipExpression" class="trexp" style="border: 1px solid #aaa; padding: 0.5em; font-family: monospace; margin-bottom: 2em;">${tip.trustExpression}</div>
                             <div>
                                 <h4>References (${tip.references.size()})</h4>
-                                <table class="table table-condensed table-bordered table-striped">
-                                    <g:each in="${tip.references}" var="reference">
+                                <g:each in="${tip.references}" var="reference">
+                                    <table class="table table-condensed table-bordered table-striped">
                                         <tr>
-                                            <td>${reference.id}</td>
-                                            <td>
-                                                <div style="font-size: 110%; font-weight: bold">
-                                                    <g:if test="${reference.isTrustInteroperabilityProfileReference()}">
-                                                        <span class="glyphicon glyphicon-th-list" title="Trust Interoperability Profile"></span>
-                                                    </g:if>
-                                                    <g:if test="${reference.isTrustmarkDefinitionRequirement()}">
-                                                        <span class="glyphicon glyphicon-tag" title="Trustmark Definition Requirement"></span>
-                                                    </g:if>
-                                                    <a href="${reference.identifier.toString()}">
-                                                        ${reference.name}, v${reference.version}
-                                                    </a>
-                                                </div>
-                                                <div style="padding-left: 1.5em;">
-                                                    ${reference.description}
-                                                </div>
-                                            </td>
+                                            <th colspan=2>
+                                                <g:if test="${reference.isTrustInteroperabilityProfileReference()}">
+                                                    <span class="glyphicon glyphicon-th-list" title="Trust Interoperability Profile"></span>&nbsp;TIP&nbsp;
+                                                </g:if>
+                                                <g:if test="${reference.isTrustmarkDefinitionRequirement()}">
+                                                    <span class="glyphicon glyphicon-tag" title="Trustmark Definition Requirement"></span>&nbsp;TD&nbsp;
+                                                </g:if>
+                                                <a href="${reference.identifier.toString()}">
+                                                    ${reference.name}, v${reference.version}
+                                                </a>
+                                            </th>
                                         </tr>
-                                    </g:each>
-                                </table>
+                                        <tr>
+                                            <td class="col-md-2">Description</td>
+                                            <td><%= LinkHelper.linkifyText(reference.description) %></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="col-md-2">ID</td>
+                                            <td>${reference.id}</td>
+                                        </tr>
+                                        <g:if test="${reference.isTrustmarkDefinitionRequirement()}">
+                                            <tr>
+                                                <td class="col-md-2">Provider Reference</td>
+                                                <td>
+                                                    <g:each in="${reference.providerReferences}" var="providerReference">
+                                                        <div><%= LinkHelper.linkifyText(providerReference.identifier) %></div>
+                                                    </g:each>
+                                                </td>
+                                            </tr>
+                                        </g:if>
+                                    </table>
+                                </g:each>
                             </div>
                         </div>
                     </div>

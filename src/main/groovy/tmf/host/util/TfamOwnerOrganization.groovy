@@ -83,4 +83,14 @@ class TfamOwnerOrganization implements Entity {
             c = getContacts().get(0);
         return c;
     }
+
+    public List <Contact> getOtherContacts(){
+        List <Contact> otherContacts = new ArrayList<>();
+        for( Contact cur : getContacts() ){
+            if( cur.getKind() == ContactKindCode.OTHER ){
+                otherContacts.add(cur)
+            }
+        }
+        return otherContacts;
+    }
 }
