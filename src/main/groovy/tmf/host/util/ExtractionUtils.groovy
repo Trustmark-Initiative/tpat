@@ -86,14 +86,18 @@ class ExtractionUtils {
         ArchiveEntry entry = null;
         while( (entry = archiveInputStream.getNextEntry()) != null ){
             if( archiveInputStream.canReadEntryData(entry) ){
+                if(entry.getName().startsWith(".") || entry.getName().contains("System Volume Information") || entry.getName().contains("/.")){
+                    logger.debug(String.format("Skipping directory for archive entry [@|cyan %s|@]...", entry.getName()));
+                    continue;
+                }
                 File newFile = new File(directory, entry.getName());
                 newFile.getParentFile().mkdirs(); // Ensure parent exists.
                 if( entry.isDirectory() ){
-                    logger.debug(String.format("Creating directory for archive entry[@|cyan %s|@]...", entry.getName()));
+                    logger.debug(String.format("Creating directory for archive entry [@|cyan %s|@]...", entry.getName()));
                     newFile.mkdirs(); // Might have been created, might not.
                     directoriesExtracted++;
                 }else{
-                    logger.debug(String.format("Extracting archive entry[@|cyan %s|@]...", entry.getName()));
+                    logger.debug(String.format("Extracting archive entry [@|cyan %s|@]...", entry.getName()));
                     FileOutputStream currentEntryOut = new FileOutputStream(newFile);
                     long amountToRead = entry.getSize();
                     byte[] buffer = new byte[5012]; // 5k bytes at a time.

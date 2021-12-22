@@ -19,6 +19,10 @@ enum ActionType {
      */
     DEPRECATE,
     /**
+     * Indicates we are Superseding the artifact, and marking it as deprecated by something else.
+     */
+    SUPERSEDE,
+    /**
      * Indicates that we are going to remove an artifact.
      */
     REMOVE,

@@ -180,7 +180,6 @@ class ProcessUploadService extends AbstractLongRunningService {
      * @param td
      */
     private void processTd(Long uploadId, edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td){
-        log.debug("Processing TD td[${td.getMetadata().getIdentifier().toString()}] Deprecated: "+td.getMetadata().isDeprecated())
         String id = td.getMetadata().getIdentifier().toString()
         MemoryProcessingData mpd = MemoryProcessingData.find(uploadId)
         log.debug("Processing TD id=[@|green ${id}|@]...")
@@ -193,7 +192,7 @@ class ProcessUploadService extends AbstractLongRunningService {
             if( !isLocalUrl(id) ){
                 action.actionType = ActionType.ERROR
                 action.errorType = ActionErrorType.NO_LOCAL_BASE
-                action.errorMessage = "Artifact[${td.getMetadata().getName()}, v${td.getMetadata().getVersion()}, ID=${td.getMetadata().getIdentifier().toString()}] does not have a local base URL and cannot be updated.  You may only update those Identifiers which start with one of your pre-configured Base URLs."
+                action.errorMessage = "Artifact TD [${td.getMetadata().getName()}, v${td.getMetadata().getVersion()}, ID=${id}] does not have a local base URL and cannot be updated.  You may only update those Identifiers which start with one of your pre-configured Base URLs: [${TFAMPropertiesHolder.getBaseURLsAsStrings()}]."
                 mpd.add(action)
                 return
             }
@@ -205,7 +204,7 @@ class ProcessUploadService extends AbstractLongRunningService {
                     if( vr.severity == ValidationSeverity.FATAL ){
                         action.actionType = ActionType.ERROR
                         action.errorType = ActionErrorType.VALIDATION_ERROR
-                        action.errorMessage = "Artifact[${td.getMetadata().getName()}, v${td.getMetadata().getVersion()}] is not valid: "+vr.getMessage()+" [location: "+vr.getLocation()+"]"
+                        action.errorMessage = "Artifact TD [${td.getMetadata().getName()}, v${td.getMetadata().getVersion()}, ID=${id}] is not valid: "+vr.getMessage()+" [location: "+vr.getLocation()+"]"
                         mpd.add(action)
                         return
                     }
@@ -222,7 +221,7 @@ class ProcessUploadService extends AbstractLongRunningService {
                 } else if (tdLink.copyOver && tdHasChangedSignificantly(td, tdLink)) {
                     action.actionType = ActionType.ERROR
                     action.errorType = ActionErrorType.CHANGE_PREVIOUSLY_RELEASED
-                    action.errorMessage = "TD[${tdLink.trustmarkDefinition.name}, v${tdLink.trustmarkDefinition.tdVersion}] was previously released and you are trying to significantly change it; this is not allowed."
+                    action.errorMessage = "You have requested to overwrite a TD[${tdLink.trustmarkDefinition.name}, v${tdLink.trustmarkDefinition.tdVersion}] was previously released and you are trying to significantly change it; this is not allowed."
                     mpd.add(action)
                     return
 
@@ -234,31 +233,59 @@ class ProcessUploadService extends AbstractLongRunningService {
 
                 // TODO Check to see if there are pre-actions we should take (like removing the previous one) - also might need to roll back previous deprecation.
 
-            }else{ // The name/version don't conflict, so we are going to add the empty TD.
+            } else { // The name/version don't conflict, so we are going to add the empty TD.
+                //TODO refactor with TIP
                 action.actionType = ActionType.ADD
                 if( CollectionUtils.isNotEmpty(td.getMetadata().getSupersedes()) ){
                     for( TrustmarkFrameworkIdentifiedObject tmfi : td.getMetadata().getSupersedes() ){
                         VersionSetLink link = isLocalToVersionSet(vs, tmfi)
-                        log.info("Processing supersedes link ${link.toString()}")
                         if( link ){
+                            log.info("Processing TD supersedes link ${link.toString()}")
                             ArtifactAction deprecateAction = createDeprecateAction(vs, link)
-                            deprecateAction.artifact.put("SupersededBy", td.getMetadata().getIdentifier().toString())
-                            action.postActions.add(deprecateAction)
-                            log.info("Added SupersedeBy action for: ${td.getMetadata().getIdentifier().toString()}")
+                            if(deprecateAction == null){
+                                log.info("No deprecate action is created for link: ${link.toString()}")
+                            } else {
+                                deprecateAction.artifact.put("SupersededBy", id)
+                                action.postActions.add(deprecateAction)
+                                log.info("Added SupersedeBy action for: ${id}")
+                            }
                         }else{
                             action.warnings.add("Supersedes TD[${tmfi.identifier.toString()}], but it is not local.  Cannot deprecate that TD or mark it as superseded.")
                         }
                     }
-                }else if( findTDByName(vs, td.getMetadata().getName()) != null ){
+                }
+
+                if( CollectionUtils.isNotEmpty(td.getMetadata().getSupersededBy()) ){
+                    for( TrustmarkFrameworkIdentifiedObject tmfi : td.getMetadata().getSupersededBy() ){
+                        VersionSetLink link = isLocalToVersionSet(vs, tmfi)
+                        if( link ){
+                            log.info("Processing supersededBy link ${link.toString()}")
+                            ArtifactAction supersedesAction = createSupersededByAction(vs, link)
+                            if(supersedesAction == null){
+                                log.info("No supersedes action is created for link: ${link.toString()}")
+                            } else {
+                                supersedesAction.artifact.put("Supersedes", id)
+                                action.postActions.add(supersedesAction)
+                                log.info("Added Supersedes action for: ${id}")
+                            }
+                        }else{
+                            action.warnings.add("SupersededBy TD[${tmfi.identifier.toString()}], but it is not local.  Cannot add supersedes to that TD.")
+                        }
+                    }
+                }
+
+                //Autodeprecation
+                VersionSetTDLink tdToDeprecate = findTDByName(vs, td.getMetadata().getName())
+                if( ! td.getMetadata().isDeprecated()
+                        && CollectionUtils.isEmpty(td.getMetadata().getSupersedes())
+                        && CollectionUtils.isEmpty(td.getMetadata().getSupersededBy())
+                        && tdToDeprecate != null ){
                     log.info("Processing TD which was matching by name '@|cyan ${td.getMetadata().getName()}|@'!")
-                    VersionSetTDLink tdToDeprecate = findTDByName(vs, td.getMetadata().getName())
                     TmfiObjImpl tmfi = new TmfiObjImpl(typeName: 'TrustmarkDefinition', identifier: new URI(tdToDeprecate.getTdIdentifier()))
                     td.getMetadata().getSupersedes().add(tmfi)
                     ArtifactAction deprecateAction = createDeprecateAction(vs, tdToDeprecate)
-                    deprecateAction.artifact.put("SupersededBy", td.getMetadata().getIdentifier().toString())
+                    deprecateAction.artifact.put("SupersededBy", id)
                     action.postActions.add(deprecateAction)
-                } else {
-                    log.info("Skipping processing supercedes")
                 }
             }
 
@@ -272,10 +299,12 @@ class ProcessUploadService extends AbstractLongRunningService {
     /**
      * Analyzes the 2 TDs against each other generating a diff.  Examines the diff to determine if any major changes
      * have occurred.
+     * TODO synchronize with areTipsSame
      */
     private boolean tdHasChangedSignificantly(edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition tdNew, VersionSetTDLink tdLink){
-        File td2File = tdLink.getTrustmarkDefinition().getArtifact().getContent().toFile()
-        edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition tdOld = FactoryLoader.getInstance(TrustmarkDefinitionResolver.class).resolve(td2File)
+        File tdFile = tdLink.getTrustmarkDefinition().getArtifact().getContent().toFile()
+        edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition tdOld =
+                FactoryLoader.getInstance(TrustmarkDefinitionResolver.class).resolve(tdFile)
 
         Collection<TrustmarkDefinitionDiffResult> diffResults = FactoryLoader.getInstance(TrustmarkDefinitionUtils.class).diff(tdNew, tdOld)
         if( diffResults.size() > 0 ){
@@ -291,15 +320,39 @@ class ProcessUploadService extends AbstractLongRunningService {
     }
 
     private TrustmarkFrameworkIdentifiedObject resolveTmfiForTd(TrustmarkDefinition td){
+        if (td == null) {
+            log.error("Unable to resolveTmfiForTd -- null TD");
+            return null
+        }
         File file = td.getArtifact().getContent().toFile()
+        if (file == null) {
+            log.error("Unable to resolveTmfiForTd -- null file...");
+            return null
+        }
         edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition fullTd = FactoryLoader.getInstance(TrustmarkDefinitionResolver.class).resolve(file, false)
+        if (fullTd == null) {
+            log.error("Unable to resolveTmfiForTd -- null fullTd...");
+            return null
+        }
         return fullTd.getMetadata()
     }
 
 
     private TrustmarkFrameworkIdentifiedObject resolveTmfiForTip(TrustInteroperabilityProfile tip){
+        if (tip == null) {
+            log.error("Unable to resolveTmfiForTip -- null TIP");
+            return null
+        }
         File file = tip.getArtifact().getContent().toFile()
+        if (file == null) {
+            log.error("Unable to resolveTmfiForTip -- null file...");
+            return null
+        }
         edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile fullTip = FactoryLoader.getInstance(TrustInteroperabilityProfileResolver.class).resolve(file, false)
+        if (fullTip == null) {
+            log.error("Unable to resolveTmfiForTip -- null fullTip...");
+            return null
+        }
         return fullTip
     }
 
@@ -313,11 +366,19 @@ class ProcessUploadService extends AbstractLongRunningService {
             id = ((VersionSetTDLink) link).getTrustmarkDefinition().getIdentifier()
             type = "TD"
             artifact = resolveTmfiForTd(((VersionSetTDLink) link).getTrustmarkDefinition())
-        }else{
+        } else if (link.isTipLink()) {
+            log.debug("Creating DeprecateAction - given version set link is associated with TIP");
             id = ((VersionSetTIPLink) link).getTrustInteroperabilityProfile().getIdentifier()
             type = "TIP"
             artifact = resolveTmfiForTip(((VersionSetTIPLink) link).getTrustInteroperabilityProfile())
-            log.debug("Creating DeprecateAction - given version set link is associated with TIP");
+        } else {
+            log.error("Creating DeprecateAction error - link is not TD or TIP");
+            return null
+        }
+
+        if (artifact == null){
+            log.error("Creating Deprecate error - unable to resolve artifact at link. Artifact is null");
+            return null
         }
 
         ArtifactAction deprecation = new ArtifactAction(id: id, type: type, artifact: createSummary(artifact))
@@ -325,6 +386,43 @@ class ProcessUploadService extends AbstractLongRunningService {
         deprecation.uniqueId = -1
 
         return deprecation
+    }
+
+    private ArtifactAction createSupersededByAction(VersionSet vs, VersionSetLink link){
+        if (!link){
+            log.error("Creating SupersededBy error - VersionSetLink is null");
+            return null
+        } else {
+            log.debug("Creating SupersededByAction for VS " + link.toString());
+        }
+        String id = null
+        String type = null
+        TrustmarkFrameworkIdentifiedObject artifact = null
+        if( link.isTdLink() ){
+            log.debug("Creating SupersededBy - given version set link is associated with TD");
+            id = ((VersionSetTDLink) link).getTrustmarkDefinition().getIdentifier()
+            type = "TD"
+            artifact = resolveTmfiForTd(((VersionSetTDLink) link).getTrustmarkDefinition())
+        } else if (link.isTipLink()) {
+            log.debug("Creating SupersededBy - given version set link is associated with TIP");
+            id = ((VersionSetTIPLink) link).getTrustInteroperabilityProfile().getIdentifier()
+            type = "TIP"
+            artifact = resolveTmfiForTip(((VersionSetTIPLink) link).getTrustInteroperabilityProfile())
+        } else {
+            log.error("Creating SupersededBy error - link is not TD or TIP");
+            return null
+        }
+
+        if (artifact == null){
+            log.error("Creating SupersededBy error - unable to resolve artifact at link. Artifact is null");
+            return null
+        }
+
+        ArtifactAction supersededByAction = new ArtifactAction(id: id, type: type, artifact: createSummary(artifact))
+        supersededByAction.actionType = ActionType.SUPERSEDE
+        supersededByAction.uniqueId = -1
+
+        return supersededByAction //see doSupersedesAction in ApplyChangesService
     }
 
     private VersionSetLink isLocalToVersionSet(VersionSet vs, TrustmarkFrameworkIdentifiedObject tmfi){
@@ -384,23 +482,39 @@ class ProcessUploadService extends AbstractLongRunningService {
     private VersionSetTDLink findTDByName(VersionSet vs, String name){
         List<VersionSetTDLink> links =
                 VersionSetTDLink.executeQuery(
-                        "from VersionSetTDLink link where link.versionSet = :vs and lower(link.trustmarkDefinition.name) = :name order by link.trustmarkDefinition.tdVersion desc",
+                        "from VersionSetTDLink link where " +
+                        "link.versionSet = :vs and " +
+                        "lower(link.trustmarkDefinition.name) = :name order by link.trustmarkDefinition.tdVersion desc",
                         [vs: vs, name: name.toLowerCase()])
         if( links.isEmpty() )
             return null
-        else
+        else {
+            for (VersionSetTDLink link : links ){
+                log.debug("Found the following  TD link '@|cyan ${link.getTdIdentifier()}|@'!")
+            }
             return links.get(0)
+        }
     }
 
     private VersionSetTDLink findMatchingTDLink(VersionSet vs, edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td){
         List<VersionSetTDLink> links =
-                VersionSetTDLink.executeQuery("from VersionSetTDLink link where link.versionSet = :vs and ((lower(link.trustmarkDefinition.name) = :name and lower(link.trustmarkDefinition.tdVersion) = :version) or lower(link.tdIdentifier) = :id)",
-                    [vs: vs, name: td.getMetadata().getName().toLowerCase(), version: td.getMetadata().getVersion().toLowerCase(),
-                    id: td.getMetadata().getIdentifier().toString().toLowerCase()])
+                VersionSetTDLink.executeQuery(
+                        "from VersionSetTDLink link where " +
+                        "link.versionSet = :vs and " +
+                        "((lower(link.trustmarkDefinition.name) = :name and lower(link.trustmarkDefinition.tdVersion) = :version) or " +
+                        "lower(link.tdIdentifier) = :id)",
+                        [vs: vs,
+                         name: td.getMetadata().getName().toLowerCase(),
+                         version: td.getMetadata().getVersion().toLowerCase(),
+                         id: td.getMetadata().getIdentifier().toString().toLowerCase()])
         if( links.isEmpty() )
             return null
-        else
+        else {
+            for (VersionSetTDLink link : links ){
+                log.debug("Found the following TD link '@|cyan ${link.getTdIdentifier()}|@'!")
+            }
             return links.get(0)
+        }
     }
 
     private void processTip(Long uploadId, edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip){
@@ -414,10 +528,10 @@ class ProcessUploadService extends AbstractLongRunningService {
 
             ArtifactAction action = new ArtifactAction(type: 'TIP', id: id, artifact: createSummary(tip))
 
-            if( !isLocalUrl(tip.getIdentifier().toString()) ){
+            if( !isLocalUrl(id) ){
                 action.actionType = ActionType.ERROR
                 action.errorType = ActionErrorType.NO_LOCAL_BASE
-                action.errorMessage = "Artifact[${tip.getIdentifier().toString()}] is not hosted at a local URL, and you cannot publish it here."
+                action.errorMessage = "Artifact TIP [${tip.getName()}, v${tip.getVersion()}, ID=${id}] is not hosted at a local URL, and you cannot publish it here. You may only update those Identifiers which start with one of your pre-configured Base URLs: [${TFAMPropertiesHolder.getBaseURLsAsStrings()}]."
                 mpd.add(action)
                 return
             }
@@ -428,8 +542,12 @@ class ProcessUploadService extends AbstractLongRunningService {
             if( tipLink ){
                 if( tipLink.copyOver ){
                     action.actionType = ActionType.ERROR
-                    action.errorMessage = "You have requested to overwrite a TIP[${tipLink.trustInteroperabilityProfile.name}, v${tipLink.trustInteroperabilityProfile.tipVersion}] which was previously released.  This is not allowed."
-                }else{
+                    action.errorType = ActionErrorType.CHANGE_PREVIOUSLY_RELEASED
+                    action.errorMessage = "You have requested to overwrite a TIP[${tipLink.trustInteroperabilityProfile.name}, v${tipLink.trustInteroperabilityProfile.tipVersion}] which was previously released; this is not allowed."
+                    mpd.add(action)
+                    return
+
+                } else {
                     if( areTipsSame(tip, tipLink) ){
                         action.actionType = ActionType.IGNORE
                     }else{
@@ -441,31 +559,65 @@ class ProcessUploadService extends AbstractLongRunningService {
 
                 }
 
-            }else{ // The name/version don't conflict, so we are going to add the empty TD.
+            } else { // The name/version don't conflict, so we are going to add the empty TD.
+                //TODO refactor with TD
                 action.actionType = ActionType.ADD
                 if( CollectionUtils.isNotEmpty(tip.getSupersedes()) ){
                     for( TrustmarkFrameworkIdentifiedObject tmfi : tip.getSupersedes() ){
                         VersionSetLink link = isLocalToVersionSet(vs, tmfi)
                         if( link ){
+                            log.info("Processing TIP supersedes link ${link.toString()}")
                             ArtifactAction deprecateAction = createDeprecateAction(vs, link)
-                            deprecateAction.artifact.put("SupersededBy", tip.getIdentifier().toString())
-                            action.postActions.add(deprecateAction)
+                            if(deprecateAction == null){
+                                log.info("No deprecate action is created for link: ${link.toString()}")
+                            } else {
+                                deprecateAction.artifact.put("SupersededBy", id)
+                                action.postActions.add(deprecateAction)
+                                log.info("Added SupersedeBy action for: ${id}")
+                            }
                         }else{
                             action.warnings.add("TIP[${tip.getIdentifier()}] Supersedes TIP[${tmfi.identifier.toString()}], but it is not local.  Cannot deprecate that TIP or mark it as superseded.")
                         }
                     }
-                }else if( findTIPByName(vs, tip.getName()) != null ){
-                    log.info("Found matching TIP by name '@|cyan ${tip.getName()}|@'!")
-                    VersionSetTIPLink tipToDeprecate = findTIPByName(vs, tip.getName())
+                }
+
+                if( CollectionUtils.isNotEmpty(tip.getSupersededBy()) ){
+                    for( TrustmarkFrameworkIdentifiedObject tmfi : tip.getSupersededBy() ){
+                        VersionSetLink link = isLocalToVersionSet(vs, tmfi)
+                        if( link ){
+                            log.info("Processing supersededBy link ${link.toString()}")
+                            ArtifactAction supersedesAction = createSupersededByAction(vs, link)
+                            if(supersedesAction == null){
+                                log.info("No supersedes action is created for link: ${link.toString()}")
+                            } else {
+                                supersedesAction.artifact.put("Supersedes", id)
+                                action.postActions.add(supersedesAction)
+                                log.info("Added Supersedes action for: ${id}")
+                            }
+                        }else{
+                            action.warnings.add("SupersededBy TIP[${tmfi.identifier.toString()}], but it is not local.  Cannot add supersedes to that TIP.")
+                        }
+                    }
+                }
+
+                //Autodeprecation
+                VersionSetTIPLink tipToDeprecate = findTIPByName(vs, tip.getName())
+                if( ! tip.isDeprecated()
+                        && CollectionUtils.isEmpty(tip.getSupersedes())
+                        && CollectionUtils.isEmpty(tip.getSupersededBy())
+                        && tipToDeprecate != null ){
+                    log.info("Processing TIP which was matching by name '@|cyan ${tip.getName()}|@'!")
                     TmfiObjImpl tmfi = new TmfiObjImpl(typeName: 'TrustInteroperabilityProfile', identifier: new URI(tipToDeprecate.getTipIdentifier()))
                     tip.getSupersedes().add(tmfi)
                     ArtifactAction deprecateAction = createDeprecateAction(vs, tipToDeprecate)
-                    deprecateAction.artifact.put("SupersededBy", tip.getIdentifier().toString())
+                    deprecateAction.artifact.put("SupersededBy", id)
                     action.postActions.add(deprecateAction)
                 }
             }
 
             mpd.add(action)
+
+            // TODO Check for any action post conditions (like a deprecation of previous TIP)
 
         }
     }
@@ -473,14 +625,24 @@ class ProcessUploadService extends AbstractLongRunningService {
     private VersionSetTIPLink findTIPByName(VersionSet vs, String name){
         List<VersionSetTIPLink> links =
                 VersionSetTIPLink.executeQuery(
-                        "from VersionSetTIPLink link where link.versionSet = :vs and lower(link.trustInteroperabilityProfile.name) = :name order by link.trustInteroperabilityProfile.tipVersion desc",
+                        "from VersionSetTIPLink link where " +
+                        "link.versionSet = :vs and lower(link.trustInteroperabilityProfile.name) = :name order by link.trustInteroperabilityProfile.tipVersion desc",
                         [vs: vs, name: name.toLowerCase()])
         if( links.isEmpty() )
             return null
-        else
+        else {
+            for (VersionSetTIPLink link : links ){
+                log.debug("Found the following TIP link '@|cyan ${link.getTipIdentifier()}|@'!")
+            }
             return links.get(0)
+        }
     }
 
+    /**
+     * Analyzes the 2 TIPs against each other generating a diff.  Examines the diff to determine if any major changes
+     * have occurred.
+     * TODO synchronize with tdHasChangedSignificantly
+     */
     private boolean areTipsSame(edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip, VersionSetTIPLink tipLink ){
         File tipFile = tipLink.trustInteroperabilityProfile.artifact.content.toFile()
         edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile fromDatabaseTip =
@@ -500,13 +662,22 @@ class ProcessUploadService extends AbstractLongRunningService {
 
     protected VersionSetTIPLink findMatchingTIPLink(VersionSet vs, edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip){
         List<VersionSetTIPLink> links =
-                VersionSetTIPLink.executeQuery("from VersionSetTIPLink link where link.versionSet = :vs and ((lower(link.trustInteroperabilityProfile.name) = :name and lower(link.trustInteroperabilityProfile.tipVersion) = :version) or lower(link.tipIdentifier) = :id)",
-                        [vs: vs, name: tip.getName().toLowerCase(), version: tip.getVersion().toLowerCase(),
+                VersionSetTIPLink.executeQuery(
+                        "from VersionSetTIPLink link where " +
+                        "link.versionSet = :vs and ((lower(link.trustInteroperabilityProfile.name) = :name and lower(link.trustInteroperabilityProfile.tipVersion) = :version) or " +
+                        "lower(link.tipIdentifier) = :id)",
+                        [vs: vs,
+                         name: tip.getName().toLowerCase(),
+                         version: tip.getVersion().toLowerCase(),
                          id: tip.getIdentifier().toString().toLowerCase()])
         if( links.isEmpty() )
             return null
-        else
+        else {
+            for (VersionSetTIPLink link : links ){
+                log.debug("Found the following TD link '@|cyan ${link.getTipIdentifier()}|@'!")
+            }
             return links.get(0)
+        }
     }
 
     void setProcessStatus(Long uploadId, ProcessPhase phase, String message) {

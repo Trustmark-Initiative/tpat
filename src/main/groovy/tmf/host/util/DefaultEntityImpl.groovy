@@ -71,4 +71,11 @@ class DefaultEntityImpl implements Entity {
             c = getContacts().get(0);
         return c;
     }
+
+    public String toString() {
+        return String.format("Entity[ identifier = %s, name = %s , contacts = %s ]",
+                this.getIdentifier() == null ? "" : this.getIdentifier().toString(),
+                this.getName() == null ? "" : this.getName(),
+                this.getContacts() == null ? "" : Arrays.toString(this.getContacts().toArray()));
+    }
 }

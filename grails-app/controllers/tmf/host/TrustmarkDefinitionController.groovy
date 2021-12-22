@@ -45,6 +45,8 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
                 throw new ServletException("ContentType ${response.format} is not supported.")
             }
         }else{
+            log.error("Operation is not supported until Version Sets exist in the database : VERSION_SET_NAME param: " +
+                    "[${session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE)}]")
             throw new ServletException("Operation is not supported until Version Sets exist in the database.")
         }
     }
@@ -119,6 +121,8 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
     def view(){
         VersionSet vs = VersionSet.findByName(session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE))
         if( !vs ){
+            log.error("Operation is not supported until Version Sets exist in the database : VERSION_SET_NAME param: " +
+                    "[${session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE)}]")
             throw new ServletException("Operation is not supported until Version Sets exist in the database.")
         }
 
@@ -196,6 +200,8 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
     def listByName() {
         VersionSet vs = VersionSet.findByName(session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE))
         if (!vs) {
+            log.error("Operation is not supported until Version Sets exist in the database : VERSION_SET_NAME param: " +
+                    "[${session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE)}]")
             throw new ServletException("Operation is not supported until Version Sets exist in the database.")
         }
 
