@@ -3,12 +3,7 @@ This repository holds the source for the Trust Policy Authoring Tool.
 
 ## How to Use the TPAT
 
-If you are interested in trying out the TPAT, the recommmended way is to download docker 
-and simply use the https://github.com/Trustmark-Initiative/tpat-deploy project.  You can
-quickly setup a local version of the tool to experiment with, and you can use that project
-to deploy an Internet facing version as well.  That project includes a compiled version of
-the code available in this project. For more information about how  to use the TPAT, please
-see the TPAT User Guide at https://github.com/Trustmark-Initiative/tpat/wiki.
+If you are interested in trying out the TPAT, we recommmended that you deploy it using the [Trustmark Tools Deployer](https://github.com/Trustmark-Initiative/trustmark-tools-deploy). You can quickly setup a local version of the tool to experiment with, and you can use that project to deploy an Internet facing version as well. For more information about how to use the TPAT, please see the [TPAT User Guide](https://github.com/Trustmark-Initiative/tpat/wiki).
 
 ## How to Build
 
@@ -24,7 +19,7 @@ see the TPAT User Guide at https://github.com/Trustmark-Initiative/tpat/wiki.
 
 6. To run the software you must have a database available.  You can run this DB via docker, locally, remotely, or however makes sense 
 for your environment.  You must configure the DB within the `grails-app/conf/application.yml` file.  This file is currently configured
-to use the docker database as seen configured within the https://github.com/Trustmark-Initiative/tpat-deploy project.
+to use the docker database as seen configured within the https://github.com/Trustmark-Initiative/trustmark-tools-deploy project.
 
 7. Execute the web application (grails run-app or run the war in docker)
 
