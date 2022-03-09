@@ -70,7 +70,7 @@ class Provider implements Comparable<Provider>{
 
 
     public String toString() {
-        return "Provider["+this.name+"]"
+        return "Provider[ Name:" + this.name + ", Uri: " + this.uri +", Email: " + this.email +"]"
     }
 
     public int hashCode() {
@@ -94,7 +94,7 @@ class Provider implements Comparable<Provider>{
             List<Provider> providers = Provider.findAll()
             if (providers.isEmpty()) {
                 Provider provider
-                TfamOwnerOrganization ownerOrganization = TFAMPropertiesHolder.getDefaultEntity()
+                TfamOwnerOrganization ownerOrganization = TFAMPropertiesHolder.getDefaultEntityFromProperties()
                 Contact contact
                 contact = ownerOrganization.getDefaultContact()
                 if(contact) {

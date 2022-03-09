@@ -49,8 +49,8 @@ class BootStrap {
             VersionSetTIPLink.search().createIndexAndWait()
         }
 
-        String info = buildStartupInfo()
         addDefaultProperties()
+        String info = buildStartupInfo()
 
         long stop = System.currentTimeMillis()
         log.info("Startup @|green Successful|@ in @|cyan ${(stop - start)}|@ms: \n" + info)
@@ -81,7 +81,7 @@ class BootStrap {
             info.append("    |         [${url}]\n")
         }
         info.append("    |     Organization Information: \n")
-        TfamOwnerOrganization ownerOrganization = TFAMPropertiesHolder.getDefaultEntity()
+        TfamOwnerOrganization ownerOrganization = TFAMPropertiesHolder.getDefaultEntityFromProperties()
         info.append("    |         URI:  [@|cyan ${ownerOrganization.getIdentifier()?.toString()}|@]\n")
         info.append("    |         Name: [@|green ${ownerOrganization.getName()?.toString()}|@]\n")
         info.append("    |         Abbr: [@|green ${ownerOrganization.getAbbreviation()?.toString()}|@]\n")

@@ -64,10 +64,11 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
             params.max = DEFAULT_MAX.toString()
         if( params.offset == null )
             params.offset = "0"
-        if( params.sort == null )
-            params.sort = "trustmarkDefinition.name"
-        if( params.order == null )
-            params.order = "asc"
+        //TODO following parameters are not supported in the current grails version.
+//        if( params.sort == null )
+//            params.sort = "link.trustmarkDefinition.name"
+//        if( params.order == null )
+//            params.order = "asc"
 
         params.max = Math.min(100, Integer.parseInt(params.max)).toString() // we will display at most 100.
 
@@ -76,7 +77,8 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
         log.debug("Selecting all TDs (including deprecated) for VersionSet[${vs.name}] params=${params}")
 
         tds = VersionSetTDLink.executeQuery(
-                        "select link.trustmarkDefinition from VersionSetTDLink link where link.versionSet = :vs",
+                        "select link.trustmarkDefinition from VersionSetTDLink link where link.versionSet = :vs " +
+                                "order by link.trustmarkDefinition.name asc",
                         [vs: vs], params);
 
         totalCount = VersionSetTDLink.countByVersionSet(vs)

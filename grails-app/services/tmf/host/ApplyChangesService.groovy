@@ -101,11 +101,11 @@ class ApplyChangesService extends AbstractLongRunningService {
      * that or 2) store the new TrustmarkDefinition.
      */
     TrustmarkDefinition storeTd(String username, edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td){
-        Serializer jsonSerializer = FactoryLoader.getInstance(SerializerFactory.class).jsonSerializer
+        Serializer jsonSerializer = FactoryLoader.getInstance(SerializerFactory.class).getJsonSerializer()
         StringWriter stringWriter = new StringWriter()
         jsonSerializer.serialize(td, stringWriter)
-        File tempFile = File.createTempFile("td-", ".json")
         String tdJson = stringWriter.toString()
+        File tempFile = File.createTempFile("td-", ".json")
         tempFile << tdJson
 
         String checksum = BinaryObject.calculateChecksum(tempFile)
@@ -596,11 +596,11 @@ class ApplyChangesService extends AbstractLongRunningService {
 
 
     TrustInteroperabilityProfile storeTip(String username, edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip){
-        Serializer jsonSerializer = FactoryLoader.getInstance(SerializerFactory.class).jsonSerializer
+        Serializer jsonSerializer = FactoryLoader.getInstance(SerializerFactory.class).getJsonSerializer()
         StringWriter stringWriter = new StringWriter()
         jsonSerializer.serialize(tip, stringWriter)
-        File tempFile = File.createTempFile("tip-", ".json")
         String tipJson = stringWriter.toString()
+        File tempFile = File.createTempFile("tip-", ".json")
         tempFile << tipJson
 
         String checksum = BinaryObject.calculateChecksum(tempFile)
@@ -679,7 +679,11 @@ class ApplyChangesService extends AbstractLongRunningService {
 
     private BinaryObject buildBinary(String username, File tempFile){
         return fileService.createBinaryObject(
-                tempFile, username, "application/json", "trustmark-definition.json", "json")
+                tempFile,
+                username,
+                "application/json",
+                tempFile.getName(),
+                "json")
     }
 
 

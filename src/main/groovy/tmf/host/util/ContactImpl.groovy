@@ -27,6 +27,14 @@ class ContactImpl implements Contact {
         if( provider.notes?.length() > 0 ){
             this.notes = provider.notes;
         }
+        if( provider.uri?.length() > 0 ){
+            this.websiteURLs.add(new URL(provider.uri))
+        }
+        if( provider.getTd()){
+            this.kind = ContactKindCode.PRIMARY
+        } else {
+            this.kind = ContactKindCode.OTHER
+        }
     }
     public ContactImpl(){
         this(ContactKindCode.PRIMARY);
