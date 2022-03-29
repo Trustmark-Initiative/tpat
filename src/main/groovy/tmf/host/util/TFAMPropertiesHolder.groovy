@@ -126,10 +126,20 @@ class TFAMPropertiesHolder {
             if( defaultTfamOwnerOrganization )
                 return defaultTfamOwnerOrganization
 
+            TfamOwnerOrganization ownerOrganization = new TfamOwnerOrganization()
+
             final String fName = getString("org.name", "<DEFAULT ORG NAME NOT SET>")
+            ownerOrganization.setName(fName)
+
             final String fId = getString("org.identifier", "urn:error:missing")
-            final String fAbbr = getString("org.abbreviation", "")
-            final String fLogoPath = getString("org.logo.imagepath", "logo.png")
+            ownerOrganization.setIdentifier(new URI(fId))
+
+            //final String fAbbr = getString("org.abbreviation", "")
+//            ownerOrganization.setAbbreviation(fAbbr)
+
+            //final String fLogoPath = getString("org.logo.imagepath", "logo.png")
+//            ownerOrganization.setLogoImagePath(fLogoPath)
+
 
             final List<Contact> contacts = []
             if( getNumber("org.contact.count") != null ){
@@ -167,11 +177,6 @@ class TFAMPropertiesHolder {
                 }
             }
 
-            TfamOwnerOrganization ownerOrganization = new TfamOwnerOrganization()
-            ownerOrganization.setIdentifier(new URI(fId))
-            ownerOrganization.setName(fName)
-            ownerOrganization.setAbbreviation(fAbbr)
-            ownerOrganization.setLogoImagePath(fLogoPath)
             ownerOrganization.setContacts(contacts)
 
             defaultTfamOwnerOrganization = ownerOrganization

@@ -14,8 +14,8 @@ class TfamOwnerOrganization implements Entity {
     //==================================================================================================================
     private String name;
     private URI identifier;
-    private String abbreviation;
-    private String logoImagePath;
+//    private String abbreviation;
+//    private String logoImagePath;
 
     private List<Contact> contacts = new ArrayList<>();
 
@@ -30,15 +30,15 @@ class TfamOwnerOrganization implements Entity {
     public String getName() {
         return name
     }
-    public String getAbbreviation(){
-        return abbreviation;
-    }
-    public String getLogoImagePath() {
-        if( !logoImagePath.startsWith("/") )
-            return "/" + logoImagePath;
-        else
-            return logoImagePath;
-    }
+//    public String getAbbreviation(){
+//        return abbreviation;
+//    }
+//    public String getLogoImagePath() {
+//        if( !logoImagePath.startsWith("/") )
+//            return "/" + logoImagePath;
+//        else
+//            return logoImagePath;
+//    }
     @Override
     public List<Contact> getContacts() {
         if( contacts == null )
@@ -48,9 +48,13 @@ class TfamOwnerOrganization implements Entity {
     //==================================================================================================================
     //  Setters
     //==================================================================================================================
-    public void setLogoImagePath(String logoImagePath) {
-        this.logoImagePath = logoImagePath
-    }
+//    public void setAbbreviation(String abbreviation) {
+//        this.abbreviation = abbreviation
+//    }
+
+//    public void setLogoImagePath(String logoImagePath) {
+//        this.logoImagePath = logoImagePath
+//    }
 
     public void setName(String name) {
         this.name = name
@@ -58,10 +62,6 @@ class TfamOwnerOrganization implements Entity {
 
     public void setIdentifier(URI identifier) {
         this.identifier = identifier
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation
     }
 
     public void setContacts(List<Contact> contacts) {
@@ -92,5 +92,14 @@ class TfamOwnerOrganization implements Entity {
             }
         }
         return otherContacts;
+    }
+
+    @Override
+    public String toString(){
+        return new StringBuilder("TfamOwnerOrganization [")
+                .append(" name = ").append(name).append(";")
+                .append(" identifier = ").append(identifier).append(";")
+                .append(" contacts = (").append(contacts).append(")]")
+                .toString()
     }
 }

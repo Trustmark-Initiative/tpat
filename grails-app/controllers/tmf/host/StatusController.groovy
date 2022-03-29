@@ -164,8 +164,8 @@ public class StatusController extends AbstractTFObjectAwareController {
         return [
                 Name: ownerOrganization.name,
                 Identifier: ownerOrganization.identifier.toString(),
-                Abbreviation: ownerOrganization.getAbbreviation(),
-                LogoPath: g.createLink(uri: ownerOrganization.getLogoImagePath(), absolute: true),
+//                Abbreviation: ownerOrganization.getAbbreviation(),
+//                LogoPath: g.createLink(uri: ownerOrganization.getLogoImagePath(), absolute: true),
                 PrimaryContact: getContactJsonMap(ownerOrganization.getDefaultContact())
         ]
     }

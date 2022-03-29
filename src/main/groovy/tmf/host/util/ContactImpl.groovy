@@ -64,6 +64,19 @@ class ContactImpl implements Contact {
     }
 
     @Override
+    public String toString(){
+        return new StringBuilder("Contact [")
+                .append(" responder = ").append(responder).append(";")
+                .append(" emails = ").append(emails).append(";")
+                .append(" telephones = ").append(telephones).append(";")
+                .append(" physicalAddresses = ").append(physicalAddresses).append(";")
+                .append(" mailingAddresses = ").append(mailingAddresses).append(";")
+                .append(" websiteURLs = ").append(websiteURLs).append(";")
+                .append(" notes = ").append(notes).append("]")
+                .toString()
+    }
+
+    @Override
     ContactKindCode getKind() {
         return kind;
     }
