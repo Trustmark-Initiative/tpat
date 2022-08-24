@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>404 Page Not Found</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | 404 Page Not Found</title>
 
         <asset:stylesheet src="errors.css" />
 

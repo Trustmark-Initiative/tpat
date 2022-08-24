@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>500 Internal Server Error</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | 500 Internal Server Error</title>
 
         <asset:stylesheet src="errors.css" />
     </head>

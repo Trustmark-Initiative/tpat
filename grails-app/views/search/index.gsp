@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Search</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Search</title>
         <style type="text/css"></style>
 
     </head>

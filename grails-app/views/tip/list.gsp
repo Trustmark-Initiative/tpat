@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>TIP Index</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | All TIPs</title>
         <style type="text/css">
             .xmlLink {
                 text-align: center;
@@ -52,7 +52,17 @@
                     <div style="float: left;">
                         <page:paginate total="${tipCount}" />
                     </div>
+                    <div style="float: right;">
+                    </div>
                 </div>
+            </div>
+            <div style="margin-top: 1em;">
+                <div>
+                    <div>
+                        <div id="copyURLtoClipboard-status">
+                        </div>
+                    </div>
+                <div>
             </div>
             <div>
                 <table class="table table-striped table-condensed table-bordered">

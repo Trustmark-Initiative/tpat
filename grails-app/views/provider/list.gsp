@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Provider List</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Organizations</title>
         <style type="text/css">
 
 

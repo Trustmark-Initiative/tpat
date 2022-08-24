@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta name="layout" content="main"/>
-    <title>Trust Interoperability Profile Editor</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | TIP Editor</title>
 
     <meta charset="utf-8"/>
 

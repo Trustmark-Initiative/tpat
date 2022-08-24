@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Version Set Manage Trustmark Definitions</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Manage Trustmark Definitions</title>
         <style type="text/css">
 
         </style>

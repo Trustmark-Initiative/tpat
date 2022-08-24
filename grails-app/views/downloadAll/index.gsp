@@ -3,7 +3,7 @@
     <head>
         <meta name="layout" content="main"/>
 
-        <title>Download All</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Download All</title>
 
         <style type="text/css">
         </style>

@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Trustmark Definition List By Name</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | All TDs</title>
         <style type="text/css">
             .xmlLink {
                 text-align: center;

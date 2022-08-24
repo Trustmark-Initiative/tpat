@@ -163,3 +163,37 @@ function buildPagination(offset, max, total, callbackFunction, displayCounts){
 function getCurrentPage(offset, max){
     return Math.floor(offset/max) + 1;
 }
+
+
+function isEmtpy(str) {
+    return (!str || str.length === 0);
+}
+
+let setStatusMessage = function(target, data) {
+    let html = "";
+    //html += "<div id='status-message' class='alert alert-success' class='glyphicon glyphicon-ok-circle'>Copied</div>";
+
+    html = html +
+    "<div id='status-message' class='alert alert-success' role='alert' class='glyphicon glyphicon-ok-circle' style='border-radius: 1px; margin-top: 2em;'>"+
+    "<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='True' style='color:#155724; float: right;'>&times;</span></button>"+
+    //"<div class='text-center'>" +
+    //"<svg width='3em' height='3em' viewBox='0 0 16 16' class='m-1 bi bi-shield-fill-check' fill='currentColor' xmlns='http://www.w3.org/2000/svg'><path fill-rule='evenodd' d='M8 .5c-.662 0-1.77.249-2.813.525a61.11 61.11 0 0 0-2.772.815 1.454 1.454 0 0 0-1.003 1.184c-.573 4.197.756 7.307 2.368 9.365a11.192 11.192 0 0 0 2.417 2.3c.371.256.715.451 1.007.586.27.124.558.225.796.225s.527-.101.796-.225c.292-.135.636-.33 1.007-.586a11.191 11.191 0 0 0 2.418-2.3c1.611-2.058 2.94-5.168 2.367-9.365a1.454 1.454 0 0 0-1.003-1.184 61.09 61.09 0 0 0-2.772-.815C9.77.749 8.663.5 8 .5zm2.854 6.354a.5.5 0 0 0-.708-.708L7.5 8.793 6.354 7.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l3-3z'/></svg>" +
+    //"</div>" +
+    "<p style='font-size:80%;' class='mb-0 font-weight-light'><b class='mr-1'>Copied:</b> "+ data +"</p>"+
+    "</div>";
+
+    if (!isEmtpy(html)) {
+        $('#'+target).html(html);
+
+        $('#'+target).fadeToggle(2000,"swing", function(){ if ($('#'+target).html != "") $('#'+target).html("");});
+
+        //$('#'+target).fadeTo(200, 1);
+        //$('#'+target).delay(2000).fadeTo(300, 0);
+
+    }
+}
+
+function copyFunction(hrefLinkId) {
+  navigator.clipboard.writeText(hrefLinkId);
+  setStatusMessage('copyURLtoClipboard-status', hrefLinkId);
+}

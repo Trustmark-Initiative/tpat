@@ -19,7 +19,7 @@ buildscript {
     }
 }
 
-version "1.4.1"
+version "1.5-SNAPSHOT"
 group "tf.host"
 
 apply plugin:"eclipse"
@@ -41,7 +41,7 @@ repositories {
     maven { url "https://repo.grails.org/grails/plugins" }
     mavenCentral()
     maven { url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases" }
-    maven { url "https://idcapture.bintray.com/plugins" }
+//    maven { url "https://idcapture.bintray.com/plugins" }
 }
 
 dependencyManagement {
@@ -74,7 +74,7 @@ dependencies {
     implementation "org.grails.plugins:scaffolding"
     implementation "org.grails.plugins:events"
     implementation "org.grails.plugins:gsp:4.0.0"
-    implementation "org.grails.plugins:hibernate5:${project.gormVersion}"
+    implementation "org.grails.plugins:hibernate5"
     implementation 'org.grails.plugins:spring-security-core:4.0.3'
     implementation "org.grails.plugins:hibernate-search:2.4.0"
 
@@ -98,9 +98,9 @@ dependencies {
     implementation 'org.grails.plugins:quartz:2.0.13' // For monitoring configuration directories periodically
     implementation 'org.quartz-scheduler:quartz:2.2.1'
 
-    implementation 'edu.gatech.gtri.trustmark:tf-api:1.4.30'
-    implementation 'edu.gatech.gtri.trustmark:tf-api-impl:1.4.44'
-    //implementation 'org.apache.logging.log4j:log4j-core:2.16.0' // required by tf-api-impl
+    implementation 'edu.gatech.gtri.trustmark:tf-api:1.4.37'
+    implementation 'edu.gatech.gtri.trustmark:tf-api-impl:1.4.58'
+    implementation 'edu.gatech.gtri.trustmark:tf-api-reactor:1.4.37'
     implementation(platform("org.apache.logging.log4j:log4j-bom:2.17.1"))
 
     implementation 'org.fusesource.jansi:jansi:1.17' // For colored command line output
@@ -139,7 +139,7 @@ dependencies {
 }
 
 war {
-    baseName = "tpat"
+    baseName = "tfam"
 }
 
 bootRun {

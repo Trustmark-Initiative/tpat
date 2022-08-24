@@ -3,7 +3,7 @@
     <head>
         <meta name="layout" content="main"/>
 
-        <title>Secured Page Test</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Secured Page Test</title>
 
         <style type="text/css">
 

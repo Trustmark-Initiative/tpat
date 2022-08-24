@@ -8,7 +8,7 @@
         --%>
         <base target="_blank"/>
         <meta name="layout" content="main"/>
-        <title>View TD: ${td.metadata.name}</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | TD: ${td.metadata.name}</title>
         <style type="text/css">
             .URIList, .URIList li {
                 list-style: none;
@@ -193,6 +193,15 @@
 
     <hr />
 
+            <div style="margin-top: 1em;">
+                <div>
+                    <div>
+                        <div id="copyURLtoClipboard-status">
+                        </div>
+                    </div>
+                <div>
+            </div>
+
             <div id="showMetadataButtonContainer">
                 <a href="javascript:showMetadata()" target="_self" id="showMetadataButton" class="btn btn-primary">Show Metadata, Sources &amp; Terms</a>
             </div>
@@ -204,6 +213,15 @@
                 <div>
                     <h4 style="margin-bottom: 0;">Metadata</h4>
                     <table class="table table-condensed table-bordered table-striped">
+                        <tr>
+                            <td style="width: 20%;"><abbr title="Unique Trustmark Definition Identifier">Identifier</abbr></td>
+                            <td style="width: 80%;">
+                                ${td.identifier.toString()}
+                                <a title="Copy TD Identifier URL to clipboard" onclick="copyFunction('${td.identifier}')">
+                                    <span class="glyphicon glyphicon-copy"></span>
+                                </a>
+                            </td>
+                        </tr>
                         <tr>
                             <td style="width: 20%;"><abbr title="The date and time at which this Trustmark Definition was published">Publication Date</abbr></td>
                             <td style="width: 80%;"><g:formatDate date="${td.metadata.publicationDateTime}" format="yyyy-MM-dd" /></td>

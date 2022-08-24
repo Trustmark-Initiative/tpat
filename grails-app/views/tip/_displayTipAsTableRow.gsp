@@ -10,6 +10,10 @@
                 <tmf:createLink tip="${tip}" format="xml">XML</tmf:createLink>
                 |
                 <tmf:createLink tip="${tip}" format="json">JSON</tmf:createLink>
+                |
+                <a title="Copy TIP identifier URL to clipboard" onclick="copyFunction('${tip.identifier}')">
+                    <span class="glyphicon glyphicon-copy"></span>
+                </a>
             </div>
         </div>
         <div class="text-muted" style="margin-left: 0.5em;"><small><%= LinkHelper.linkifyText(tip.description) %></small></div>

@@ -7,7 +7,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Version Set Edit - Editor Deprecated</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Editor Deprecated</title>
     <style type="text/css">
     </style>
 </head>

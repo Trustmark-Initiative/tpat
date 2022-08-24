@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Base URL Not Matching Error</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Base URL Not Matching Error</title>
 
         <asset:stylesheet src="errors.css" />
 
