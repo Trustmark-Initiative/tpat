@@ -534,17 +534,19 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
      * @return
      */
     private String mapUrl(String content)  {
-        String s = content
-        def regx = s =~ /\b(https|http|ftp|file):\/\/[\/\-\w_+\.]+\b/
-        if(regx.find())  {
-            if(!s.contains("<a href=\""+regx[0][0]))  {
-                log.debug("REGEX  ${regx.size()} - ${regx[0]}")
-                String replacement = stripTrailing(regx[0][0], '.' as char)  // hack to remove trailing periods
-                content = s.replaceAll(replacement, "<a href=${replacement}>${replacement}</a>" )
-                log.debug("REPLACED ${content}")
-            }
-        }
         return content
+//        Replaced with LinkHelper.linkifyText on front end delivery
+//        String s = content
+//        def regx = s =~ /\b(https|http|ftp|file):\/\/[\/\-\w_+\.]+\b/
+//        if(regx.find())  {
+//            if(!s.contains("<a href=\""+regx[0][0]))  {
+//                log.debug("REGEX  ${regx.size()} - ${regx[0]}")
+//                String replacement = stripTrailing(regx[0][0], '.' as char)  // hack to remove trailing periods
+//                content = s.replaceAll(replacement, "<a href=${replacement}>${replacement}</a>" )
+//                log.debug("REPLACED ${content}")
+//            }
+//        }
+//        return content
     }
 
     /**

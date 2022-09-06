@@ -147,10 +147,13 @@ public class LinkHelper {
             return content;
         }
 
+
+        content = content.replaceAll("[\\n\\r\b\\t\\f ]", " ")
+
         String[] tokens = content.split(" ");
 
         for (int i = 0; i < tokens.length; i++){
-            String regex = "\\(?\\bhttps?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
+            String regex = "\\(?\\b(http|ftp)s?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|%?]";
 
             // if valid match replace this token with desired A HREF string
             if(Pattern.matches(regex, tokens[i])){

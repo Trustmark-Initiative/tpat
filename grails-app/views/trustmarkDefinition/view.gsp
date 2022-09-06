@@ -94,7 +94,7 @@
                                         </div>
                                         <div class="col-md-11">
                                             <div style="font-size: 125%; font-weight: bold;">${step.name} <span style="font-size: 70%; font-weight: normal; margin-left: 1em;">(${step.id})</span></div>
-                                            <div style="font-size: 120%;">${raw(step.description)}</div>
+                                            <div style="font-size: 120%;"><%= LinkHelper.linkifyText(raw(step.description)) %></div>
                                             <g:if test="${step.artifacts?.size() > 0}">
                                                 <g:set var="artifactsList" value="${new ArrayList(step.artifacts)}" />
                                                 ${java.util.Collections.sort(artifactsList, new Comparator<Artifact>(){
@@ -111,7 +111,7 @@
                                                         <g:each in="${artifactsList}" var="artifact">
                                                             <div class="row">
                                                                 <div class="col-md-2" style="text-align: left;">${artifact.name}</div>
-                                                                <div class="col-md-10">${raw(artifact.description)}</div>
+                                                                <div class="col-md-10"><%= LinkHelper.linkifyText(raw(artifact.description)) %></div>
                                                             </div>
                                                         </g:each>
                                                     </div>
@@ -135,11 +135,11 @@
                                                                 <div class="col-md-3" style="text-align: left;">
                                                                     ${parameter.name}<g:if test="${parameter.required}"><sup class="text-danger" title="This parameter must be populated for any trustmark issued.">required</sup></g:if>
                                                                 </div>
-                                                                <div class="col-md-8" style="text-align: left;" >${parameter.parameterKind} : ${raw(parameter.description)}
-                                                                    <ul>
-                                                                <g:each in="${parameter.enumValues}" var="evalue">
-                                                                        <li style="text-align: left;"><i>${evalue}</i></li>
-                                                                </g:each>
+                                                                <div class="col-md-8" style="text-align: left;" >${parameter.parameterKind} : <%= LinkHelper.linkifyText(raw(parameter.description)) %>
+                                                                <ul>
+                                                                    <g:each in="${parameter.enumValues}" var="evalue">
+                                                                            <li style="text-align: left;"><i>${evalue}</i></li>
+                                                                    </g:each>
                                                                 </ul>
                                                                 </div>
                                                              </div>
@@ -157,7 +157,7 @@
 
                 <div>
                     <g:if test="${org.apache.commons.lang.StringUtils.isNotBlank(td.conformanceCriteriaPreface)}">
-                        <h5 style="margin-bottom: 0;"><b><i>${raw(td.conformanceCriteriaPreface)}</i></b></h5>
+                        <h5 style="margin-bottom: 0;"><b><i><%= LinkHelper.linkifyText(raw(td.conformanceCriteriaPreface)) %></i></b></h5>
                     </g:if>
                     <h4 style="margin-bottom: 0;">Conformance Criteria (${td.conformanceCriteria.size()})</h4>
                     <table class="table table-condensed table-striped">
@@ -165,7 +165,7 @@
                             <tr><td>
                                 <div>
                                     <div style="font-size: 125%; font-weight: bold;">${crit.name}</div>
-                                    <div style="font-size: 120%;">${raw(crit.description)}</div>
+                                    <div style="font-size: 120%;"><%= LinkHelper.linkifyText(raw(crit.description)) %></div>
                                     <g:if test="${crit.citations?.size() > 0}">
                                         <div style="font-weight: bold;">
                                             <g:if test="${crit.citations.size() > 1}">Citations</g:if>
@@ -177,7 +177,7 @@
                                                     ${citation.source.identifier}
                                                 </div>
                                                 <div class="col-md-10">
-                                                    ${raw(citation.description)}
+                                                    <%= LinkHelper.linkifyText(raw(citation.description)) %>
                                                 </div>
                                             </div>
                                         </g:each>
@@ -396,7 +396,7 @@
                             <tr>
                                 <td style="width: 20%;">Trustmark Revocation Criteria</td>
                                 <td style="width: 80%; font-size: 90%;" class="text-muted">
-                                    <%= LinkHelper.linkifyText( td.metadata.trustmarkRevocationCriteria) %>
+                                    <%= LinkHelper.linkifyText(raw(td.metadata.trustmarkRevocationCriteria)) %>
                                 </td>
                             </tr>
                         </g:if>
