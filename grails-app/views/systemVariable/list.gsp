@@ -3,7 +3,7 @@
     <head>
         <meta name="layout" content="main"/>
 
-        <title>System Variables</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | System Variables</title>
 
         <style type="text/css">
         </style>

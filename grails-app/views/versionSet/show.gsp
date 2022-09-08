@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Version Set - Show</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Show</title>
         <style type="text/css">
 
 

@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Version Set - Create</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Create Version Set</title>
         <style type="text/css">
 
 

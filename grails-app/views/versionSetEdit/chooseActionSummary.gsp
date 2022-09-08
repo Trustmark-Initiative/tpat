@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Version Set Edit - Choose Actions</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Choose Actions</title>
     <style type="text/css">
 
 

@@ -27,6 +27,14 @@ class ContactImpl implements Contact {
         if( provider.notes?.length() > 0 ){
             this.notes = provider.notes;
         }
+        if( provider.uri?.length() > 0 ){
+            this.websiteURLs.add(new URL(provider.uri))
+        }
+        if( provider.getTd()){
+            this.kind = ContactKindCode.PRIMARY
+        } else {
+            this.kind = ContactKindCode.OTHER
+        }
     }
     public ContactImpl(){
         this(ContactKindCode.PRIMARY);
@@ -53,6 +61,19 @@ class ContactImpl implements Contact {
             return things.get(0);
         else
             return null
+    }
+
+    @Override
+    public String toString(){
+        return new StringBuilder("Contact [")
+                .append(" responder = ").append(responder).append(";")
+                .append(" emails = ").append(emails).append(";")
+                .append(" telephones = ").append(telephones).append(";")
+                .append(" physicalAddresses = ").append(physicalAddresses).append(";")
+                .append(" mailingAddresses = ").append(mailingAddresses).append(";")
+                .append(" websiteURLs = ").append(websiteURLs).append(";")
+                .append(" notes = ").append(notes).append("]")
+                .toString()
     }
 
     @Override

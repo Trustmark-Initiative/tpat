@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Version Set - Creation in Progress</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Creation in Progress</title>
     <style type="text/css"></style>
 
     <script type="text/javascript">

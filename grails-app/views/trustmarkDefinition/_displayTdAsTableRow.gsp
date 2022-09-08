@@ -10,6 +10,10 @@
                 <tmf:createLink td="${td}" format="xml">XML</tmf:createLink>
                 |
                 <tmf:createLink td="${td}" format="json">JSON</tmf:createLink>
+                |
+                <a title="Copy TD identifier URL to clipboard" onclick="copyFunction('${td.identifier}')">
+                    <span class="glyphicon glyphicon-copy"></span>
+                </a>
             </div>
         </div>
         <div class="text-muted" style="margin-left: 0.5em;"><small><%= LinkHelper.linkifyText(td.description) %></small></div>

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Change Password</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Appearance</title>
     <style type="text/css"></style>
 
 </head>

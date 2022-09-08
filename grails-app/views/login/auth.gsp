@@ -3,7 +3,7 @@
 <head>
     <meta name="layout" content="main"/>
 
-    <title>Login</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Login</title>
 
     <style type="text/css">
 

@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Primary TIP Index</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Primary TIPs</title>
         <style type="text/css">
 
         </style>

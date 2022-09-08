@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Version Set Manage Trust Interoperability Profiles</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Manage Trust Interoperability Profiles</title>
         <style type="text/css">
 
         </style>

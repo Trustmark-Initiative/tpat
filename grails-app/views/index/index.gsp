@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Home Page</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Home</title>
         <style type="text/css">
             .overallIndexLinkTable td {
                 padding: 1em;

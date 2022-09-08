@@ -68,10 +68,11 @@ class TipController extends AbstractTFObjectAwareController {
             params.max = DEFUALT_MAX.toString()
         if( params.offset == null )
             params.offset = "0"
-        if( params.sort == null )
-            params.sort = "trustInteroperabilityProfile.name"
-        if( params.order == null )
-            params.order = "asc"
+        //TODO following parameters are not supported in the current grails version.
+//        if( params.sort == null )
+//            params.sort = "link.trustInteroperabilityProfile.name"
+//        if( params.order == null )
+//            params.order = "asc"
 
         params.max = Math.min(100, Integer.parseInt(params.max)).toString(); // we will display at most 100.
 
@@ -79,7 +80,8 @@ class TipController extends AbstractTFObjectAwareController {
         Integer totalCount = -1
         log.debug("Selecting all TIPs (including deprecated) for VersionSet[${vs.name}] params=${params}")
         tips = VersionSetTIPLink.executeQuery(
-                "select link.trustInteroperabilityProfile from VersionSetTIPLink link where link.versionSet = :vs",
+                "select link.trustInteroperabilityProfile from VersionSetTIPLink link where link.versionSet = :vs " +
+                        "order by link.trustInteroperabilityProfile.name asc",
                 [vs: vs], params)
         totalCount = VersionSetTIPLink.countByVersionSet(vs)
 
@@ -256,10 +258,12 @@ class TipController extends AbstractTFObjectAwareController {
     def viewTipTree(){
         VersionSet vs = VersionSet.findByName(session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE))
         if( !vs ){
+            log.error("Operation is not supported until Version Sets exist in the database : VERSION_SET_NAME param: " +
+                    "[${session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE)}]")
             throw new ServletException("Operation is not supported until Version Sets exist in the database.")
         }
 
-        log.debug("Displaying Primary TIPs / TIP Tree for VersionSetTIPLink.TrustInteroperabilityProfile[id=@|cyan ${params.id}|@]...")
+        log.debug("Searching for TIP in VersionSetTIPLink.TrustInteroperabilityProfile[id=@|cyan ${params.id}|@] in VersionSet[${vs.name}]...")
         if( StringUtils.isBlank(params.id) ){
             log.warn("Given blank ID, cannot display!")
             throw new ServletException("Invalid blank id, cannot display tmf.host.TrustInteroperabilityProfile.")
@@ -272,16 +276,21 @@ class TipController extends AbstractTFObjectAwareController {
             throw new ServletException("No such tmf.host.TrustInteroperabilityProfile identifier [${params.id}] found.")
         }
 
+        String jsonOutput = getTipTreeCache(databaseTip, StringUtils.isBlank(params.resetCache))
+
+        return render(contentType: 'application/json', text: jsonOutput)
+    }
+
+    private String getTipTreeCache(TrustInteroperabilityProfile databaseTip, boolean dontResetCache){
         String jsonOutput = null
         TipTreeCache cache = TipTreeCache.findByTip(databaseTip)
-        if( cache && StringUtils.isBlank(params.resetCache)){
-            log.debug("Successfully found Primary TIPs / TIP Tree JSON in cache!")
+        if( cache && dontResetCache){
+            log.info("Successfully found Primary TIPs / TIP Tree JSON in cache!")
             jsonOutput = cache.binaryObject.content.toFile().text
         }else{
-            log.info("Successfully Found TIP[${params.id}]: ${databaseTip.name}, v. ${databaseTip.tipVersion} ${databaseTip.identifier} | Downloading Primary TIPs / TIP Tree...")
+            log.info("Successfully Found TIP[ Id: ${databaseTip.id}, Name: ${databaseTip.name}, V: ${databaseTip.tipVersion}, Identifier: ${databaseTip.identifier}]. Downloading Primary TIPs / TIP Tree...")
             TipTreeNode tipTreeNode = FactoryLoader.getInstance(TrustInteroperabilityProfileUtils.class).buildTipTree(new URI(databaseTip.getIdentifier()))
 
-            log.debug("Displaying format JSON...")
             Map treeJson = buildTreeJson(tipTreeNode)
             Map responseJson = [
                     "id" : databaseTip.id,
@@ -291,19 +300,17 @@ class TipController extends AbstractTFObjectAwareController {
             ]
 
             jsonOutput = JsonOutput.prettyPrint(JsonOutput.toJson(responseJson))
-            log.trace("Tree[${params.id}] JSON: \n"+jsonOutput)
+            log.trace("Cached Tree JSON: {}", jsonOutput)
 
             File tempFile = File.createTempFile("tip-tree-", ".json")
             tempFile << jsonOutput
-            log.debug("Saved Tree[${params.id}] to temp JSON file: [${tempFile.getCanonicalPath()}]")
+            log.debug("Saved Cached Tree: [${databaseTip.id}] to temp JSON file: [${tempFile.getCanonicalPath()}]")
 
             BinaryObject bo = fileService.createBinaryObject(tempFile, "System", "application/json", "tip-tree.json", "json")
             cache = new TipTreeCache(tip: databaseTip, binaryObject: bo)
             cache.save(failOnError: false); // Silently fail here.
         }
-
-        // TODO Support other content types?
-        return render(contentType: 'application/json', text: jsonOutput)
+        return jsonOutput
     }
 
 
@@ -457,14 +464,12 @@ class TipController extends AbstractTFObjectAwareController {
 
         log.info("Successfully Found TIP[${params.id}]: ${tip.name}, v. ${tip.tipVersion} ${tip.identifier} | Displaying to requester...")
         BinaryObject artifact = tip.getArtifact()
-
-        List<ArtifactReference> references = ArtifactReference.findAllByVersionSetAndDestinationTip(vs, tip)
-
+        log.info("BinaryObject for TIP: ${tip.name}, v. ${tip.tipVersion} ${tip.identifier} will be loaded from file: ${artifact.originalFilename}")
         TrustInteroperabilityProfileResolver tipResolver = FactoryLoader.getInstance(TrustInteroperabilityProfileResolver.class)
         edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip2 = tipResolver.resolve(new FileReader(artifact.content.toFile()))
 
         for(AbstractTIPReference ref : tip2.references) {
-            log.info( "Returning TIP ref: [name=${ref.name} | version=${ref.version} | identifier=${ref.identifier} | description=${ref.description}]...")
+            log.info( "Returning TIP that includes References: [name=${ref.name} | version=${ref.version} | identifier=${ref.identifier} | description=${ref.description}]...")
         }
 
         SerializerFactory serializerFactory = FactoryLoader.getInstance(SerializerFactory.class)
@@ -473,6 +478,10 @@ class TipController extends AbstractTFObjectAwareController {
 
         log.info "Returning format: [request=${request.format} | response=${response.format}]..."
         if( response.format == "html" || response.format == "all" ){ // Note all is the special case format!
+            List<ArtifactReference> references = ArtifactReference.findAllByVersionSetAndDestinationTip(vs, tip)
+            for(ArtifactReference ref : references) {
+                log.debug( "ArtifactReferences : [sourceTip=${ref.sourceTip} | destinationTip=${ref.destinationTip} | destinationTd=${ref.destinationTd} | externalReference=${ref.externalReference}]...")
+            }
             return [databaseTip: tip, tip: tip2, references: references]
         }else if( response.format == "json" ){
             contentType = "application/json"

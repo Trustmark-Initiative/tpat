@@ -35,7 +35,7 @@ class FileService {
 
 
     BinaryObject createBinaryObject(File file, String createdBy, String mimeType, String originalFilename, String originalExtension) {
-        log.info("Creating binary object for file[name ${originalFilename}, bytes ${file.length()}, createdBy ${createdBy}, mimeType ${mimeType}, originalFilename ${originalFilename}, originalExtension ${originalExtension}]...")
+        log.info("Creating binary object for file[originalFilename ${originalFilename}, bytes ${file.length()}, createdBy ${createdBy}, mimeType ${mimeType}, originalExtension ${originalExtension}]...")
         String checksum = digestFile(file);
 
         log.debug("Creating BinaryObject in database...")

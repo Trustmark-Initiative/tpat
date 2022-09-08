@@ -64,10 +64,11 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
             params.max = DEFAULT_MAX.toString()
         if( params.offset == null )
             params.offset = "0"
-        if( params.sort == null )
-            params.sort = "trustmarkDefinition.name"
-        if( params.order == null )
-            params.order = "asc"
+        //TODO following parameters are not supported in the current grails version.
+//        if( params.sort == null )
+//            params.sort = "link.trustmarkDefinition.name"
+//        if( params.order == null )
+//            params.order = "asc"
 
         params.max = Math.min(100, Integer.parseInt(params.max)).toString() // we will display at most 100.
 
@@ -76,7 +77,8 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
         log.debug("Selecting all TDs (including deprecated) for VersionSet[${vs.name}] params=${params}")
 
         tds = VersionSetTDLink.executeQuery(
-                        "select link.trustmarkDefinition from VersionSetTDLink link where link.versionSet = :vs",
+                        "select link.trustmarkDefinition from VersionSetTDLink link where link.versionSet = :vs " +
+                                "order by link.trustmarkDefinition.name asc",
                         [vs: vs], params);
 
         totalCount = VersionSetTDLink.countByVersionSet(vs)
@@ -532,17 +534,19 @@ class TrustmarkDefinitionController extends AbstractTFObjectAwareController {
      * @return
      */
     private String mapUrl(String content)  {
-        String s = content
-        def regx = s =~ /\b(https|http|ftp|file):\/\/[\/\-\w_+\.]+\b/
-        if(regx.find())  {
-            if(!s.contains("<a href=\""+regx[0][0]))  {
-                log.debug("REGEX  ${regx.size()} - ${regx[0]}")
-                String replacement = stripTrailing(regx[0][0], '.' as char)  // hack to remove trailing periods
-                content = s.replaceAll(replacement, "<a href=${replacement}>${replacement}</a>" )
-                log.debug("REPLACED ${content}")
-            }
-        }
         return content
+//        Replaced with LinkHelper.linkifyText on front end delivery
+//        String s = content
+//        def regx = s =~ /\b(https|http|ftp|file):\/\/[\/\-\w_+\.]+\b/
+//        if(regx.find())  {
+//            if(!s.contains("<a href=\""+regx[0][0]))  {
+//                log.debug("REGEX  ${regx.size()} - ${regx[0]}")
+//                String replacement = stripTrailing(regx[0][0], '.' as char)  // hack to remove trailing periods
+//                content = s.replaceAll(replacement, "<a href=${replacement}>${replacement}</a>" )
+//                log.debug("REPLACED ${content}")
+//            }
+//        }
+//        return content
     }
 
     /**

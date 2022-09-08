@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Provider - Edit</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Provider - Edit</title>
         <style type="text/css">
 
 

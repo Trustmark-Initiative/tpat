@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Trustmark Definition Editor</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | TD Editor</title>
 
     <style type="text/css">
     #mainContainer {

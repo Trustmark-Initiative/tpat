@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Version Set Edit - Index</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Development Repository</title>
         <style type="text/css"></style>
 
         <script type="text/javascript">

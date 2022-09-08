@@ -128,8 +128,8 @@ class ProcessUploadService extends AbstractLongRunningService {
         }
 
         log.info("From upload[@|magenta ${originalFilename}|@], successfully resolved @|cyan ${tdCount}|@ TDs and @|cyan ${tipCount}|@ TIPs.")
-        setProcessStatus(uploadId, ProcessPhase.PROCESS_TDS, "The system is now processing the ${tdCount} TDs that were uploaded...")
 
+        setProcessStatus(uploadId, ProcessPhase.PROCESS_TDS, "The system is now processing the ${tdCount} TDs that were uploaded...")
         for( int i = 0; i < tdCount; i++ ){
             edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td = mpd.getTd(i)
             setProcessStatus(uploadId, ProcessPhase.PROCESS_TDS, "Processing Trustmark Definition[${td.getMetadata().getName()}, v.${td.getMetadata().getVersion()}]...", getPercent(i, tdCount))
@@ -416,6 +416,8 @@ class ProcessUploadService extends AbstractLongRunningService {
         if (artifact == null){
             log.error("Creating SupersededBy error - unable to resolve artifact at link. Artifact is null");
             return null
+        } else {
+            log.debug("Found artifact: " + artifact)
         }
 
         ArtifactAction supersededByAction = new ArtifactAction(id: id, type: type, artifact: createSummary(artifact))
@@ -450,10 +452,13 @@ class ProcessUploadService extends AbstractLongRunningService {
         }
     }
 
-    private Map createSummary(edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td){
-        return createSummary(td.getMetadata())
+    private Map createSummary(edu.gatech.gtri.trustmark.v1_0.model.TrustInteroperabilityProfile tip){
+        return createTrustmarkFrameworkIdentifiedObjectSummary(tip)
     }
-    private Map createSummary(edu.gatech.gtri.trustmark.v1_0.model.TrustmarkFrameworkIdentifiedObject tfi){
+    private Map createSummary(edu.gatech.gtri.trustmark.v1_0.model.TrustmarkDefinition td){
+        return createTrustmarkFrameworkIdentifiedObjectSummary(td.getMetadata())
+    }
+    private Map createTrustmarkFrameworkIdentifiedObjectSummary(edu.gatech.gtri.trustmark.v1_0.model.TrustmarkFrameworkIdentifiedObject tfi){
         return [
                 identifier: tfi.getIdentifier().toString(),
                 name: tfi.getName(),
@@ -751,7 +756,7 @@ class ProcessUploadService extends AbstractLongRunningService {
             setProcessStatus(uploadId, ProcessPhase.RESOLVE, "Processing Microsoft Excel file ${uploadedFileOriginalName}...")
             BulkReadListenerImpl listenerImpl = new BulkReadListenerImpl(uploadId)
             bulkReader.addListener(listenerImpl)
-            BulkReadContext context = new BulkReadContextFromTfamProperties()
+            BulkReadContext context = new BulkReadContextTpatImpl()
             BulkReadResult bulkReadResult = bulkReader.readBulkFrom(context, [uploadedFile])
 
 //            BulkReadResult bulkReadResult = bulkReader.readBulkFrom(bulkReaderFactory.createBulkReadContextFromProperties(TFAMPropertiesHolder.getProperties()), [uploadedFile])
@@ -801,7 +806,7 @@ class ProcessUploadService extends AbstractLongRunningService {
                 context = bulkReaderFactory.createBulkReadContextFromProperties(properties)
             } else {
                 log.debug("Using default properties since no properties file were provided")
-                context = new BulkReadContextFromTfamProperties()
+                context = new BulkReadContextTpatImpl()
             }
             setProcessStatus(uploadId, ProcessPhase.RESOLVE, "Processing ${files.size()} files from archive ${uploadedFileOriginalName}...")
             BulkReadListenerImpl listenerImpl = new BulkReadListenerImpl(uploadId)

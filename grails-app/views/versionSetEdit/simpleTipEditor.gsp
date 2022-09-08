@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Trust Profile - Create Simple</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Create Simple TIP</title>
     <style type="text/css">
 
 

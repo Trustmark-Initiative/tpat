@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Version Set Edit - Process File Upload</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Process File Upload</title>
     <style type="text/css">
 
 

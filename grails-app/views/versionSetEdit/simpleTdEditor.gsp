@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Trustmark Definition - Create Simple</title>
+    <title>${grailsApplication.config.tf.org.toolheader} | Create Simple TD</title>
     <style type="text/css">
 
 

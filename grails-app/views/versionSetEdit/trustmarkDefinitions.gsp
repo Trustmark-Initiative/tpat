@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Version Set Manage Trustmark Definitions</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Manage Trustmark Definitions</title>
         <style type="text/css">
 
         </style>
@@ -88,7 +88,7 @@
                                         ${td.name}, v${td.tdVersion}
                                     </div>
                                     <div class="text-muted" style="font-size: 80%;">
-                                        ${raw(td.description)}
+                                        <%= LinkHelper.linkifyText( raw(td.description)) %>
                                     </div>
                                 </td>
                                 <td style="width: 10%; text-align: center;">

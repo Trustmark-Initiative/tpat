@@ -4,6 +4,7 @@ import edu.gatech.gtri.trustmark.v1_0.model.Contact
 import edu.gatech.gtri.trustmark.v1_0.model.ContactKindCode
 import edu.gatech.gtri.trustmark.v1_0.model.Entity
 import grails.util.Environment
+import org.apache.commons.lang.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
@@ -75,19 +76,70 @@ class TFAMPropertiesHolder {
     }
 
     /**
-     * Returns the default configured {@link Entity} for this TFAM.
+     * Returns the TfamOwnerOrganization entity from DB {@link Entity}
      * <br/><br/>
      * @return
      */
     static TfamOwnerOrganization getDefaultEntity() {
+        Provider.withTransaction {
+            List<Provider> providers = Provider.findAll()
+            if (providers.isEmpty()){
+                log.error("No providers are available in the database")
+                return null
+            }
+            for (Provider p : providers) {
+                log.debug("Processing Provider: " + p)
+                if (p.getTd()) {
+                    TfamOwnerOrganization ownerOrganization = new TfamOwnerOrganization()
+                    ownerOrganization.setIdentifier(new URI(p.getUri()))
+                    ownerOrganization.setName(p.getName())
+                    final List<Contact> contacts = []
+                    Contact c = new ContactImpl()
+                    c.kind = ContactKindCode.PRIMARY
+                    if(StringUtils.isNotBlank(p.getEmail()))
+                        c.emails.add(p.getEmail())
+                    if(StringUtils.isNotBlank(p.getTelephone()))
+                        c.telephones.add(p.getTelephone())
+                    if(StringUtils.isNotBlank(p.getMailingAddress()))
+                        c.mailingAddresses.add(p.getMailingAddress())
+                    if(StringUtils.isNotBlank(p.getResponder()))
+                        c.responder = p.responder
+                    if(StringUtils.isNotBlank(p.getUri()))
+                        c.websiteURLs.add(new URL(p.getUri()))
+                    if(StringUtils.isNotBlank(p.getNotes()))
+                        c.notes = p.getNotes()
+                    contacts.add(c)
+                    ownerOrganization.setContacts(contacts)
+                    return ownerOrganization
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the TfamOwnerOrganization entity configured {@link Entity} for this TFAM from properties file
+     * <br/><br/>
+     * @return
+     */
+    static TfamOwnerOrganization getDefaultEntityFromProperties() {
         synchronized (log){
             if( defaultTfamOwnerOrganization )
                 return defaultTfamOwnerOrganization
 
+            TfamOwnerOrganization ownerOrganization = new TfamOwnerOrganization()
+
             final String fName = getString("org.name", "<DEFAULT ORG NAME NOT SET>")
+            ownerOrganization.setName(fName)
+
             final String fId = getString("org.identifier", "urn:error:missing")
-            final String fAbbr = getString("org.abbreviation", "")
-            final String fLogoPath = getString("org.logo.imagepath", "logo.png")
+            ownerOrganization.setIdentifier(new URI(fId))
+
+            //final String fAbbr = getString("org.abbreviation", "")
+//            ownerOrganization.setAbbreviation(fAbbr)
+
+            //final String fLogoPath = getString("org.logo.imagepath", "logo.png")
+//            ownerOrganization.setLogoImagePath(fLogoPath)
+
 
             final List<Contact> contacts = []
             if( getNumber("org.contact.count") != null ){
@@ -125,15 +177,11 @@ class TFAMPropertiesHolder {
                 }
             }
 
-            TfamOwnerOrganization ownerOrganization = new TfamOwnerOrganization()
-            ownerOrganization.setIdentifier(new URI(fId))
-            ownerOrganization.setName(fName)
-            ownerOrganization.setAbbreviation(fAbbr)
-            ownerOrganization.setLogoImagePath(fLogoPath)
             ownerOrganization.setContacts(contacts)
 
             defaultTfamOwnerOrganization = ownerOrganization
-            return defaultEntity
+            log.debug("Returning defaultTfamOwnerOrganization" + defaultTfamOwnerOrganization)
+            return defaultTfamOwnerOrganization
         }
     }
 
@@ -213,6 +261,7 @@ class TFAMPropertiesHolder {
         log.warn("Generating list of ProviderReferences");
         Provider.withTransaction {
             for (Provider p : Provider.findAll()) {
+                log.debug("Processing Provider: " + p)
                 if(p.getTp())
                     urlsList.add(new URL(p.getUri()))
             }

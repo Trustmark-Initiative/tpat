@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta name="layout" content="main"/>
-        <title>Keyword Index</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Keyword Index</title>
 
         <style type="text/css">
             .overallIndexLinkTable td {

@@ -2,7 +2,7 @@
     <head>
         <meta name="layout" content="main"/>
 
-        <title>Primary Trust Interoperability Profiles</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Primary TIPs</title>
 
 
         <style type="text/css">

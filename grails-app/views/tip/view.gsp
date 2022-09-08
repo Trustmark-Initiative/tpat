@@ -8,7 +8,7 @@
         --%>
         <base target="_blank"/>
         <meta name="layout" content="main"/>
-        <title>View TIP: ${tip.name}</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | TIP: ${tip.name}</title>
         <style type="text/css">
         </style>
 
@@ -66,7 +66,25 @@
             </g:if>
 
             <div style="margin-top: 1em;">
+                <div>
+                    <div>
+                        <div id="copyURLtoClipboard-status">
+                        </div>
+                    </div>
+                <div>
+            </div>
+
+            <div style="margin-top: 1em;">
                 <table class="table table-condensed table-bordered table-striped">
+                    <tr>
+                        <td style="width: 20%;"><abbr title="Unique Trust Interoperability Profile Identifier">Identifier</abbr></td>
+                        <td style="width: 80%;">
+                            ${tip.identifier.toString()}
+                            <a title="Copy TIP Identifier URL to clipboard" onclick="copyFunction('${tip.identifier}')">
+                                <span class="glyphicon glyphicon-copy"></span>
+                            </a>
+                        </td>
+                    </tr>
                     <tr>
                         <td style="width: 20%;"><abbr title="The date and time at which this Trust Interoperability Profile was published">Publication Date</abbr></td>
                         <td style="width: 80%;"><g:formatDate date="${tip.publicationDateTime}" format="yyyy-MM-dd" /></td>
@@ -266,6 +284,55 @@
                                     </table>
                                 </g:each>
                             </div>
+
+                        <g:if test="${tip.sources.size() > 0}">
+                            <div style="margin-top: 2em;">
+                                <h4 style="margin-bottom: 0;">Sources (${tip.sources.size()})</h4>
+                                <div>
+                                    <table class="table table-condensed table-bordered table-striped">
+                                    <g:each in="${tip.sources}" var="source">
+                                        <tr>
+                                            <td class="col-md-2">${source.identifier}</td>
+                                            <td><%= LinkHelper.linkifyText( raw(source.reference)) %></td>
+                                        </tr>
+                                    </g:each>
+                                    </table>
+                                </div>
+                            </div>
+                        </g:if>
+
+
+                        <g:if test="${tip.terms.size() > 0}">
+                            <div style="margin-top: 2em;">
+                                <h4 style="margin-bottom: 0;">Terms (${tip.terms.size()})</h4>
+                                <div>
+                                    <table class="table table-condensed table-bordered table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>Term Name</th>
+                                            <th>Abbreviations</th>
+                                            <th>Definition</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <g:each in="${tip.termsSorted}" var="term">
+                                            <tr>
+                                                <td style="width: 20%;">${term.name}</td>
+                                                <td style="text-align: center; width: 10%;">
+                                                    <g:each in="${term.abbreviations}" status="index" var="abbr">
+                                                        ${abbr}<g:if test="${index < (term.abbreviations.size() - 1)}">, </g:if>
+                                                    </g:each>
+                                                </td>
+                                                <td><%= LinkHelper.linkifyText( raw(term.definition)) %></td>
+                                            </tr>
+                                        </g:each>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </g:if>
+
                         </div>
                     </div>
                 </div>

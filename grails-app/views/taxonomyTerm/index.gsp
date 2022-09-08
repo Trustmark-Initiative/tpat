@@ -4,7 +4,7 @@
     <head>
         <meta name="layout" content="main"/>
 
-        <title>Taxonomy Terms</title>
+        <title>${grailsApplication.config.tf.org.toolheader} | Taxonomy Terms</title>
 
         <style type="text/css">
         </style>
