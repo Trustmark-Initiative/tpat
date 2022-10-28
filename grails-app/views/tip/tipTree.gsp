@@ -1,10 +1,9 @@
+<%@ page import="tmf.host.util.LinkHelper" %>
+<!doctype html>
 <html>
     <head>
         <meta name="layout" content="main"/>
-
         <title>${grailsApplication.config.tf.org.toolheader} | Primary TIPs</title>
-
-
         <style type="text/css">
             .xmlLink {
                 text-align: center;
@@ -28,7 +27,14 @@
             <div>
                 This page displays a list of primary trust interoperability profiles (TIPs) that have been created on this system.
             </div>
-
+            <div style="margin-top: 1em;">
+                <div>
+                    <div>
+                        <div id="copyURLtoClipboard-status">
+                        </div>
+                    </div>
+                <div>
+            </div>
             <div id="topLevelTipsContainer" style="margin-top: 2em;">
                 <table class="table table-striped table-condensed table-bordered">
                     <thead>
