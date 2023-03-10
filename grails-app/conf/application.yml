@@ -98,19 +98,10 @@ dataSource:
     jmxExport: true
 #    driverClassName: net.sf.log4jdbc.DriverSpy
     driverClassName: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://aapc_mysql_host:3306/tfam_dev?verifyServerCertificate=false&useSSL=false&allowPublicKeyRetrieval=true
-#   TPAT For TAT DB Settings
-#    url: jdbc:mysql://tpatfortatDatabase:3306/tpat_db
-#    username: tpat_user
-#    password: tpat_pw_11
 #   Prod Settings
-#    url: jdbc:mysql://tpatDatabase:3306/tpat_db
-#    username: tpat_user
-#    password: tpat_pw_11
-#   Normal Dev DB Settings
-    url: jdbc:mysql://tpat_database:3306/tfam_dev
-    username: tfam
-    password: tfam_11
+    url: jdbc:mysql://tpatDatabase:3306/tpat_db
+    username: tpat_user
+    password: tpat_pw_11
     dialect: tmf.host.util.CustomMysqlDialect
     properties: 
       testWhileIdle: true
