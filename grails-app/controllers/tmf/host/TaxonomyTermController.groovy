@@ -6,13 +6,13 @@ import edu.gatech.gtri.trustmark.v1_0.service.RemoteTaxonomyTerm
 import edu.gatech.gtri.trustmark.v1_0.service.TrustmarkFrameworkService
 import edu.gatech.gtri.trustmark.v1_0.service.TrustmarkFrameworkServiceFactory
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.security.access.prepost.PreAuthorize
 import tmf.host.util.TFAMPropertiesHolder
 
 /**
  * Created by brad on 4/27/17.
  */
-@Secured("ROLE_ADMIN")
+@PreAuthorize('hasAuthority("tpat-admin")')
 class TaxonomyTermController {
 
     static def scaffold = TaxonomyTerm.class

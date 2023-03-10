@@ -6,8 +6,8 @@ import edu.gatech.gtri.trustmark.v1_0.service.RemoteStatus
 import edu.gatech.gtri.trustmark.v1_0.service.RemoteTrustInteroperabilityProfile
 import edu.gatech.gtri.trustmark.v1_0.service.RemoteTrustmarkDefinition
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import org.apache.commons.lang.StringUtils
+import org.springframework.security.access.prepost.PreAuthorize
 import tmf.host.util.RemoteSearchRunnable
 
 import javax.servlet.ServletException
@@ -145,7 +145,7 @@ class SearchController {
     }//end index()
 
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def rebuildIndex(){
         log.info("Rebuilding indexes...")
 

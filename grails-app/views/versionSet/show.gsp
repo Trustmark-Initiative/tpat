@@ -1,3 +1,4 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!doctype html>
 <html>
     <head>
@@ -428,10 +429,10 @@
                     </g:elseif>
                 </g:if>
                 <g:else>
-                    <sec:ifAllGranted roles="ROLE_ADMIN">
+                    <sec:authorize access="hasAuthority('tpat-admin')">
                         <a href="javascript:rebuildReferenceGraph();" id="rebuildReferenceGraphButton" class="btn btn-default">Rebuild References</a>
                         %{--<a href="javascript:buildKeywords();" id="buildKeywordsButton" class="btn btn-default">Build TIP Keywords</a>--}%
-                    </sec:ifAllGranted>
+                    </sec:authorize>
                 </g:else>
             </div>
             <div id="feedbackWindow">&nbsp;</div>
@@ -530,13 +531,13 @@
                     </div>
                 </div>
             </div>
-            <sec:ifAllGranted roles="ROLE_ADMIN">
+            <sec:authorize access="hasAuthority('tpat-admin')">
 %{--
                 <div>
                     <a href="${createLink(controller:'tip', action: 'listPrimary')}" class="btn btn-default">Edit Primary Tips</a>
                 </div>
 --}%
-            </sec:ifAllGranted>
+            </sec:authorize>
 
 
         </div>

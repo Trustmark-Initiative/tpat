@@ -1,3 +1,4 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!doctype html>
 <html>
     <head>
@@ -23,9 +24,9 @@
                         <input type="text" class="form-control" id="q" placeholder="Query String..." style="width: 40em;" />
                     </div>
                     <a id="searchButton" class="btn btn-default" href="javascript:performSearch();">Search</a>
-                    <sec:ifAllGranted roles="ROLE_ORG_ADMIN">
+                    <sec:authorize access="hasAuthority('tpat-admin')">
                         <a class="btn btn-warning" href="javascript:rebuildIndex();">Rebuild Index</a>
-                    </sec:ifAllGranted>
+                    </sec:authorize>
                 </form>
             </div>
             <hr />
@@ -76,7 +77,7 @@
 
             }
 
-            <sec:ifAllGranted roles="ROLE_ORG_ADMIN">
+            <sec:authorize access="hasAuthority('tpat-admin')">
                 function rebuildIndex(){
                     $('#tdResultsContainer').html('${raw(asset.image(src: 'spinner.gif'))} Rebuilding Index...');
                     $('#tipResultsContainer').html('');
@@ -98,7 +99,7 @@
                     })
 
                 }
-            </sec:ifAllGranted>
+            </sec:authorize>
 
             jQuery(function () { jQuery('#q').focus(); });
 

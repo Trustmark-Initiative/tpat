@@ -1,6 +1,6 @@
 package tmf.host
 
-import grails.plugin.springsecurity.annotation.Secured
+import org.springframework.security.access.prepost.PreAuthorize
 
 /**
  * A controller for handling system variables directly.
@@ -8,7 +8,7 @@ import grails.plugin.springsecurity.annotation.Secured
  * @author brad
  * @date 3/3/17
  */
-@Secured("ROLE_ADMIN")
+@PreAuthorize('hasAuthority("tpat-admin")')
 class SystemVariableController {
 
     def index(){

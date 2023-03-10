@@ -29,8 +29,6 @@ class BootStrap {
         log.info("Files Directory: @|green ${filesDirectory}|@")
         SystemVariable.storeProperty(SystemVariable.FILES_DIRECTORY, filesDirectory)
 
-        checkSecurityInit()
-
         log.info("Rebuilding search index...")
         VersionSetTDLink.withTransaction {
             SessionFactory sessionFactory = grailsApplication.mainContext.sessionFactory
@@ -89,88 +87,6 @@ class BootStrap {
         info.append("    |         Contact Email: [@|yellow ${ownerOrganization.getDefaultContact()?.getDefaultEmail()}|@]\n")
         info.append("    --------------------------------------------------------------------------------------------------------------------\n\n")
         return info.toString()
-    }
-
-    private void checkSecurityInit() {
-        Role.withTransaction {
-            log.debug "Checking security..."
-            List<Role> roles = Role.findAll()
-            if (roles.size() == 0) {
-                log.info "Creating security roles..."
-                log.debug("Adding role[@|cyan ${Role.ROLE_ADMIN}|@]...")
-                new Role(authority: Role.ROLE_ADMIN).save(failOnError: true)
-                log.debug("Adding role[@|cyan ${Role.ROLE_ORG_ADMIN}|@]...")
-                new Role(authority: Role.ROLE_ORG_ADMIN).save(failOnError: true)
-                log.debug("Adding role[@|cyan ${Role.ROLE_DEVELOPER}|@]...")
-                new Role(authority: Role.ROLE_DEVELOPER).save(failOnError: true)
-                log.debug("Adding role[@|cyan ${Role.ROLE_REVIEWER}|@]...")
-                new Role(authority: Role.ROLE_REVIEWER).save(failOnError: true)
-            } else {
-                log.debug "Successfully found @|green ${roles.size()}|@ roles."
-            }
-        }
-
-        if (User.count() == 0) {
-            log.info "Creating default users..."
-            User.withTransaction {
-                createSingleUser()
-            }
-        } else {
-            log.debug("Found @|green ${User.count()}|@ users in the database already.")
-        }
-    }
-
-
-    private void createSingleUser() {
-            User user = new User(
-                    username: grailsApplication.config.tf.org.user,
-                    password: grailsApplication.config.tf.org.pswd,
-                    name: grailsApplication.config.tf.org.username,
-                    accountExpired: false,
-                    accountLocked: false,
-                    passwordExpired: false
-            )
-            user.save(failOnError: true)
-
-            String rolesForThisUser = "ROLE_ADMIN, ROLE_ORG_ADMIN, ROLE_DEVELOPER, ROLE_REVIEWER"
-
-            for (String roleName : rolesForThisUser.split(Pattern.quote(","))) {
-                roleName = roleName.trim()
-                Role role = Role.findByAuthority(roleName)
-                UserRole.create(user, role, true)
-            }
-
-            log.debug "Successfully created user: @|cyan " + user.name + "|@ <@|magenta " + user.username + "|@>"
-    }
-
-    private void createDefaultUsers() {
-        ResourceBundle defaultUserBundle = ResourceBundle.getBundle("defaultAccounts")
-        if (defaultUserBundle == null)
-            throw new UnsupportedOperationException("Cannot read users from defaultAccounts.properties")
-
-        Integer userCount = Integer.parseInt(defaultUserBundle.getString("user.count"))
-        for (int i = 0; i < userCount; i++) {
-            int userKey = i + 1
-
-            User user = new User(
-                    username: defaultUserBundle.getString("user." + userKey + ".username"),
-                    password: defaultUserBundle.getString("user." + userKey + ".password"),
-                    name: defaultUserBundle.getString("user." + userKey + ".name"),
-                    accountExpired: false,
-                    accountLocked: false,
-                    passwordExpired: false
-            )
-            user.save(failOnError: true)
-
-            String rolesForThisUser = defaultUserBundle.getString("user." + userKey + ".roles")
-            for (String roleName : rolesForThisUser.split(Pattern.quote(","))) {
-                roleName = roleName.trim()
-                Role role = Role.findByAuthority(roleName)
-                UserRole.create(user, role, true)
-            }
-            log.debug "Successfully created user: @|cyan " + user.name + "|@ <@|magenta " + user.username + "|@>"
-        }
-
     }
 
     private void addDefaultProperties()  {

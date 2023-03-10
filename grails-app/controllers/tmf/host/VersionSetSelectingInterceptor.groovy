@@ -1,7 +1,9 @@
 package tmf.host
 
-import grails.plugin.springsecurity.SpringSecurityService
 import org.apache.commons.lang.StringUtils
+import org.grails.gsp.jsp.JspTagImpl
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 
 /**
  * On all incoming requests, asserts that a Version Set name is set in the appropriate session parameter.
@@ -14,7 +16,7 @@ class VersionSetSelectingInterceptor implements Interceptor {
     public static final String VERSION_SET_NAME_ATTRIBUTE = VersionSetSelectingInterceptor.class.name + ".VERSION_SET_NAME";
     public static final String VERSION_SET_NAME_PARAM = "VERSION_SET_NAME";
 
-    SpringSecurityService springSecurityService;
+    UserService userService
 
     int order = HIGHEST_PRECEDENCE - 10; // Called directly after the Url Printer.
 
@@ -28,6 +30,8 @@ class VersionSetSelectingInterceptor implements Interceptor {
      */
 
     boolean before() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName()
+
         def session = request.getSession(true) // Force create a session
         if( session.getAttribute(VERSION_SET_NAME_ATTRIBUTE) != null && StringUtils.isBlank(params[VERSION_SET_NAME_PARAM]) ) {
             log.debug("Skipping VersionSetSelectingInterceptor[session=@|green ${session.getAttribute(VERSION_SET_NAME_ATTRIBUTE)}|@] [params[${VERSION_SET_NAME_PARAM}]=@|yellow ${params[VERSION_SET_NAME_PARAM]}|@]...")
@@ -45,9 +49,9 @@ class VersionSetSelectingInterceptor implements Interceptor {
                 }
             }
 
-            if (vs && (vs.production || (!vs.production && springSecurityService.isLoggedIn()))) {
+            if (vs && (vs.production || (!vs.production && userService.isLoggedIn()))) {
                 // For now, just having any account means you can set the version set.
-                log.debug("User[@|cyan ${springSecurityService.currentUser?.username}|@] is switching to version set @|green ${vs.name}|@...")
+                log.debug("User[@|cyan ${username}|@] is switching to version set @|green ${vs.name}|@...")
                 session.setAttribute(VERSION_SET_NAME_ATTRIBUTE, vs.name)
             } else if (vs) {
                 log.warn("IP address @|red ${request.remoteAddr}|@ is requesting VersionSet @|yellow ${vs?.name}|@, but they do not have a current session!  Ignoring this request.")

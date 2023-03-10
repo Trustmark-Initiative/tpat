@@ -7,9 +7,9 @@ import edu.gatech.gtri.trustmark.v1_0.model.AbstractTIPReference
 import edu.gatech.gtri.trustmark.v1_0.model.TrustmarkFrameworkIdentifiedObject
 import edu.gatech.gtri.trustmark.v1_0.util.TipTreeNode
 import edu.gatech.gtri.trustmark.v1_0.util.TrustInteroperabilityProfileUtils
-import grails.plugin.springsecurity.annotation.Secured
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringUtils
+import org.springframework.security.access.prepost.PreAuthorize
 import tmf.host.util.LinkHelper
 
 import javax.servlet.ServletException
@@ -119,7 +119,7 @@ class TipController extends AbstractTFObjectAwareController {
 
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def listPrimary() {
         log.info("Displaying all Primary TIPs...")
         VersionSet vs = VersionSet.findByName(session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE))
@@ -141,7 +141,7 @@ class TipController extends AbstractTFObjectAwareController {
     /**
      * Makes a TIP primary in the current version set.
      */
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def modifyPrimary() {
         log.info("Modifying primary TIP...")
         VersionSet vs = VersionSet.findByName(session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE))

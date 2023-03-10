@@ -1,5 +1,5 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page import="tmf.host.VersionSetSelectingInterceptor" %>
-
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
@@ -24,13 +24,15 @@
                             <li><a target="_self" href="${createLink(controller:'tip', action: 'list')}">All TIPs</a></li>
                             <li><a target="_self" href="${createLink(controller:'keyword', action: 'list')}">Keywords</a></li>
                             <li><a target="_self" href="${createLink(controller:'tip', action: 'tipTree')}">Primary TIPs</a></li>
-                            <li><a target="_self" href="${createLink(controller:'downloadAll')}">Download All</a></li>
+                            <sec:authorize access="hasAuthority('tpat-admin')">
+                                <li><a target="_self" href="${createLink(controller:'downloadAll')}">Download All</a></li>
+                            </sec:authorize>
                         </g:if><g:else>
                             <li><a target="_self" href="#"><em>None</em></a></li>
                         </g:else>
                     </ul>
                 </li>
-                <sec:ifLoggedIn>
+                <sec:authorize access="isAuthenticated()">
                     <li class="dropdown">
                         <a target="_self" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Repositories<span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -40,36 +42,33 @@
                             </g:if>
                         </ul>
                     </li>
-                    <sec:ifAllGranted roles="ROLE_ADMIN">
+                    <sec:authorize access="hasAuthority('tpat-admin')">
                         <li class="dropdown">
                             <a target="_self" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administration <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a target="_self" href="${createLink(controller:'provider', action: 'list')}">Manage Organizations</a></li>
                                 <li><a target="_self" href="${createLink(controller:'appearance', action: 'tddefaults')}">Change TD Defaults</a></li>
                                 <li><a target="_self" href="${createLink(controller:'appearance', action: 'tipdefaults')}">Change TIP Defaults</a></li>
-                                <li><a target="_self" href="${createLink(controller:'chpasswd', action: 'index')}">Change Password</a></li>
                                 <%--<li><a target="_self" href="${createLink(controller:'taxonomyTerm', action: 'index')}">Taxonomy</a></li>--%>
                                 <%--<li><a target="_self" href="${createLink(controller:'systemVariable')}">System Variables</a></li>--%>
                                 <li><a target="_self" href="${createLink(controller: 'email', action: 'settings')}">Email</a></li>
                             </ul>
                         </li>
-                    </sec:ifAllGranted>
-                </sec:ifLoggedIn>
+                    </sec:authorize>
+                </sec:authorize>
             %{--<li><a target="_self" href="#about">About</a></li>--}%
             %{--<li><a target="_self" href="#contact">Contact</a></li>--}%
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <sec:ifLoggedIn>
+                <sec:authorize access="isAuthenticated()">
                     <li>
                         <g:link controller="logout">Logout</g:link>
                     </li>
-                </sec:ifLoggedIn>
-                <sec:ifNotLoggedIn>
-                    <li>
-                        <g:link controller="login" action="auth">Login</g:link>
-                    </li>
-                </sec:ifNotLoggedIn>
+                </sec:authorize>
+                <sec:authorize access="!isAuthenticated()">
+                    <li class="nav-item"><a class="nav-link" href="oauth2/authorize-client/keycloak">Login</a></li>
+                </sec:authorize>
             </ul>
         </div><!--/.nav-collapse -->
     </div>

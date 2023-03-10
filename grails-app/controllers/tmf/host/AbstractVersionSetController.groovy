@@ -1,6 +1,5 @@
 package tmf.host
 
-import grails.plugin.springsecurity.SpringSecurityService
 import org.apache.commons.lang.StringUtils
 
 import javax.servlet.ServletException
@@ -11,8 +10,6 @@ import javax.servlet.ServletException
  * @date 11/22/16
  */
 abstract class AbstractVersionSetController {
-
-    SpringSecurityService springSecurityService
 
     /**
      * check if 2 dates come back with same date time, take the one lower on the list

@@ -1,10 +1,11 @@
 package tmf.host
 
 import grails.converters.JSON
-import grails.plugin.springsecurity.SpringSecurityService
-import grails.plugin.springsecurity.annotation.Secured
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.web.multipart.MultipartFile
 import tmf.host.util.TFAMPropertiesHolder
 
@@ -14,11 +15,10 @@ import java.nio.file.Paths
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 
-@Secured("ROLE_ADMIN")
+@PreAuthorize('hasAuthority("tpat-admin")')
 class AppearanceController {
 
-    SpringSecurityService springSecurityService
-    
+
     Resource resource
     Path bannerPath
 
@@ -40,7 +40,8 @@ class AppearanceController {
     }
 
     def sysDefault() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         log.debug("User @|green ${user.username}|@ called systemDefault @|cyan -> ${params.name} ${params.value}")
 
         def status = [

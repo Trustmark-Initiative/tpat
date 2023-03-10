@@ -4,10 +4,11 @@ package tmf.host
 import grails.converters.JSON
 import grails.converters.XML
 import grails.gorm.transactions.Transactional
-import grails.plugin.springsecurity.SpringSecurityService
-import grails.plugin.springsecurity.annotation.Secured
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringUtils
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 
 import javax.servlet.ServletException
 import java.text.SimpleDateFormat
@@ -18,12 +19,11 @@ import java.text.SimpleDateFormat
  * @author brad
  * @date 11/21/16
  */
-@Secured("ROLE_ORG_ADMIN")
+@PreAuthorize('hasAuthority("tpat-admin")')
 @Transactional
 class VersionSetController extends AbstractVersionSetController {
 
     FileService fileService
-    SpringSecurityService springSecurityService
     CreateVersionSetService createVersionSetService
     RebuildReferencesService rebuildReferencesService
     TipKeywordsService tipKeywordsService
@@ -60,7 +60,7 @@ class VersionSetController extends AbstractVersionSetController {
         log.debug("Request to display VersionSet: @|cyan ${params.id}|@")
 
         VersionSet vs = resolveVersionSet(params.id)
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
 
         String vsName = session.getAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE)
         if( !vsName ){
@@ -91,7 +91,9 @@ class VersionSetController extends AbstractVersionSetController {
     def showCreating() {
         log.debug("Showing the creating page for VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
-        User user = springSecurityService.currentUser
+
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         [versionSet: vs, user: user]
     }
 
@@ -127,7 +129,9 @@ class VersionSetController extends AbstractVersionSetController {
     def unlock() {
         log.debug("Request to forcibly unlock VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
-        User user = springSecurityService.currentUser
+
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         if( vs.lockedBy == null )
             throw new ServletException("Can't unlock, this version set is not locked.")
 
@@ -159,7 +163,8 @@ class VersionSetController extends AbstractVersionSetController {
      * @return
      */
     def removeProduction()  {
-        log.info("Request to remove Development VersionSet ${params.id} and reset production by ${springSecurityService.currentUser}")
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        log.info("Request to remove Development VersionSet ${params.id} and reset production by ${user}")
 
         VersionSet vs = VersionSet.findByProduction(true);
 
@@ -175,7 +180,7 @@ class VersionSetController extends AbstractVersionSetController {
 
         if(vs != null)  {
             VersionSetLogEntry.create(vs.id, "CLEARED_PRODUCTION",
-                    "Cleared version set ${vs.name} and Production", [name: vs.name, userid: springSecurityService.currentUser.username])
+                    "Cleared version set ${vs.name} and Production", [name: vs.name, userid: user.username])
         }
 
         flash.message = "Successfully wiped Production and Development."
@@ -187,9 +192,9 @@ class VersionSetController extends AbstractVersionSetController {
      * @return
      */
     def resetDevelopment()  {
-        log.info("Request to remove VersionSet ${params.id} by ${springSecurityService.currentUser}")
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
 
-        User user = springSecurityService.currentUser
+        log.info("Request to remove VersionSet ${params.id} by ${user}")
 
         if( !createVersionSetService.setExecuting() ){
             log.error("Cannot create version set ${params.id}, because one is already being created!")
@@ -228,7 +233,7 @@ class VersionSetController extends AbstractVersionSetController {
         session.setAttribute(VersionSetSelectingInterceptor.VERSION_SET_NAME_ATTRIBUTE, devVs.name)
 
         VersionSetLogEntry.create(vs.id, "RESET_TO_PRODUCTION",
-                "Version set ${vs.name} reset to Production", [name: vs.name, userid: springSecurityService.currentUser.username])
+                "Version set ${vs.name} reset to Production", [name: vs.name, userid: user.username])
 
         flash.message = "Successfully reset Development."
         redirect(controller: 'versionSetEdit', action: 'index', id: devVs.name)
@@ -239,7 +244,9 @@ class VersionSetController extends AbstractVersionSetController {
      * and no longer be production.
      */
     def moveToProduction() {
-        log.info("Request to move VersionSet ${params.id} to production by ${springSecurityService.currentUser}")
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
+        log.info("Request to move VersionSet ${params.id} to production by ${user}")
 
         VersionSet vs = resolveVersionSet(params.id)
         boolean prodPredecessor = false
@@ -262,7 +269,7 @@ class VersionSetController extends AbstractVersionSetController {
 
                 VersionSetLogEntry.create(predecessor.id, "MARKED_LEGACY",
                         "Marked version set ${predecessor.name} as Legacy (no longer production)",
-                        [name: predecessor.name, userid: springSecurityService.currentUser.username])
+                        [name: predecessor.name, userid: user.username])
             }
 
             if(!prodPredecessor)  {     // the development set was not immediately preceded by the production set
@@ -270,7 +277,7 @@ class VersionSetController extends AbstractVersionSetController {
                 if(productionVS != null)  {
                     productionVS.production = false
                     productionVS.lockedDate = Calendar.getInstance().getTime()
-                    productionVS.lockedBy = springSecurityService.currentUser
+                    productionVS.lockedBy = user
                     productionVS.save(failOnError: true)
                 }
             }
@@ -278,13 +285,13 @@ class VersionSetController extends AbstractVersionSetController {
             vs.production = true
             vs.development = false
             vs.editable = false
-            vs.releasedBy = springSecurityService.currentUser
+            vs.releasedBy = user
             vs.releasedDate = Calendar.getInstance().getTime()
             vs.save(failOnError: true)
         }
 
         VersionSetLogEntry.create(vs.id, "MARKED_PRODUCTION",
-                "Marked version set ${vs.name} as Production", [name: vs.name, userid: springSecurityService.currentUser.username])
+                "Marked version set ${vs.name} as Production", [name: vs.name, userid: user.username])
 
         flash.message = "Successfully published to production."
 
@@ -304,7 +311,7 @@ class VersionSetController extends AbstractVersionSetController {
      * This action is called from the form shown on the create page.
      */
     def save() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
 
         CreateVersionSetCommand command = new CreateVersionSetCommand(name: generateNextVsName())
 
@@ -362,7 +369,7 @@ class VersionSetController extends AbstractVersionSetController {
      * create a new version set and copy tds and tips over from the passed in version set.
      */
     def copyVS(String vsName) {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
 
         CreateVersionSetCommand command = new CreateVersionSetCommand(name: generateNextVsName())
 
@@ -415,7 +422,8 @@ class VersionSetController extends AbstractVersionSetController {
      */
     def saveEmptyVersionSet(VersionSet predecessor, boolean noCopyTdsAndTips) {
         log.debug("saveEmptyVersionSet... ${predecessor.name}")
-        User user = springSecurityService.currentUser
+
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
 
         boolean productionVS = false
         if(predecessor != null)  {
@@ -460,7 +468,9 @@ class VersionSetController extends AbstractVersionSetController {
      * @return
      */
     def trustmarkDefinitions() {
-        User user = springSecurityService.currentUser
+
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id)
         log.info("Request to view TrustmarkDefinitions for VersionSet @|green ${vs.name}|@ to production by @|cyan ${user.username}|@...")
 
@@ -504,7 +514,8 @@ class VersionSetController extends AbstractVersionSetController {
     }
 
     def keywords() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id)
         log.info("Request to view Keywords for VersionSet @|green ${vs.name}|@ by @|cyan ${user.username}|@...")
 
@@ -554,7 +565,9 @@ class VersionSetController extends AbstractVersionSetController {
      * A method to show the current state of a TD relative to the VersionSet it is on.
      */
     def showTrustmarkDefinition(){
-        User user = springSecurityService.currentUser
+
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id)
         log.info("Request to show TrustmarkDefinition @|cyan ${params.tdName}|@ v@|cyan ${params.tdVersion}|@ for VersionSet @|green ${vs.name}|@ by @|cyan ${user.username}|@...")
 
@@ -579,7 +592,8 @@ class VersionSetController extends AbstractVersionSetController {
      * @return
      */
     def trustInteroperabilityProfiles() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id)
         log.info("Request to view trustInteroperabilityProfiles for VersionSet @|green ${vs.name}|@ to production by @|cyan ${user.username}|@...")
 
@@ -622,9 +636,10 @@ class VersionSetController extends AbstractVersionSetController {
 
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def rebuildReferences() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id)
         log.info("Request to rebuild references for VersionSet @|green ${vs.name}|@ by @|cyan ${user.username}|@...")
 
@@ -646,7 +661,7 @@ class VersionSetController extends AbstractVersionSetController {
         render response as JSON
     }//end rebuildReferences()
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def checkOnRebuildReferencesProcess() {
         String response = SystemVariable.quickFindPropertyValue(RebuildReferencesService.getStatusVariable())
         if( response == null || StringUtils.isBlank(response) ){
@@ -655,9 +670,10 @@ class VersionSetController extends AbstractVersionSetController {
         render(contentType: 'application/json', text: response)
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def buildKeywordForTips() {
-        User user = springSecurityService.currentUser;
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id);
         log.info("Request to build keywords for VersionSet @|green ${vs.name}|@ by @|cyan ${user.username}|@...")
 
@@ -676,7 +692,7 @@ class VersionSetController extends AbstractVersionSetController {
         render response as JSON
     }//end rebuildReferences()
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def checkOnBuildKeywordForTips() {
         String response = SystemVariable.quickFindPropertyValue(TipKeywordsService.getStatusVariable())
         if( response == null || StringUtils.isBlank(response) ){
@@ -690,7 +706,8 @@ class VersionSetController extends AbstractVersionSetController {
      * A method to show the current state of a TIP relative to the VersionSet it is on.
      */
     def showTrustInteroperabilityProfile(){
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         VersionSet vs = resolveVersionSet(params.id)
         log.info("Request to show TIP @|cyan ${params.tipName}|@ v@|cyan ${params.tipVersion}|@ for VersionSet @|green ${vs.name}|@ by @|cyan ${user.username}|@...")
 

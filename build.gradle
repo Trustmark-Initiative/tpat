@@ -19,7 +19,7 @@ buildscript {
     }
 }
 
-version "1.5.1"
+version "2.0-SNAPSHOT"
 group "tf.host"
 
 apply plugin:"eclipse"
@@ -57,7 +57,11 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     //provided "org.springframework.boot:spring-boot-starter-tomcat"
 
+    // TODO: this is needed to work out of docker
+//    implementation "org.springframework.boot:spring-boot-starter-tomcat"
+
     implementation "org.grails:grails-core"
+
     implementation "org.grails:grails-web-boot"
     implementation "org.grails:grails-logging"
     implementation "org.grails:grails-plugin-rest"
@@ -75,10 +79,22 @@ dependencies {
     implementation "org.grails.plugins:events"
     implementation "org.grails.plugins:gsp:4.0.0"
     implementation "org.grails.plugins:hibernate5"
-    implementation 'org.grails.plugins:spring-security-core:4.0.3'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+    implementation "org.springframework.security:spring-security-taglibs"
+
+
+    implementation 'org.grails:grails-web-jsp:5.2.1'
+    implementation 'javax.servlet:jstl:1.2'
+    implementation 'taglibs:standard:1.1.2'
+
+    runtimeOnly "javax.servlet.jsp:javax.servlet.jsp-api:2.3.3"
+
     implementation "org.grails.plugins:hibernate-search:2.4.0"
 
-    implementation "shared.views:tmf-shared-views:0.4"
+    implementation "edu.gatech.gtri.trustmark:tf-grails-shared-views:0.9.1" 
 
     runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:3.3.4"
     runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
@@ -98,9 +114,9 @@ dependencies {
     implementation 'org.grails.plugins:quartz:2.0.13' // For monitoring configuration directories periodically
     implementation 'org.quartz-scheduler:quartz:2.2.1'
 
-    implementation 'edu.gatech.gtri.trustmark:tf-api:1.4.39'
-    implementation 'edu.gatech.gtri.trustmark:tf-api-impl:1.4.63'
-    implementation 'edu.gatech.gtri.trustmark:tf-api-reactor:1.4.39'
+    implementation 'edu.gatech.gtri.trustmark:tf-api:1.4.44'
+    implementation 'edu.gatech.gtri.trustmark:tf-api-impl:1.4.70'
+    implementation 'edu.gatech.gtri.trustmark:tf-api-reactor:1.4.44'
     //implementation 'org.apache.logging.log4j:log4j-core:2.16.0' // required by tf-api-impl
     implementation(platform("org.apache.logging.log4j:log4j-bom:2.17.1"))
 

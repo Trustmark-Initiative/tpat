@@ -1,3 +1,4 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 
 <html lang="en">
@@ -1364,13 +1365,13 @@
 
     <tmpl:/templates/tipReferenceSearch buttonContainerId="tipReferenceButtons" onTipReferenceAddFunction="addTipReferences" hasTipReferenceFunction="hasTipReference" />
 
-    <sec:ifAllGranted roles="ROLE_ADMIN">
+    <sec:authorize access="hasAuthority('tpat-admin')">
         <div style="margin-top: 4em;">
             <a href="javascript:menuAutofillTestData()" class="btn btn-warning">Auto-Fill</a>
             <a onclick="menuFileDownloadJSON(); return false;" class="btn btn-warning">Show JSON</a>
         </div>
         <div id="jsonView">&nbsp;</div>
-    </sec:ifAllGranted>
+    </sec:authorize>
 
 
 </div><!-- /.container -->

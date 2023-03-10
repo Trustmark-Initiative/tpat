@@ -1,6 +1,5 @@
 package tmf.host
 
-import grails.plugin.springsecurity.SpringSecurityService
 import tmf.host.util.TFAMPropertiesHolder
 
 import javax.servlet.http.HttpServletRequest
@@ -13,8 +12,6 @@ import javax.servlet.http.HttpServletRequest
  * @date 12/14/16
  */
 class BaseUrlCheckInterceptor implements Interceptor {
-
-    SpringSecurityService springSecurityService;
 
     int order = HIGHEST_PRECEDENCE - 15; // Called directly after the Url Printer.
 

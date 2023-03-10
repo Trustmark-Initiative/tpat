@@ -5,7 +5,6 @@ import edu.gatech.gtri.trustmark.v1_0.TrustmarkFramework
 import edu.gatech.gtri.trustmark.v1_0.model.Contact
 import edu.gatech.gtri.trustmark.v1_0.model.Entity
 import grails.converters.XML
-import grails.plugin.springsecurity.SpringSecurityService
 import groovy.json.JsonOutput
 import org.apache.commons.lang.StringUtils
 import tmf.host.util.TFAMPropertiesHolder
@@ -18,7 +17,7 @@ import javax.servlet.ServletException
  */
 public class StatusController extends AbstractTFObjectAwareController {
 
-    SpringSecurityService springSecurityService;
+    UserService userService;
 
     /**
      * Provides an overall view of the server's status.
@@ -85,7 +84,7 @@ public class StatusController extends AbstractTFObjectAwareController {
         }
 
         def versionSets = [];
-        if( springSecurityService.isLoggedIn() ){
+        if( userService.isLoggedIn() ){
             log.debug("Listing available version sets...")
             for( VersionSet curVs : VersionSet.findAll() ){
                 Map json = curVs.toJson(false);
