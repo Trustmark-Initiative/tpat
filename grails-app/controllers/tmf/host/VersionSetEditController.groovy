@@ -5,15 +5,16 @@ import edu.gatech.gtri.trustmark.v1_0.io.*
 import edu.gatech.gtri.trustmark.v1_0.model.*
 import grails.converters.JSON
 import grails.converters.XML
-import grails.plugin.springsecurity.SpringSecurityService
-import grails.plugin.springsecurity.annotation.Secured
 import groovy.json.JsonOutput
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
 import org.json.JSONArray
 import org.json.JSONObject
-
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.validation.ObjectError
 import tmf.host.artifact_processing.ActionType
 import tmf.host.artifact_processing.ArtifactAction
@@ -32,12 +33,11 @@ import java.util.regex.Pattern
  * @user brad
  * @date 11/22/16
  */
-@Secured("ROLE_ORG_ADMIN")
+@PreAuthorize('hasAuthority("tpat-admin")')
 class VersionSetEditController extends AbstractVersionSetController {
     //==================================================================================================================
     // Services
     //==================================================================================================================
-    SpringSecurityService springSecurityService
     ProcessUploadService processUploadService
     ApplyChangesService applyChangesService
     FileService fileService
@@ -49,7 +49,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Puts the current version set under "edit".
      */
     def index() {
-        User user = (User) springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         log.debug("Request to edit contents of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -102,7 +103,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Called by ajax after a file is uploaded on the edit page to associate that file with the version set.
      */
     def assignFile() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ called assign file upload[id=@|cyan ${params.id}|@] to [@|magenta ${params.versionSetName}|@]...")
         VersionSet vs = resolveVersionSet(params.versionSetName)
 
@@ -138,7 +140,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Called when user clicks the "Process" button under the file upload control on the index page.
      */
     def processFileUpload() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ called process file upload[id=@|cyan ${params.id}|@]...")
         VersionSet vs = resolveVersionSet(params.versionSetName)
 
@@ -230,7 +233,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * to show the user exactly what options are available.
      */
     def chooseActionSummary() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ called process file upload[id=@|cyan ${params.id}|@]...")
         VersionSet vs = resolveVersionSet(params.versionSetName)
 
@@ -262,7 +266,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * @return
      */
     def cancelActionSummary() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ called cancel action summaryrocess file upload[id=@|cyan ${params.id}|@]...")
         VersionSet vs = VersionSet.findByDevelopment(true)
 
@@ -290,7 +295,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * associated with it.
      */
     def viewMemoryHtmlArtifact() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ viewing artifact for action[id=@|cyan ${params.id}|@]...")
         VersionSet vs = resolveVersionSet(params.versionSetName)
         if( !user.username.equalsIgnoreCase(vs.lockedBy?.username) ){
@@ -339,7 +345,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * associated with it.
      */
     def ignoreArtifactAction() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ ignoring action[id=@|cyan ${params.id}|@]...")
         VersionSet vs = resolveVersionSet(params.versionSetName)
         if( !user.username.equalsIgnoreCase(vs.lockedBy?.username) ){
@@ -407,7 +414,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * user interface.
      */
     def applyChanges() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         String uploadedJSONString = request.inputStream.text
         log.debug("User @|green ${user.username}|@ called apply changes to file upload [id=@|cyan ${params.id}|@]: \n"+uploadedJSONString)
         VersionSet vs = resolveVersionSet(params.versionSetName)
@@ -473,7 +481,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * page.
      */
     def applyChangesView() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("User @|green ${user.username}|@ called view apply changes for file upload[id=@|cyan ${params.id}|@]...")
         VersionSet vs = resolveVersionSet(params.versionSetName)
 
@@ -529,7 +538,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Allows you to edit the trustmark definitions for this verison set.
      */
     def trustmarkDefinitions() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("Request to manage TrustmarkDefinitions of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -566,7 +576,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * double check.
      */
     def deleteTrustmarkDefinition() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+        
         log.debug("Request to manage TrustmarkDefinitions of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -605,7 +616,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * @deprecated
      */
     def createTrustmarkDefinitionComplete() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.info("Request to create complete TrustmarkDefinition on VersionSet: @|cyan ${params.id}|@")
         return render(view: 'deprecatedEditor')  // SHORT CIRCUIT this page to prevent editing TI-1806
 
@@ -637,7 +648,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * @deprecated
      */
     def editTrustmarkDefinition() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to edit TrustmarkDefinition ${params.linkId} of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -667,7 +678,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Save the trustmark definition
      */
     def saveTrustmarkDefinition(){
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to save TrustmarkDefinition ${params.linkId} of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -773,7 +784,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      */
     @Secured("@tfamSecurity.hasLock(authentication, request)")
     def simpleTdEditor() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.info("Request to create simple TrustmarkDefinition on VersionSet: @|cyan ${params.id}|@")
 
         return render(view: 'deprecatedEditor')  // SHORT CIRCUIT this page to prevent editing TI-1806
@@ -795,7 +806,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Processes the simpleTdEditor form.
      */
     def saveSimpleTd(SimpleTrustmarkDefinitionCommand command) {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.info("Request to save simple TrustmarkDefinition on VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -859,7 +870,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Allows you to edit the TIPs for this verison set.
      */
     def trustInteroperabilityProfiles() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to manage TIPs of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -908,7 +919,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * double check.
      */
     def deleteTIP() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to delete TIP @|yellow ${params.linkId}|@ from VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -937,7 +948,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Marks a TIP as primary or not.  Note that tip/listPrimary has similar functionality (after release)
      */
     def toggleTIPPrimary() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to toggle primary for TIP @|yellow ${params.linkId}|@ from VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -981,7 +992,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Displays the Trustmark Definition edit page, with the given trustmark definition.
      */
     def createTrustInteroperabilityProfile() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.info("Request to create complete TIP on VersionSet: @|cyan ${params.id}|@")
         return render(view: 'deprecatedEditor')  // SHORT CIRCUIT this page to prevent editing TI-1806
 
@@ -1020,7 +1031,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Displays the TrustInteroperabilityProfile edit page, with the given TrustInteroperabilityProfile.
      */
     def editTrustInteroperabilityProfile() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to edit TrustInteroperabilityProfile ${params.linkId} of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -1060,7 +1071,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Called to save a TIP.
      */
     def saveTrustInteroperabilityProfile() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.debug("Request to save TrustInteroperabilityProfile ${params.linkId} of VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )
@@ -1165,7 +1176,8 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Displays the "Simple" TIP edit page.
      */
     def simpleTipEditor() {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
+
         log.info("Request to create simple Trust Profile on VersionSet: @|cyan ${params.id}|@")
         return render(view: 'deprecatedEditor')  // SHORT CIRCUIT this page to prevent editing TI-1806
 
@@ -1203,7 +1215,7 @@ class VersionSetEditController extends AbstractVersionSetController {
      * Called to save a simple TIP.
      */
     def saveSimpleTip(SimpleTrustProfileCommand command) {
-        User user = springSecurityService.currentUser
+        User user = User.findByUsername(((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName())
         log.info("Request to save simple Trust Profile on VersionSet: @|cyan ${params.id}|@")
         VersionSet vs = resolveVersionSet(params.id)
         if( vs.isProduction() || !vs.isEditable() )

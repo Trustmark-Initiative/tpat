@@ -1,8 +1,8 @@
 package tmf.host
 
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import org.apache.commons.io.FileUtils
+import org.springframework.security.access.prepost.PreAuthorize
 
 import javax.servlet.ServletException
 import java.text.SimpleDateFormat
@@ -18,7 +18,7 @@ class DownloadAllController {
 
     BuildAllZipService buildAllZipService;
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def index() {
         log.info("Displaying download all index page...");
         List<VersionSet> versionSets = VersionSet.findAll([sort: 'name']);

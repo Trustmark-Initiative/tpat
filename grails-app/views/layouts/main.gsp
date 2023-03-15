@@ -1,3 +1,4 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page import="tmf.host.VersionSetSelectingInterceptor" %>
 <!doctype html>
 <html lang="en" class="no-js">
@@ -24,6 +25,20 @@
                     <asset:image height="90em" src="${grailsApplication.config.tf.org.banner}" />
                 </div>
             </div>
+
+        %{--        Warning banner for users with no TPAT admin role. --}%
+            <sec:authorize access="isAuthenticated()">
+                <sec:authorize access="!hasAuthority('tpat-admin')">
+                    <div class="container pt-4" id="users-with-no-tbr-roles-warning-message">
+                        <div class="alert alert-warning d-flex " role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <div>
+                                You have no TPAT administrator role assigned. You must have the TPAT administrator role in order to use the TPAT. Contact your TPAT administrator for help.
+                            </div>
+                        </div>
+                    </div>
+                </sec:authorize>
+            </sec:authorize>
 
             <div>
                 <g:layoutBody/>

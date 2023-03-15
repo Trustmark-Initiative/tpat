@@ -1,9 +1,11 @@
 package tmf.host
 
 import grails.artefact.Interceptor
-import grails.plugin.springsecurity.SpringSecurityService
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
+import org.apache.commons.lang.StringUtils
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
@@ -13,7 +15,6 @@ class UrlPrinterInterceptor implements Interceptor {
 
     int order = HIGHEST_PRECEDENCE
 
-    SpringSecurityService springSecurityService;
 
     public UrlPrinterInterceptor(){
         matchAll()
@@ -36,10 +37,13 @@ class UrlPrinterInterceptor implements Interceptor {
 
     String getUsername() {
         try{
-            Object user = springSecurityService.currentUser;
-            if( !user )
+            String username = ((OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication()).getName()
+
+            if (StringUtils.isEmpty(username)) {
                 return "<null>";
-            return ((User) user).username;
+            }
+
+            return username;
         }catch(Throwable t){
             return "<error>";
         }

@@ -2,8 +2,6 @@ package tmf.host
 
 import edu.gatech.gtri.trustmark.v1_0.io.SessionResolver
 import grails.artefact.Interceptor
-import grails.plugin.springsecurity.SpringSecurityService
-import org.apache.commons.lang.StringUtils
 
 /**
  * If the user is logged in, this session sharing interceptor makes sure that any underlying TMF API Calls will share
@@ -14,7 +12,7 @@ import org.apache.commons.lang.StringUtils
  */
 class TmfApiSessionSharingInterceptor implements Interceptor {
 
-    SpringSecurityService springSecurityService;
+    UserService userService;
 
     int order = HIGHEST_PRECEDENCE - 20; // Called directly after the Url Printer.
 
@@ -27,7 +25,7 @@ class TmfApiSessionSharingInterceptor implements Interceptor {
      * ThreadLocal scope variable.
      */
     boolean before() {
-        if( springSecurityService.isLoggedIn() ){
+        if( userService.isLoggedIn() ){
             def session = request.getSession(true); // Force create a session
             SessionResolver.setSessionResolver(session.id);
         }

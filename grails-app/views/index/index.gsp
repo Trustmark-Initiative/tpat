@@ -1,3 +1,4 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!doctype html>
 <html>
     <head>
@@ -24,7 +25,7 @@
                     <div>
                         This system has no Trustmark Definition or Trust Interoperability Profile data to display.
 
-                        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_ORG_ADMIN,ROLE_DEVELOPER">
+                        <sec:authorize access="hasAuthority('tpat-admin')">
                             <div style="margin-top: 1em;">
                                 <g:if test="${tmf.host.VersionSet.count() == 0}">
                                     <g:link controller="versionSet" action="save" class="btn btn-primary">Get Started &raquo;</g:link>
@@ -35,33 +36,33 @@
                                     </g:link>
                                 </g:else>
                             </div>
-                        </sec:ifAnyGranted>
-                        <sec:ifNotLoggedIn>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
                             <div style="margin-top: 1em;">
-                                <g:link controller="login" class="btn btn-primary">Login to Create Data &raquo;</g:link>
+                                <a href="oauth2/authorize-client/keycloak" class="btn btn-primary">Login to Create Data &raquo;</a>
                             </div>
-                        </sec:ifNotLoggedIn>
+                        </sec:authorize>
                     </div>
                 </div>
             </g:if>
             <g:else>
-                <sec:ifLoggedIn>
-                <g:if test="${versionSet.production}">
-                    <div style="margin-top: 2em;" class="row">
-                        <div class="col-md-6"><h1>Production Repository</h1></div>
-                        <div class="col-md-6"></div>
-                    </div>
-                </g:if><g:else>
-                    <div style="margin-top: 2em;" class="row">
-                        <div class="col-md-6"><h1>Development Repository</h1>
-                            <g:link controller="versionSetEdit" action="index" id="${tmf.host.VersionSet.findByDevelopment(true).name}" class="btn btn-primary">
-                                Edit
-                            </g:link>
+                <sec:authorize access="isAuthenticated()">
+                    <g:if test="${versionSet.production}">
+                        <div style="margin-top: 2em;" class="row">
+                            <div class="col-md-6"><h1>Production Repository</h1></div>
+                            <div class="col-md-6"></div>
                         </div>
-                        <div class="col-md-6"></div>
-                    </div>
-                </g:else>
-                </sec:ifLoggedIn>
+                    </g:if><g:else>
+                        <div style="margin-top: 2em;" class="row">
+                            <div class="col-md-6"><h1>Development Repository</h1>
+                                <g:link controller="versionSetEdit" action="index" id="${tmf.host.VersionSet.findByDevelopment(true).name}" class="btn btn-primary">
+                                    Edit
+                                </g:link>
+                            </div>
+                            <div class="col-md-6"></div>
+                        </div>
+                    </g:else>
+                </sec:authorize>
                 <div style="margin-top: 2em;" class="row">
                 <div class="col-md-6">
                     <h2>Trustmark Definitions <small>(${tdCount ?: 0} Total)</small></h2>

@@ -74,6 +74,9 @@ grails:
                 scriptlets: html
                 taglib: none
                 staticparts: none
+
+    gsp:
+        tldScanPattern: classpath*:/META-INF/*.tld
 ---
 hibernate:
     cache:
@@ -82,7 +85,7 @@ hibernate:
         region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
     search:
         default:
-            indexBase: '/opt/tfam/lucene'
+            indexBase: '/opt/tpat/lucene'
             indexmanager: near-real-time
             directory_provider: filesystem
 
@@ -93,7 +96,9 @@ endpoints:
 dataSource:
     pooled: true
     jmxExport: true
+#    driverClassName: net.sf.log4jdbc.DriverSpy
     driverClassName: com.mysql.cj.jdbc.Driver
+#   Prod Settings
     url: jdbc:mysql://tpatDatabase:3306/tpat_db
     username: tpat_user
     password: tpat_pw_11
@@ -102,10 +107,10 @@ dataSource:
       testWhileIdle: true
       testOnBorrow: true
       autoReconnect: true
-      initialSize: 8
-      maxActive: 64
-      minIdle: 8
-      maxIdle: 16
+      initialSize: 5
+      maxActive: 8
+      minIdle: 5
+      maxIdle: 8
       validationInterval: 450
 
 environments:

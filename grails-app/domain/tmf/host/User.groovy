@@ -1,109 +1,69 @@
 package tmf.host
-import grails.plugin.springsecurity.SpringSecurityService
+
+import org.apache.commons.lang.StringUtils
+import org.gtri.fj.data.Option
+import org.json.JSONArray
+
+import static org.gtri.fj.data.Option.fromNull
 
 class User {
 
-    transient SpringSecurityService springSecurityService;
-
     String username
-    String password
-    String name
-    boolean enabled = true
-    boolean accountExpired
-    boolean accountLocked
-    boolean passwordExpired
-
-    static transients = ['springSecurityService']
+    String nameFamily
+    String nameGiven
+    String contactEmail
+    String roleArrayJson
 
     static constraints = {
         username blank: false, unique: true
-        name blank: false
-        password blank: false, password: true
+        nameFamily nullable: true, length: 1000
+        nameGiven nullable: true, length: 1000
+        contactEmail nullable: true, length: 1000
+        roleArrayJson nullable: true, length: 1000
     }
 
     static mapping = {
         table name: 'tfam_user'
-        password column: '`pass_hash`'
     }
 
 
-    public Boolean hasRole(Role role) {
-        return hasRole(role.getAuthority());
+    static final Option<User> findByUsernameHelper(final String username) {
+        fromNull(findByUsername(username))
     }
 
-    public Boolean hasRole(String roleName) {
-        Set<UserRole> roles = UserRole.findAllByUser(this);
-        boolean hasRole = false;
-        roles.each { UserRole role ->
-            if( role.role.authority == roleName )
-                hasRole = true;
+    User saveAndFlushHelper() {
+        User.withTransaction {
+            save(flush: true, failOnError: true)
         }
-        return hasRole;
     }
 
     public Boolean isAdmin() {
-        Set<UserRole> roles = UserRole.findAllByUser(this);
-        boolean hasRole = false;
-        roles.each { UserRole role ->
-            if( role.role.authority == Role.ROLE_ADMIN )
-                hasRole = true;
+
+        if (StringUtils.isNotEmpty(this.roleArrayJson)) {
+            JSONArray rolesJsonArray = new JSONArray(this.roleArrayJson);
+
+            return rolesJsonArray.toList()
+                    .stream()
+                    .filter(role -> Role.fromValue((String) role).isPresent())
+                    .map(role -> Role.fromValue((String) role).get())
+                    .anyMatch(role -> Role.ROLE_ADMIN == role)
         }
-        return hasRole;
+
+        return false
     }
-
-    public Boolean isReviewer() {
-        Set<UserRole> roles = UserRole.findAllByUser(this);
-        boolean hasRole = false;
-        roles.each { UserRole role ->
-            if( role.role.authority == Role.ROLE_REVIEWER )
-                hasRole = true;
-        }
-        return hasRole;
-    }
-
-    public Boolean isOrgAdmin() {
-        Set<UserRole> roles = UserRole.findAllByUser(this);
-        boolean hasRole = false;
-        roles.each { UserRole role ->
-            if( role.role.authority == Role.ROLE_ORG_ADMIN )
-                hasRole = true;
-        }
-        return hasRole;
-    }
-
-    public Boolean isDeveloper() {
-        Set<UserRole> roles = UserRole.findAllByUser(this);
-        boolean hasRole = false;
-        roles.each { UserRole role ->
-            if( role.role.authority == Role.ROLE_DEVELOPER )
-                hasRole = true;
-        }
-        return hasRole;
-    }
-
-
-
-    Set<Role> getAuthorities() {
-        UserRole.findAllByUser(this).collect { it.role } as Set
-    }
-
 
     public String toString() {
         return username;
     }
 
-
-
-
     public Map toJsonMap(boolean shallow = true) {
         def json = [
                 id: this.id,
                 username: this.username,
-                enabled: this.enabled,
-                admin: this.isAdmin(),
-                orgAdmin: this.isOrgAdmin(),
-                reviewer: this.isReviewer(),
-                developer: this.isDeveloper()
+                nameFamily: this.nameFamily,
+                nameGiven: this.nameGiven,
+                contactEmail: this.contactEmail,
+                admin: this.isAdmin()
         ]
         if( !shallow ){
             // TODO Create rest of data model...

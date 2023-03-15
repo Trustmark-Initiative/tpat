@@ -1,3 +1,4 @@
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!doctype html>
 <html>
     <head>
@@ -80,13 +81,13 @@
                 </g:else>
                 <div class="row">
                     <div class="col-md-5">
-                        <sec:ifAnyGranted roles="ROLE_ORG_ADMIN">
+                        <sec:authorize access="hasAuthority('tpat-admin')">
                             <g:link action="create" class="btn btn-primary">Add Organization</g:link>
                             <g:if test="${grails.util.Environment.current == grails.util.Environment.DEVELOPMENT}">
                                 <g:link action="stuffDatabase" class="btn btn-warning" onclick="return confirm('Really create data?');">Stuff Database</g:link>
                                 <g:link action="clearDatabase" class="btn btn-danger" onclick="return confirm('Really delete all provider data?');">Clear Database</g:link>
                             </g:if>
-                        </sec:ifAnyGranted>
+                        </sec:authorize>
                     </div>
                     <div class="col-md-7" style="text-align: right;">
                         <page:paginate total="${providerCount}" />

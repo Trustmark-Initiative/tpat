@@ -86,8 +86,6 @@ class UrlMappings {
         "/appearance/banner"(controller:'appearance', action: 'banner')
         "/appearance/title"(controller:'appearance', action: 'title')
 
-        "/chpasswd"(controller:'chpasswd', action: 'index')
-
         "500"(controller: 'errors', action: 'servletError')
         "404"(controller: 'errors', action: 'notFound')
 

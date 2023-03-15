@@ -7,7 +7,7 @@ If you are interested in trying out the TPAT, we recommmended that you deploy it
 
 ## How to Build
 
-1. Download and Install Java8.  Make sure javac -version is `javac 1.8.0_*`
+1. Download and Install Java11.  
 
 2. You must have a built copy of the https://github.com/Trustmark-Initiative/tmf-api available in your local Maven repository.
 

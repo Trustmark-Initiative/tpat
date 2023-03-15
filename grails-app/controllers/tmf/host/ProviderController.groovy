@@ -1,11 +1,12 @@
 package tmf.host
 
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
+
 import grails.util.Environment
 import org.apache.commons.lang.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.ObjectError
 
 import javax.servlet.ServletException
@@ -17,12 +18,12 @@ class ProviderController {
     //==================================================================================================================
     //  Web Methods
     //==================================================================================================================
-    @Secured("ROLE_DEVELOPER")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def index() {
         redirect(action: 'list')
     }//end index()
 
-    @Secured("ROLE_DEVELOPER")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def list(){
         log.info("Listing all providers...");
 
@@ -55,7 +56,7 @@ class ProviderController {
 
     }//end list()
 
-    @Secured("ROLE_DEVELOPER")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def show() {
         log.info("Request to display provider[${params.id}]...")
         if( StringUtils.isBlank(params.id) )
@@ -77,7 +78,7 @@ class ProviderController {
 
     }//end show()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def clearDatabase() {
         if( Environment.current == Environment.DEVELOPMENT ){
             log.warn("Removing all providers...");
@@ -92,7 +93,7 @@ class ProviderController {
         }
     }
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def stuffDatabase() {
         if( Environment.current == Environment.DEVELOPMENT ){
             log.info("Creating test providers...")
@@ -127,13 +128,13 @@ class ProviderController {
     }
 
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def create() {
         log.info("Displaying the create new provider form...")
         [command: new CreateProviderCommand()]
     }//end create()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def save(CreateProviderCommand command) {
         log.info("Processing CreateProviderCommand...")
         if( command.hasErrors() ){
@@ -163,7 +164,7 @@ class ProviderController {
         redirect(action: 'list')
     }//end save()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def edit() {
         log.info("Request to edit provider[${params.id}]...")
         if( StringUtils.isBlank(params.id) )
@@ -178,7 +179,7 @@ class ProviderController {
         [command: command]
     }//end edit()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def setTd() {
         log.info("Request to set TD provider[${params.id}]...")
         if( StringUtils.isBlank(params.id) )
@@ -205,7 +206,7 @@ class ProviderController {
         redirect(action: 'list')
     }//end edit()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def setTp() {
         log.info("Request to set TP provider[${params.id}]...")
         if( StringUtils.isBlank(params.id) )
@@ -229,7 +230,7 @@ class ProviderController {
         redirect(action: 'list')
     }//end edit()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def update(EditProviderCommand command) {
         log.info("Processing EditProviderCommand...")
         if( command.hasErrors() ){
@@ -265,7 +266,7 @@ class ProviderController {
 
     }//end update()
 
-    @Secured("ROLE_ORG_ADMIN")
+    @PreAuthorize('hasAuthority("tpat-admin")')
     def delete() {
         log.info("Request to delete provider[${params.id}]...")
         if( StringUtils.isBlank(params.id) )
