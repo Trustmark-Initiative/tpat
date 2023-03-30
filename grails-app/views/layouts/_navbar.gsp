@@ -67,7 +67,14 @@
                     </li>
                 </sec:authorize>
                 <sec:authorize access="!isAuthenticated()">
-                    <li class="nav-item"><a class="nav-link" href="oauth2/authorize-client/keycloak">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onClick="document.location.href=ensureTrailingSlash('${grailsApplication.config.tf.base.url}');">Login</a></li>
+                    <script type="text/javascript">
+                        function ensureTrailingSlash(url) {
+                            url += url.endsWith('/') ? '' : '/';
+                            url += 'oauth2/authorize-client/keycloak';
+                            return url
+                        }
+                    </script>
                 </sec:authorize>
             </ul>
         </div><!--/.nav-collapse -->
