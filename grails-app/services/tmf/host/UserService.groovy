@@ -15,7 +15,7 @@ public class UserService {
             final String nameFamily,
             final String nameGiven,
             final String contactEmail,
-            final List<String> roleList) {
+            final List<Role> roleList) {
 
         User.withTransaction {
             User user = User.findByUsernameHelper(username).orSome(new User());
@@ -24,7 +24,7 @@ public class UserService {
             user.setNameGiven(nameGiven);
             user.setContactEmail(contactEmail);
 
-            user.setRoleArrayJson(new JSONArray(roleList.toList()).toString());
+            user.setRoleArrayJson(new JSONArray(roleList.map(role -> role.getValue())).toString());
 
             user.saveAndFlushHelper();
         };

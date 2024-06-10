@@ -1,8 +1,14 @@
 package tmf.host.security;
 
+import edu.gatech.gtri.trustmark.grails.OidcLoginCustomizer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import tmf.host.Role;
 import tmf.host.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,14 +40,43 @@ import org.gtri.fj.data.List;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import tmf.host.util.TFAMPropertiesHolder;
 
+import static org.gtri.fj.data.Option.somes;
+
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    @Autowired
-    private ClientRegistrationRepository clientRegistrationRepository;
+    @Value("${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
+    private String clientId;
+
+    @Value("${spring.security.oauth2.client.registration.keycloak.redirect-uri}")
+    private String redirectUri;
+
+    @Value("${spring.security.oauth2.client.registration.keycloak.scope}")
+    private String scope;
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        ClientRegistration clientRegistration = ClientRegistration.withRegistrationId("keycloak")
+                .clientId(clientId)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri(redirectUri)
+                .scope(scope)
+                .authorizationUri(issuerUri + "/protocol/openid-connect/auth")
+                .tokenUri(issuerUri + "/protocol/openid-connect/token")
+                .userInfoUri(issuerUri + "/protocol/openid-connect/userinfo")
+                .userNameAttributeName("preferred_username")
+                .jwkSetUri(issuerUri + "/protocol/openid-connect/certs")
+                .clientName("Keycloak")
+                .build();
+
+        return new InMemoryClientRegistrationRepository(clientRegistration);
+    }
 
     @Bean
     UserService userService() {
@@ -69,47 +104,24 @@ public class SecurityConfig {
                         .antMatchers("/search/**").permitAll()
                         .antMatchers("/keywords/**").permitAll()
                         .anyRequest().authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint( userInfo -> userInfo
-                                .userAuthoritiesMapper(this.userAuthoritiesMapper())
-                                .userService( oauth2UserRequest -> {
 
-                                    final OAuth2User oAuth2User = oauth2UserService.loadUser(oauth2UserRequest);
-
-                                    java.util.List rolesList = oAuth2User.getAttribute(ROLES_CLAIM);
-
-                                    List roles = List.iterableList(rolesList);
-
-                                    final java.util.List<GrantedAuthority> grantedAuthorityJavaList = new ArrayList<>(oAuth2User.getAuthorities());
-                                    final List<GrantedAuthority> grantedAuthorityList = List.list(new ArrayList<>(grantedAuthorityJavaList));
-
-                                    final DefaultOAuth2User defaultOAuth2User = new DefaultOAuth2User(
-                                            grantedAuthorityList.toJavaList(),
-                                            oAuth2User.getAttributes(),
-                                            "preferred_username");
-
-                                    userService().insertOrUpdateHelper(
-                                            defaultOAuth2User.getName(),
-                                            (String) defaultOAuth2User.getAttributes().get("family_name"),
-                                            (String) defaultOAuth2User.getAttributes().get("given_name"),
-                                            (String) defaultOAuth2User.getAttributes().get("email"),
-                                            roles
-                                    );
-
-                                    return defaultOAuth2User;
-                                })
-
-                        )
-                        .loginPage("/") // landing page
-                        .authorizationEndpoint(authorization -> authorization
-                        .baseUri("/oauth2/authorize-client"))
-                        )
-                        .logout()
-                        .logoutUrl("/logout")
-                        .logoutSuccessHandler(oidcLogoutSuccessHandler())
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID");
+                .oauth2Login(new OidcLoginCustomizer(defaultOAuth2User -> {
+                    userService().insertOrUpdateHelper(
+                            defaultOAuth2User.getName(),
+                            (String)defaultOAuth2User.getAttributes().get("family_name"),
+                            (String)defaultOAuth2User.getAttributes().get("given_name"),
+                            (String)defaultOAuth2User.getAttributes().get("email"),
+                            somes(org.gtri.fj.data.List.iterableList(
+                                    defaultOAuth2User.getAuthorities()).map(
+                                    GrantedAuthority::getAuthority).map(
+                                    Role::fromValueOption)));
+                }, "/", "/oauth2/authorize-client"))
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessHandler(oidcLogoutSuccessHandler())
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .deleteCookies("JSESSIONID");
 
         return httpSecurity.build();
     }
@@ -118,11 +130,11 @@ public class SecurityConfig {
 
         OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =
                 new OidcClientInitiatedLogoutSuccessHandler(
-                        this.clientRegistrationRepository);
+                        this.clientRegistrationRepository());
 
         String redirectUrl = TFAMPropertiesHolder.getBaseUrlAsString();
 
-        oidcLogoutSuccessHandler.setPostLogoutRedirectUri(URI.create(redirectUrl));
+        oidcLogoutSuccessHandler.setPostLogoutRedirectUri(redirectUrl);
 
         return oidcLogoutSuccessHandler;
     }

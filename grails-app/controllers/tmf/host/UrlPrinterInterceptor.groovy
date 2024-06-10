@@ -120,23 +120,23 @@ class UrlPrinterInterceptor implements Interceptor {
         }
     }
 
-    Map cookieToJson(Cookie cookie){
-        Map json = [
+    Map<String, Object> cookieToJson(Cookie cookie){
+        Map<String, Object> json = [
                 name: cookie.name,
                 version: cookie.version,
                 value: cookie.value
-        ]
+        ] as Map<String, Object>
         if( cookie.comment != null )
             json.put("comment", cookie.comment);
 
         if( cookie.domain != null )
             json.put("domain", cookie.domain);
 
-        if( cookie.httpOnly == true )
-            json.put("httpOnly", cookie.httpOnly);
+        if(cookie.httpOnly)
+            json.put("httpOnly", (Boolean) cookie.httpOnly);
 
-        if( cookie.secure == true )
-            json.put("secure", cookie.secure);
+        if(cookie.secure)
+            json.put("secure", (Boolean) cookie.secure);
 
         if( cookie.maxAge > -1 )
             json.put("maxAge", cookie.maxAge);

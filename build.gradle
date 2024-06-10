@@ -10,16 +10,26 @@ buildscript {
         maven { url "https://repo.spring.io/plugins-snapshot" }
         maven { url "https://repo.spring.io/snapshot" }
         maven { url "https://repo.spring.io/milestone" }
+
+//        gradle versions plugin
+        gradlePluginPortal()
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsGradlePluginVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:$comBertramlabsPluginsAssetPipelineGradle"
         classpath "org.grails.plugins:hibernate5:${gormVersion}"
         classpath "org.grails.plugins:quartz:2.0.13"
+
+//        gradle versions plugin
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.51.0"
     }
 }
 
-version "2.0-SNAPSHOT"
+plugins {
+    id 'org.springframework.boot' version '2.7.18'
+}
+
+version "$tpatVersion"
 group "tf.host"
 
 apply plugin:"eclipse"
@@ -29,10 +39,30 @@ apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
 
+// gradle versions plugin
+apply plugin: "com.github.ben-manes.versions"
 
 ext {
     grailsVersion = project.grailsVersion
     gradleWrapperVersion = project.gradleWrapperVersion
+
+    // ICL Artifactory Metadata
+    artifactoryBaseUrl = 'https://artifactory.icl.gtri.org:443/artifactory/'
+    artifactoryTrustmarkMavenReleaseRepoUrl = "$artifactoryBaseUrl" + "trustmark-maven"
+    artifactoryExternalReleaseRepoUrl = "$artifactoryBaseUrl" + "external"
+    artifactoryProxiedReleaseRepoUrl = "$artifactoryBaseUrl" + "proxied"
+}
+
+
+// ICL Artifactory Credentials
+def iclArtifactoryUsername = System.getenv('ICL_ARTIFACTORY_USERNAME')
+if (!iclArtifactoryUsername?.trim()) {
+    iclArtifactoryUsername = project.properties['artifactoryUsername']
+}
+
+def iclArtifactoryPassword = System.getenv('ICL_ARTIFACTORY_PASSWORD')
+if (!iclArtifactoryPassword?.trim()) {
+    iclArtifactoryPassword = project.properties['artifactoryPassword']
 }
 
 repositories {
@@ -42,6 +72,33 @@ repositories {
     mavenCentral()
     maven { url "https://repository.jboss.org/nexus/content/repositories/thirdparty-releases" }
 //    maven { url "https://idcapture.bintray.com/plugins" }
+
+    maven {
+        name 'proxied'
+        url artifactoryProxiedReleaseRepoUrl
+        credentials {
+            username iclArtifactoryUsername
+            password iclArtifactoryPassword
+        }
+    }
+    maven {
+        name 'central'
+        url artifactoryTrustmarkMavenReleaseRepoUrl
+
+        credentials {
+            username = iclArtifactoryUsername
+            password = iclArtifactoryPassword
+        }
+    }
+    maven {
+        name 'icl-central'
+        url artifactoryExternalReleaseRepoUrl
+
+        credentials {
+            username = iclArtifactoryUsername
+            password = iclArtifactoryPassword
+        }
+    }
 }
 
 dependencyManagement {
@@ -55,12 +112,14 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-logging"
     implementation "org.springframework.boot:spring-boot-autoconfigure"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
-    //provided "org.springframework.boot:spring-boot-starter-tomcat"
 
     // TODO: this is needed to work out of docker
 //    implementation "org.springframework.boot:spring-boot-starter-tomcat"
 
-    implementation "org.grails:grails-core"
+    implementation( "org.grails:grails-core" ) {
+        exclude group: 'org.fusesource.jansi', module: 'jansi:1.18'
+    }
+    implementation group: 'org.fusesource.jansi', name: 'jansi', version: '2.4.1'
 
     implementation "org.grails:grails-web-boot"
     implementation "org.grails:grails-logging"
@@ -71,22 +130,22 @@ dependencies {
     implementation "org.grails:grails-plugin-url-mappings"
     implementation "org.grails:grails-plugin-interceptors"
     console "org.grails:grails-console"
-    profile "org.grails.profiles:web"
+    profile "org.grails.profiles:web:5.0.5"
 
     implementation "org.grails.plugins:cache"
     implementation "org.grails.plugins:async"
     implementation "org.grails.plugins:scaffolding"
     implementation "org.grails.plugins:events"
-    implementation "org.grails.plugins:gsp:4.0.0"
+    implementation "org.grails.plugins:gsp"
     implementation "org.grails.plugins:hibernate5"
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-    implementation "org.springframework.security:spring-security-taglibs"
+    implementation "org.springframework.security:spring-security-taglibs:5.8.12"
 
 
-    implementation 'org.grails:grails-web-jsp:5.2.1'
+    implementation 'org.grails:grails-web-jsp'
     implementation 'javax.servlet:jstl:1.2'
     implementation 'taglibs:standard:1.1.2'
 
@@ -94,69 +153,73 @@ dependencies {
 
     implementation "org.grails.plugins:hibernate-search:2.4.0"
 
-    implementation "edu.gatech.gtri.trustmark:tf-grails-shared-views:0.9.1" 
+    implementation "edu.gatech.gtri.trustmark:tf-grails-shared-views:0.9.5"
 
-    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:3.3.4"
-    runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:4.3.0"
+    runtimeOnly "javax.xml.bind:jaxb-api:2.4.0-b180830.0359"
 
-    implementation "org.hibernate:hibernate-core:5.5.7.Final"
-    implementation "org.hibernate:hibernate-ehcache:5.5.7.Final"
-    implementation "org.hibernate:hibernate-search-orm:5.11.10.Final"
-//    implementation "org.hibernate:hibernate-core:5.4.12.Final"
-//    implementation "org.hibernate:hibernate-ehcache:5.4.12.Final"
-//    implementation "org.hibernate:hibernate-search-orm:5.11.8.Final"
+    implementation "org.hibernate:hibernate-core:5.6.15.Final"
+    implementation "org.hibernate:hibernate-ehcache:5.6.15.Final"
+    implementation "org.hibernate:hibernate-search-orm:5.11.12.Final"
 
-    implementation "org.codehaus.groovy:groovy-ant:2.5.14"
-    implementation "org.codehaus.groovy:groovy-all:2.5.14"
+    implementation "org.codehaus.groovy:groovy-ant:3.0.21"
+    implementation "org.codehaus.groovy:groovy-all:3.0.21"
 
-    implementation 'org.grails.plugins:mail:2.0.0.RC6' // @see [https://repo.grails.org/grails/core/org/grails/plugins/mail] for any updates
+    implementation 'org.grails.plugins:mail:4.0.0' // @see [https://repo.grails.org/grails/core/org/grails/plugins/mail] for any updates
 
     implementation 'org.grails.plugins:quartz:2.0.13' // For monitoring configuration directories periodically
-    implementation 'org.quartz-scheduler:quartz:2.2.1'
+    implementation 'org.quartz-scheduler:quartz:2.3.2'
 
-    implementation 'edu.gatech.gtri.trustmark:tf-api:1.4.44'
-    implementation 'edu.gatech.gtri.trustmark:tf-api-impl:1.4.70'
-    implementation 'edu.gatech.gtri.trustmark:tf-api-reactor:1.4.44'
-    //implementation 'org.apache.logging.log4j:log4j-core:2.16.0' // required by tf-api-impl
-    implementation(platform("org.apache.logging.log4j:log4j-bom:2.17.1"))
+    implementation 'edu.gatech.gtri.trustmark:tf-api:1.4.46'
+    implementation 'edu.gatech.gtri.trustmark:tf-api-impl:1.4.74'
+    implementation 'edu.gatech.gtri.trustmark:tf-api-reactor:1.4.46'
+    implementation(platform("org.apache.logging.log4j:log4j-bom:2.23.1"))
 
-    implementation 'org.fusesource.jansi:jansi:1.17' // For colored command line output
-    implementation 'org.json:json:20180130'
+    implementation 'org.fusesource.jansi:jansi:2.4.1' // For colored command line output
+    implementation 'org.json:json:20240303'
     // For zip files.  @see http://stackoverflow.com/a/14656534
-    implementation 'net.lingala.zip4j:zip4j:1.3.2'
+    implementation 'net.lingala.zip4j:zip4j:1.3.3'
 
-    implementation 'commons-io:commons-io:2.7'
-    //implementation 'org.slf4j:log4j-over-slf4j'
+    implementation 'commons-io:commons-io:2.13.0'
 
-
-    implementation('org.apache.commons:commons-compress:1.16.1'){
+    implementation('org.apache.commons:commons-compress:1.26.1') {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
     }
 
-    implementation 'org.freemarker:freemarker:2.3.31'
+    implementation 'org.freemarker:freemarker:2.3.32'
 
-    testImplementation 'org.grails:grails-gorm-testing-support'
-    testImplementation 'org.grails:grails-web-testing-support'
-    testImplementation 'org.grails.plugins:geb:2.0.0.RC1'
+    testImplementation 'org.grails:grails-gorm-testing-support:3.2.2'
+    testImplementation 'org.grails:grails-web-testing-support:3.2.2'
+    testImplementation 'org.grails.plugins:geb:4.0.0'
 
-    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:2.35.1'
-    testImplementation 'org.seleniumhq.selenium:selenium-remote-driver:3.141.59'
-    testImplementation 'org.seleniumhq.selenium:selenium-api:3.141.59'
-    testImplementation 'org.seleniumhq.selenium:selenium-support:3.141.59'
-    testRuntimeOnly 'net.sourceforge.htmlunit:htmlunit:2.35.0'
-    testRuntimeOnly 'org.seleniumhq.selenium:selenium-firefox-driver:3.141.59'
-    testRuntimeOnly 'org.seleniumhq.selenium:selenium-chrome-driver:3.141.59'
+    testImplementation 'org.seleniumhq.selenium:htmlunit-driver:4.13.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-remote-driver:4.20.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-api:4.20.0'
+    testImplementation 'org.seleniumhq.selenium:selenium-support:4.20.0'
+    testRuntimeOnly 'net.sourceforge.htmlunit:htmlunit:2.70.0'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-firefox-driver:4.20.0'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-chrome-driver:4.20.0'
 
     runtimeOnly 'org.apache.poi:poi-ooxml:3.17'
 
-    runtimeOnly 'mysql:mysql-connector-java:8.0.20'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+}
 
-    //runtimeOnly 'org.lazyluke:log4jdbc-remix:0.2.7'
 
+
+tasks.withType(War).configureEach { War war ->
+    war.dependsOn compileGroovyPages
 }
 
 war {
-    baseName = "tfam"
+    enabled=true
+    baseName = "tpat"
+}
+
+bootWar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    enabled = true
+    dependsOn compileGroovyPages
 }
 
 bootRun {
@@ -191,4 +254,34 @@ assets {
 // copied from: http://nimavat.me/blog/grails3-add-custom-build-info-to-war
 buildProperties {
     inputs.property("info.app.buildDate", new Date().format('yyyy-MM-dd HH:mm:ss'))
+}
+
+apply plugin: "maven-publish"
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = "edu.gatech.gtri.trustmark"
+            artifactId = "tpat"
+            version = "$tpatVersion"
+
+            from components.web
+        }
+    }
+
+    repositories {
+        maven {
+            name 'central'
+            url artifactoryTrustmarkMavenReleaseRepoUrl
+
+            credentials {
+                username = iclArtifactoryUsername
+                password = iclArtifactoryPassword
+            }
+        }
+    }
+}
+
+assets {
+    packagePlugin = true
 }

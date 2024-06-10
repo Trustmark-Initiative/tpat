@@ -17,7 +17,88 @@ import tmf.host.VersionSetTIPLink
 import org.apache.commons.lang.StringUtils
 
 class BulkReadContextTpatImpl extends BulkReadContextImpl {
-    
+
+    /**
+     * Resolver class for finding a TrustInteroperabilityProfile based on a version set and an identifier.
+     * This class implements the VersionSetObjectNameResolver interface and is used to encapsulate the logic
+     * for retrieving trust interoperability profiles by their identifiers associated with a specific version set.
+     */
+    public class TipVersionSetByIdentifierResolver implements VersionSetObjectNameResolver {
+
+        /**
+         * Resolves a trust interoperability profile by its identifier within a given version set.
+         *
+         * @param vs the version set within which to search for the trust interoperability profile
+         * @param identifier the identifier of the trust interoperability profile to find
+         * @return the found trust interoperability profile or {@code null} if no profile matches the identifier
+         */
+        @Override
+        public Object resolve(VersionSet vs, String identifier) {
+            return VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, identifier)?.trustInteroperabilityProfile;
+        }
+    }
+
+    /**
+     * Resolver class for finding a TrustInteroperabilityProfile based on a version set and a name.
+     * This class implements the VersionSetObjectNameResolver interface and is used to encapsulate the logic for
+     * retrieving trust interoperability profiles by their names associated with a specific version set.
+     */
+    public class TipVersionSetByNameResolver implements VersionSetObjectNameResolver {
+
+        /**
+         * Resolves a trust interoperability profile by its name within a given version set.
+         *
+         * @param vs the version set within which to search for the trust interoperability profile
+         * @param name the name of the trust interoperability profile to find
+         * @return the found trust interoperability profile or {@code null} if no profile matches the name
+         */
+        @Override
+        public Object resolve(VersionSet vs, String name) {
+            return VersionSetTIPLink.findAllByVersionSet(vs)?.find { it?.trustInteroperabilityProfile?.name == name }?.trustInteroperabilityProfile;
+        }
+    }
+
+    /**
+     * Resolver class for finding a TrustmarkDefinition based on a version set and an identifier.
+     * This class implements the VersionSetObjectNameResolver interface and is used to encapsulate the logic
+     * for retrieving trustmark definitions by their identifiers associated with a specific version set.
+     */
+    public class TdVersionSetByIdentifierResolver implements VersionSetObjectNameResolver {
+
+        /**
+         * Resolves a trustmark definition by its identifier within a given version set.
+         *
+         * @param vs the version set within which to search for the trustmark definition
+         * @param identifier the identifier of the trustmark definition to find
+         * @return the found trustmark definition or {@code null} if no profile matches the identifier
+         */
+        @Override
+        public Object resolve(VersionSet vs, String identifier) {
+            return VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, identifier)?.trustmarkDefinition;
+        }
+    }
+
+    /**
+     * Resolver class for finding a TrustmarkDefinition based on a version set and a name.
+     * This class implements the VersionSetObjectNameResolver interface and is used to encapsulate the logic for
+     * retrieving trustmark definitions by their names associated with a specific version set.
+     */
+    public class TdVersionSetByNameResolver implements VersionSetObjectNameResolver {
+
+        /**
+         * Resolves a trustmark definition by its name within a given version set.
+         *
+         * @param vs the version set within which to search for the trustmark definition
+         * @param name the name of the trustmark definition to find
+         * @return the found trustmark definition or {@code null} if no trustmark definition matches the name
+         */
+        @Override
+        public Object resolve(VersionSet vs, String name) {
+            return VersionSetTDLink.findAllByVersionSet(vs)?.find{ it?.trustmarkDefinition?.name == name }?.trustmarkDefinition;
+        }
+    }
+
+
     private static final Logger log = LoggerFactory.getLogger(BulkReadContextTpatImpl.class)
 
     @Override
@@ -61,22 +142,23 @@ class BulkReadContextTpatImpl extends BulkReadContextImpl {
         return new URI(uriString);
     }
 
+
     @Override
     TrustmarkFrameworkIdentifiedObject resolveReferencedExternalTrustmarkDefinition(String tdReference) {
         log.debug("Resolving Referenced External TrustmarkDefinition {}", tdReference)
         if(BulkImportUtils.isValidUri(tdReference)) {
             return resolveReferencedExternalArtifact(
                     tdReference,
-                    { vs, id -> VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)?.trustmarkDefinition },
-                    { vs, name -> VersionSetTDLink.findAllByVersionSet(vs)?.find{ it?.trustmarkDefinition?.name == name }?.trustmarkDefinition },
+                    new TdVersionSetByIdentifierResolver(),
+                    new TdVersionSetByNameResolver(),
                     { tfs, ref -> tfs.getTrustmarkDefinitionByUrl(ref) }
             )
         }
         return resolveReferencedExternalArtifact(
-            tdReference,
-            { vs, id -> VersionSetTDLink.findByVersionSetAndTdIdentifier(vs, id)?.trustmarkDefinition },
-            { vs, name -> VersionSetTDLink.findAllByVersionSet(vs)?.find{ it?.trustmarkDefinition?.name == name }?.trustmarkDefinition },
-            { tfs, ref -> tfs.getTrustmarkDefinitionByName(ref) }
+                tdReference,
+                new TdVersionSetByIdentifierResolver(),
+                new TdVersionSetByNameResolver(),
+                { tfs, ref -> tfs.getTrustmarkDefinitionByName(ref) }
         )
     }
 
@@ -86,15 +168,15 @@ class BulkReadContextTpatImpl extends BulkReadContextImpl {
         if(BulkImportUtils.isValidUri(tipReference)) {
             return resolveReferencedExternalArtifact(
                     tipReference,
-                    { vs, id -> VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, id)?.trustInteroperabilityProfile },
-                    { vs, name -> VersionSetTIPLink.findAllByVersionSet(vs)?.find{ it?.trustInteroperabilityProfile?.name == name }?.trustInteroperabilityProfile },
+                    new TipVersionSetByIdentifierResolver(),
+                    new TipVersionSetByNameResolver(),
                     { tfs, ref -> tfs.getTrustInteroperabilityProfileByUrl(ref) }
             )
         }
         return resolveReferencedExternalArtifact(
             tipReference,
-            { vs, id -> VersionSetTIPLink.findByVersionSetAndTipIdentifier(vs, id)?.trustInteroperabilityProfile },
-            { vs, name -> VersionSetTIPLink.findAllByVersionSet(vs)?.find{ it?.trustInteroperabilityProfile?.name == name }?.trustInteroperabilityProfile },
+            new TipVersionSetByIdentifierResolver(),
+            new TipVersionSetByNameResolver(),
             { tfs, ref -> tfs.getTrustInteroperabilityProfileByName(ref) }
         )
     }
