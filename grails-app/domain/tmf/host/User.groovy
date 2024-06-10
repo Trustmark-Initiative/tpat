@@ -2,6 +2,7 @@ package tmf.host
 
 import org.apache.commons.lang.StringUtils
 import org.gtri.fj.data.Option
+import org.gtri.fj.function.Effect0
 import org.json.JSONArray
 
 import static org.gtri.fj.data.Option.fromNull
@@ -37,6 +38,10 @@ class User {
         }
     }
 
+    static final void withTransactionHelper(final Effect0 effect0) {
+        withTransaction({ return effect0.f() })
+    }
+    
     public Boolean isAdmin() {
 
         if (StringUtils.isNotEmpty(this.roleArrayJson)) {
