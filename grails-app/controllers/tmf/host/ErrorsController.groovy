@@ -39,7 +39,10 @@ class ErrorsController {
 
         log.info("Page Not Found: ${uri}");
         withFormat {
-            html {}
+            html {
+                log.debug("Rendering view: notFound")
+                render(view: 'notFound')
+            }
             json {
                 return render(contentType: 'application/json') {
                     [

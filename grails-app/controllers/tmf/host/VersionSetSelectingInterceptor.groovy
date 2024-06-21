@@ -2,6 +2,7 @@ package tmf.host
 
 import org.apache.commons.lang.StringUtils
 import org.grails.gsp.jsp.JspTagImpl
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 
@@ -30,7 +31,7 @@ class VersionSetSelectingInterceptor implements Interceptor {
      */
 
     boolean before() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName()
+        String username = getCurrentUsername()
 
         def session = request.getSession(true) // Force create a session
         if( session.getAttribute(VERSION_SET_NAME_ATTRIBUTE) != null && StringUtils.isBlank(params[VERSION_SET_NAME_PARAM]) ) {
@@ -87,5 +88,16 @@ class VersionSetSelectingInterceptor implements Interceptor {
     @Override
     boolean doInvoke() {
         return false
+    }
+
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication()
+        if (authentication != null) {
+            String username = authentication.getName()
+            if (username != null) {
+                return username
+            }
+        }
+        return "anonymous"  // or any default value you prefer
     }
 }

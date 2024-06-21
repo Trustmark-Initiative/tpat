@@ -24,7 +24,7 @@ class BaseUrlCheckInterceptor implements Interceptor {
      * ThreadLocal scope variable.
      */
     boolean before() {
-        if( controllerName.equalsIgnoreCase('errors') ){
+        if( !org.apache.commons.lang3.StringUtils.isEmpty(controllerName) && controllerName.equalsIgnoreCase('errors') ){
             return true; // We don't check this one.
         }
 
